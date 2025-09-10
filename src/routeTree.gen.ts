@@ -11,10 +11,11 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as LoginRouteImport } from './routes/login'
-import { Route as ClientsRouteImport } from './routes/clients'
+import { Route as ClientsRouteImport } from './routes/clients_'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as ClientsNewRouteImport } from './routes/clients/new'
-import { Route as ClientsClientIdRouteImport } from './routes/clients/$clientId'
+import { Route as ClientsIndexRouteImport } from './routes/clients_/index'
+import { Route as ClientsNewRouteImport } from './routes/clients_/new'
+import { Route as ClientsClientIdIndexRouteImport } from './routes/clients_/$clientId/index'
 
 const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',
@@ -27,7 +28,7 @@ const LoginRoute = LoginRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const ClientsRoute = ClientsRouteImport.update({
-  id: '/clients',
+  id: '/clients_',
   path: '/clients',
   getParentRoute: () => rootRouteImport,
 } as any)
@@ -36,14 +37,19 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ClientsIndexRoute = ClientsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ClientsRoute,
+} as any)
 const ClientsNewRoute = ClientsNewRouteImport.update({
   id: '/new',
   path: '/new',
   getParentRoute: () => ClientsRoute,
 } as any)
-const ClientsClientIdRoute = ClientsClientIdRouteImport.update({
-  id: '/$clientId',
-  path: '/$clientId',
+const ClientsClientIdIndexRoute = ClientsClientIdIndexRouteImport.update({
+  id: '/$clientId/',
+  path: '/$clientId/',
   getParentRoute: () => ClientsRoute,
 } as any)
 
@@ -52,25 +58,27 @@ export interface FileRoutesByFullPath {
   '/clients': typeof ClientsRouteWithChildren
   '/login': typeof LoginRoute
   '/profile': typeof ProfileRoute
-  '/clients/$clientId': typeof ClientsClientIdRoute
   '/clients/new': typeof ClientsNewRoute
+  '/clients/': typeof ClientsIndexRoute
+  '/clients/$clientId': typeof ClientsClientIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/clients': typeof ClientsRouteWithChildren
   '/login': typeof LoginRoute
   '/profile': typeof ProfileRoute
-  '/clients/$clientId': typeof ClientsClientIdRoute
   '/clients/new': typeof ClientsNewRoute
+  '/clients': typeof ClientsIndexRoute
+  '/clients/$clientId': typeof ClientsClientIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/clients': typeof ClientsRouteWithChildren
+  '/clients_': typeof ClientsRouteWithChildren
   '/login': typeof LoginRoute
   '/profile': typeof ProfileRoute
-  '/clients/$clientId': typeof ClientsClientIdRoute
-  '/clients/new': typeof ClientsNewRoute
+  '/clients_/new': typeof ClientsNewRoute
+  '/clients_/': typeof ClientsIndexRoute
+  '/clients_/$clientId/': typeof ClientsClientIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -79,24 +87,26 @@ export interface FileRouteTypes {
     | '/clients'
     | '/login'
     | '/profile'
-    | '/clients/$clientId'
     | '/clients/new'
+    | '/clients/'
+    | '/clients/$clientId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/clients'
     | '/login'
     | '/profile'
-    | '/clients/$clientId'
     | '/clients/new'
+    | '/clients'
+    | '/clients/$clientId'
   id:
     | '__root__'
     | '/'
-    | '/clients'
+    | '/clients_'
     | '/login'
     | '/profile'
-    | '/clients/$clientId'
-    | '/clients/new'
+    | '/clients_/new'
+    | '/clients_/'
+    | '/clients_/$clientId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -122,8 +132,8 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/clients': {
-      id: '/clients'
+    '/clients_': {
+      id: '/clients_'
       path: '/clients'
       fullPath: '/clients'
       preLoaderRoute: typeof ClientsRouteImport
@@ -136,31 +146,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/clients/new': {
-      id: '/clients/new'
+    '/clients_/': {
+      id: '/clients_/'
+      path: '/'
+      fullPath: '/clients/'
+      preLoaderRoute: typeof ClientsIndexRouteImport
+      parentRoute: typeof ClientsRoute
+    }
+    '/clients_/new': {
+      id: '/clients_/new'
       path: '/new'
       fullPath: '/clients/new'
       preLoaderRoute: typeof ClientsNewRouteImport
       parentRoute: typeof ClientsRoute
     }
-    '/clients/$clientId': {
-      id: '/clients/$clientId'
+    '/clients_/$clientId/': {
+      id: '/clients_/$clientId/'
       path: '/$clientId'
       fullPath: '/clients/$clientId'
-      preLoaderRoute: typeof ClientsClientIdRouteImport
+      preLoaderRoute: typeof ClientsClientIdIndexRouteImport
       parentRoute: typeof ClientsRoute
     }
   }
 }
 
 interface ClientsRouteChildren {
-  ClientsClientIdRoute: typeof ClientsClientIdRoute
   ClientsNewRoute: typeof ClientsNewRoute
+  ClientsIndexRoute: typeof ClientsIndexRoute
+  ClientsClientIdIndexRoute: typeof ClientsClientIdIndexRoute
 }
 
 const ClientsRouteChildren: ClientsRouteChildren = {
-  ClientsClientIdRoute: ClientsClientIdRoute,
   ClientsNewRoute: ClientsNewRoute,
+  ClientsIndexRoute: ClientsIndexRoute,
+  ClientsClientIdIndexRoute: ClientsClientIdIndexRoute,
 }
 
 const ClientsRouteWithChildren =

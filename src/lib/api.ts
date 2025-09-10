@@ -2,7 +2,7 @@ import axios from 'axios';
 import { authStorage } from './auth-storage';
 
 const api = axios.create({
-  baseURL: 'http://localhost:3001',
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000',
   timeout: 10000,
 });
 
@@ -25,127 +25,75 @@ api.interceptors.response.use(
   }
 );
 
-export { api };
-
-export const mockApi = {
-  auth: {
-    login: async (email: string, password: string) => {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      if (email === 'admin@conectar.com' && password === '123456') {
-        return {
-          access_token: 'mock-admin-token',
-          user: {
-            id: '1',
-            name: 'Admin User',
-            email: 'admin@conectar.com',
-            role: 'admin'
-          }
-        };
-      }
-      
-      if (email === 'user@conectar.com' && password === '123456') {
-        return {
-          access_token: 'mock-user-token',
-          user: {
-            id: '2',
-            name: 'Regular User',
-            email: 'user@conectar.com',
-            role: 'user'
-          }
-        };
-      }
-      
-      throw new Error('Invalid credentials');
-    }
+export const authApi = {
+  login: async (email: string, password: string) => {
+    const response = await api.post('/auth/login', { email, password });
+    return response.data;
   },
 
-  clients: {
-    list: async (filters?: any) => {
-      await new Promise(resolve => setTimeout(resolve, 800));
-      return {
-        clients: [
-          {
-            id: '1',
-            razaoSocial: 'TOKEN TEST LTDA',
-            cnpj: '71.547.504/0001-74',
-            nomeFachada: 'JOANINHA BISTRO',
-            status: 'Inativo',
-            conectaPlus: 'Não',
-            tags: ['Restaurante']
-          },
-          {
-            id: '2',
-            razaoSocial: 'RESTAURANTE BOA VISTA',
-            cnpj: '71.673.990/0001-77',
-            nomeFachada: 'RESTAURANTE BOA VISTA',
-            status: 'Inativo',
-            conectaPlus: 'Não',
-            tags: ['Restaurante']
-          },
-          {
-            id: '3',
-            razaoSocial: 'TOKEN TEST LTDA',
-            cnpj: '64.152.434/0005-51',
-            nomeFachada: 'Geo Food',
-            status: 'Inativo',
-            conectaPlus: 'Não',
-            tags: ['Delivery']
-          }
-        ],
-        pagination: {
-          page: 1,
-          limit: 10,
-          total: 3,
-          totalPages: 1
-        }
-      };
-    },
-
-    getById: async (id: string) => {
-      await new Promise(resolve => setTimeout(resolve, 500));
-      return {
-        id,
-        razaoSocial: 'TOKEN TEST LTDA',
-        cnpj: '71.547.504/0001-74',
-        nomeFachada: 'JOANINHA BISTRO',
-        cep: '01310-100',
-        rua: 'Av. Paulista, 1000',
-        bairro: 'Bela Vista',
-        cidade: 'São Paulo',
-        estado: 'SP',
-        numero: '1000',
-        complemento: 'Sala 101'
-      };
-    },
-
-    create: async (data: any) => {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      return { id: Date.now().toString(), ...data };
-    },
-
-    update: async (id: string, data: any) => {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      return { id, ...data };
-    }
-  },
-
-  users: {
-    profile: async () => {
-      await new Promise(resolve => setTimeout(resolve, 500));
-      const user = authStorage.getUser();
-      return {
-        ...user,
-        createdAt: '2024-01-15T10:30:00Z'
-      };
-    },
-
-    updateProfile: async (data: any) => {
-      await new Promise(resolve => setTimeout(resolve, 800));
-      const user = authStorage.getUser();
-      const updatedUser = { ...user, ...data };
-      authStorage.setUser(updatedUser);
-      return updatedUser;
-    }
+  register: async (userData: any) => {
+    const response = await api.post('/auth/register', userData);
+    return response.data;
   }
 };
+
+export const clientsApi = {
+  list: async (filters?: any) => {
+    const response = await api.get('/clients', { params: filters });
+    return response.data;
+  },
+
+  getById: async (id: string) => {
+    const response = await api.get(`/clients/${id}`);
+    return response.data;
+  },
+
+  create: async (data: any) => {
+    const response = await api.post('/clients', data);
+    return response.data;
+  },
+
+  update: async (id: string, data: any) => {
+    const response = await api.patch(`/clients/${id}`, data);
+    return response.data;
+  },
+
+  delete: async (id: string) => {
+    const response = await api.delete(`/clients/${id}`);
+    return response.data;
+  }
+};
+
+export const usersApi = {
+  profile: async () => {
+    const response = await api.get('/users/profile');
+    return response.data;
+  },
+
+  updateProfile: async (data: any) => {
+    const response = await api.patch('/users/profile', data);
+    return response.data;
+  },
+
+  list: async (filters?: any) => {
+    const response = await api.get('/users', { params: filters });
+    return response.data;
+  },
+
+  getById: async (id: string) => {
+    const response = await api.get(`/users/${id}`);
+    return response.data;
+  },
+
+  update: async (id: string, data: any) => {
+    const response = await api.patch(`/users/${id}`, data);
+    return response.data;
+  },
+
+  delete: async (id: string) => {
+    const response = await api.delete(`/users/${id}`);
+    return response.data;
+  }
+};
+
+export { api };

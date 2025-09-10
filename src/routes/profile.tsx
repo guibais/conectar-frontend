@@ -8,7 +8,7 @@ import { ProtectedRoute } from '../components/ProtectedRoute';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { userProfileSchema, type UserProfileFormData } from '../lib/schemas';
-import { mockApi } from '../lib/api';
+import { usersApi } from '../lib/api';
 import { useAuthStore } from '../stores/auth-store';
 
 export const Route = createFileRoute('/profile')({
@@ -34,11 +34,11 @@ function ProfilePage() {
   useEffect(() => {
     const loadProfile = async () => {
       try {
-        const profile = await mockApi.users.profile();
-        setUserProfile(profile);
+        const response = await usersApi.profile();
+        setUserProfile(response);
         reset({
-          name: profile.name,
-          email: profile.email,
+          name: response.name,
+          email: response.email,
           password: '',
         });
       } catch (error) {
@@ -59,8 +59,8 @@ function ProfilePage() {
         delete updateData.password;
       }
       
-      const updatedUser = await mockApi.users.updateProfile(updateData);
-      setUser(updatedUser);
+      const response = await usersApi.updateProfile(updateData);
+      setUser(response);
       
       alert('Perfil atualizado com sucesso!');
     } catch (error) {

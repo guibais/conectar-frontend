@@ -1,41 +1,58 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ArrowLeft, Save } from 'lucide-react';
-import { Layout } from '../../components/Layout';
-import { ProtectedRoute } from '../../components/ProtectedRoute';
-import { Button } from '../../components/ui/Button';
-import { Input } from '../../components/ui/Input';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '../../components/ui/Tabs';
-import { clientSchema, type ClientFormData } from '../../lib/schemas';
-import { mockApi } from '../../lib/api';
+import { Layout } from '../../../components/Layout';
+import { ProtectedRoute } from '../../../components/ProtectedRoute';
+import { Button } from '../../../components/ui/Button';
+import { Input } from '../../../components/ui/Input';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '../../../components/ui/Tabs';
+import { clientSchema, type ClientFormData } from '../../../lib/schemas';
+import { clientsApi } from '../../../lib/api';
 
-export const Route = createFileRoute('/clients/new')({
-  component: NewClientPage,
+export const Route = createFileRoute('/clients_/$clientId/')({
+  component: EditClientPage,
 });
 
-function NewClientPage() {
+function EditClientPage() {
+  const { clientId } = Route.useParams();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingData, setIsLoadingData] = useState(true);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
     setValue,
-    watch,
+    reset,
   } = useForm<ClientFormData>({
     resolver: zodResolver(clientSchema),
   });
 
+  useEffect(() => {
+    const loadClient = async () => {
+      try {
+        const response = await clientsApi.getById(clientId);
+        reset(response);
+      } catch (error) {
+        console.error('Error loading client:', error);
+      } finally {
+        setIsLoadingData(false);
+      }
+    };
+
+    loadClient();
+  }, [clientId, reset]);
+
   const onSubmit = async (data: ClientFormData) => {
     setIsLoading(true);
     try {
-      await mockApi.clients.create(data);
+      const response = await clientsApi.update(clientId, data);
       navigate({ to: '/clients' });
     } catch (error) {
-      console.error('Error creating client:', error);
+      console.error('Error updating client:', error);
     } finally {
       setIsLoading(false);
     }
@@ -59,6 +76,18 @@ function NewClientPage() {
     }
   };
 
+  if (isLoadingData) {
+    return (
+      <ProtectedRoute requireRole="admin">
+        <Layout>
+          <div className="flex justify-center py-12">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#4ECDC4]"></div>
+          </div>
+        </Layout>
+      </ProtectedRoute>
+    );
+  }
+
   return (
     <ProtectedRoute requireRole="admin">
       <Layout>
@@ -71,7 +100,7 @@ function NewClientPage() {
               <ArrowLeft size={16} className="mr-2" />
               Voltar
             </Button>
-            <h1 className="text-2xl font-bold text-gray-900">Novo Cliente</h1>
+            <h1 className="text-2xl font-bold text-gray-900">Editar Cliente</h1>
           </div>
 
           <div className="bg-white rounded-lg shadow">
@@ -195,5 +224,5 @@ function NewClientPage() {
         </div>
       </Layout>
     </ProtectedRoute>
-  );
+  )
 }

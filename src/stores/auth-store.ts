@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { authStorage } from '../lib/auth-storage';
+import { authApi } from '../lib/api';
 
 type User = {
   id: string;
@@ -31,20 +32,15 @@ export const useAuthStore = create<AuthState & AuthActions>((set, get) => ({
 
   login: async (email: string, password: string) => {
     try {
-      const mockToken = 'mock-jwt-token-' + Date.now();
-      const mockUser: User = {
-        id: '1',
-        name: email === 'admin@conectar.com' ? 'Admin User' : 'Regular User',
-        email,
-        role: email === 'admin@conectar.com' ? 'admin' : 'user',
-      };
+      const response = await authApi.login(email, password);
+      const { access_token, user } = response;
 
-      authStorage.setToken(mockToken);
-      authStorage.setUser(mockUser);
+      authStorage.setToken(access_token);
+      authStorage.setUser(user);
 
       set({
-        user: mockUser,
-        token: mockToken,
+        user,
+        token: access_token,
         isAuthenticated: true,
         isLoading: false,
       });
