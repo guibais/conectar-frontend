@@ -164,19 +164,16 @@ function LoginPage() {
           </div>
         </div>
 
-        <div className="mt-6 flex justify-center">
-          <div className="w-full max-w-sm">
-            <GoogleLogin
-              onSuccess={handleGoogleSuccess}
-              onError={handleGoogleError}
-              text="signin_with"
-              shape="rectangular"
-              theme="outline"
-              size="large"
-              width="100%"
-              logo_alignment="center"
-            />
-          </div>
+        <div className="mt-6 flex items-center justify-center">
+          <GoogleLogin
+            onSuccess={handleGoogleSuccess}
+            onError={handleGoogleError}
+            text="signin_with"
+            shape="rectangular"
+            theme="outline"
+            size="large"
+            logo_alignment="center"
+          />
         </div>
       </div>
 
