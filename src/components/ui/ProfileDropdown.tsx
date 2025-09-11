@@ -1,0 +1,65 @@
+import { useState, useRef, useEffect } from "react";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { User, LogOut, ChevronDown } from "lucide-react";
+import { useAuthStore } from "../../stores/auth-store";
+
+export function ProfileDropdown() {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const { user, logout } = useAuthStore();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate({ to: "/login" });
+  };
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  return (
+    <div className="relative" ref={dropdownRef}>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center gap-2 px-4 py-2 hover:bg-white/10 rounded-lg transition-colors cursor-pointer"
+      >
+        <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+          <User size={16} />
+        </div>
+        <span className="text-sm font-medium">{user?.name}</span>
+        <ChevronDown size={16} className={`transition-transform ${isOpen ? "rotate-180" : ""}`} />
+      </button>
+
+      {isOpen && (
+        <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+          <Link
+            to="/profile"
+            className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer"
+            onClick={() => setIsOpen(false)}
+          >
+            <User size={16} />
+            Meu Perfil
+          </Link>
+          <hr className="my-2 border-gray-100" />
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer w-full text-left"
+          >
+            <LogOut size={16} />
+            Sair
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}

@@ -1,20 +1,15 @@
 import type { ReactNode } from "react";
-import { Link, useNavigate } from "@tanstack/react-router";
-import { LogOut, HelpCircle, Bell } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { HelpCircle, Bell } from "lucide-react";
 import { useAuthStore } from "../stores/auth-store";
+import { ProfileDropdown } from "./ui/ProfileDropdown";
 
 type LayoutProps = {
   children: ReactNode;
 };
 
 export function Layout({ children }: LayoutProps) {
-  const { user, logout } = useAuthStore();
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    logout();
-    navigate({ to: "/login" });
-  };
+  const { user } = useAuthStore();
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -23,7 +18,7 @@ export function Layout({ children }: LayoutProps) {
           <div className="flex items-center h-16">
             <div className="flex items-center">
               <Link
-                to="/clients"
+                to={user?.role === "admin" ? "/clients" : "/profile"}
                 className="px-6 py-4 text-xl font-bold bg-[#00A085] h-16 flex items-center cursor-pointer"
               >
                 Conéctar
@@ -50,21 +45,20 @@ export function Layout({ children }: LayoutProps) {
             </div>
 
             <div className="flex items-center ml-auto mr-6 space-x-3">
-              <button className="p-2 hover:bg-white/10 rounded-full transition-colors cursor-pointer">
-                <HelpCircle size={20} />
-              </button>
-              <Link
-                to="/notifications"
-                className="p-2 hover:bg-white/10 rounded-full transition-colors cursor-pointer"
-              >
-                <Bell size={20} />
-              </Link>
-              <button
-                onClick={handleLogout}
-                className="p-2 hover:bg-white/10 rounded-full transition-colors cursor-pointer"
-              >
-                <LogOut size={20} />
-              </button>
+              {user?.role === "admin" && (
+                <>
+                  <button className="p-2 hover:bg-white/10 rounded-full transition-colors cursor-pointer">
+                    <HelpCircle size={20} />
+                  </button>
+                  <Link
+                    to="/notifications"
+                    className="p-2 hover:bg-white/10 rounded-full transition-colors cursor-pointer"
+                  >
+                    <Bell size={20} />
+                  </Link>
+                </>
+              )}
+              <ProfileDropdown />
             </div>
           </div>
         </div>
