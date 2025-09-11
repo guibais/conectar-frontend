@@ -9,11 +9,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import {
   Plus,
-  Search,
   Edit,
   Trash2,
-  ChevronDown,
-  ChevronUp,
 } from "lucide-react";
 import { useAuthStore } from "../../../stores/auth-store";
 import {
@@ -26,6 +23,7 @@ import {
   StatusBadge,
   ConectaPlusBadge,
 } from "../../../components/ui/StatusBadge";
+import { FilterCard } from "../../../components/ui/FilterCard";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 
 const clientsSearchSchema = z.object({
@@ -84,7 +82,6 @@ function ClientsPage() {
   >;
   const { user: currentUser, isAuthenticated } = useAuthStore();
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [showFilters, setShowFilters] = useState(false);
   const [tempFilters, setTempFilters] = useState<ClientFilterQuery>({
     name: search.name || "",
     taxId: search.taxId || "",
@@ -201,145 +198,114 @@ function ClientsPage() {
         </button>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100">
-        <div className="border-b border-gray-100">
-          <div className="p-6">
-            <button
-              onClick={() => setShowFilters(!showFilters)}
-              className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
-            >
-              <Search className="h-4 w-4" />
-              Filtros
-              <span className="text-xs text-gray-500">
-                • 4 opções items na página
-              </span>
-              {showFilters ? (
-                <ChevronUp className="h-4 w-4 ml-auto" />
-              ) : (
-                <ChevronDown className="h-4 w-4 ml-auto" />
-              )}
-            </button>
+      <FilterCard
+        title="Filtros"
+        itemCount={clientsQuery.data?.clients?.length || 0}
+        onClear={() => {
+          setTempFilters({
+            name: "",
+            taxId: "",
+            status: undefined,
+            conectaPlus: "",
+          });
+          navigate({
+            to: "/clients",
+            search: {
+              sortBy: search.sortBy,
+              order: search.order,
+              page: 1,
+              limit: search.limit,
+            },
+          });
+        }}
+        onApply={() => {
+          navigate({
+            to: "/clients",
+            search: {
+              ...search,
+              name: tempFilters.name || undefined,
+              taxId: tempFilters.taxId || undefined,
+              status: tempFilters.status,
+              conectaPlus: tempFilters.conectaPlus || undefined,
+              page: 1,
+            },
+          });
+        }}
+      >
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Buscar por nome
+            </label>
+            <input
+              type="text"
+              placeholder="Digite o nome"
+              value={tempFilters.name || ""}
+              onChange={(e) =>
+                setTempFilters({ ...tempFilters, name: e.target.value })
+              }
+              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            />
           </div>
 
-          {showFilters && (
-            <div className="px-6 pb-6 bg-gray-50">
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Buscar por nome
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Digite o nome"
-                    value={tempFilters.name || ""}
-                    onChange={(e) =>
-                      setTempFilters({ ...tempFilters, name: e.target.value })
-                    }
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                  />
-                </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Buscar por CNPJ
+            </label>
+            <input
+              type="text"
+              placeholder="Digite o CNPJ"
+              value={tempFilters.taxId || ""}
+              onChange={(e) =>
+                setTempFilters({ ...tempFilters, taxId: e.target.value })
+              }
+              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            />
+          </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Buscar por CNPJ
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Digite o CNPJ"
-                    value={tempFilters.taxId || ""}
-                    onChange={(e) =>
-                      setTempFilters({ ...tempFilters, taxId: e.target.value })
-                    }
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                  />
-                </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Buscar por status
+            </label>
+            <select
+              value={tempFilters.status || ""}
+              onChange={(e) =>
+                setTempFilters({
+                  ...tempFilters,
+                  status: e.target.value as any,
+                })
+              }
+              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white"
+            >
+              <option value="">Selecione</option>
+              <option value="Active">Ativo</option>
+              <option value="Inactive">Inativo</option>
+            </select>
+          </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Buscar por status
-                  </label>
-                  <select
-                    value={tempFilters.status || ""}
-                    onChange={(e) =>
-                      setTempFilters({
-                        ...tempFilters,
-                        status: e.target.value as any,
-                      })
-                    }
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white"
-                  >
-                    <option value="">Selecione</option>
-                    <option value="Active">Ativo</option>
-                    <option value="Inactive">Inativo</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Conecta Plus
-                  </label>
-                  <select
-                    value={tempFilters.conectaPlus || ""}
-                    onChange={(e) =>
-                      setTempFilters({
-                        ...tempFilters,
-                        conectaPlus: e.target.value as "Yes" | "No" | "",
-                      })
-                    }
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white"
-                  >
-                    <option value="">Selecione</option>
-                    <option value="Yes">Sim</option>
-                    <option value="No">Não</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => {
-                    setTempFilters({
-                      name: "",
-                      taxId: "",
-                      status: undefined,
-                      conectaPlus: "",
-                    });
-                    navigate({
-                      to: "/clients",
-                      search: {
-                        sortBy: search.sortBy,
-                        order: search.order,
-                        page: 1,
-                        limit: search.limit,
-                      },
-                    });
-                  }}
-                  className="px-4 py-2 text-sm font-medium text-gray-600 border border-gray-300 rounded-lg hover:bg-white transition-colors"
-                >
-                  Limpar campos
-                </button>
-                <button
-                  onClick={() => {
-                    navigate({
-                      to: "/clients",
-                      search: {
-                        ...search,
-                        name: tempFilters.name || undefined,
-                        taxId: tempFilters.taxId || undefined,
-                        status: tempFilters.status,
-                        conectaPlus: tempFilters.conectaPlus || undefined,
-                        page: 1,
-                      },
-                    });
-                  }}
-                  className="px-4 py-2 text-sm font-medium bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-                >
-                  Filtrar
-                </button>
-              </div>
-            </div>
-          )}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Buscar por conecta+
+            </label>
+            <select
+              value={tempFilters.conectaPlus || ""}
+              onChange={(e) =>
+                setTempFilters({
+                  ...tempFilters,
+                  conectaPlus: e.target.value as "Yes" | "No" | "",
+                })
+              }
+              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white"
+            >
+              <option value="">Selecione</option>
+              <option value="Yes">Sim</option>
+              <option value="No">Não</option>
+            </select>
+          </div>
         </div>
+      </FilterCard>
+
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100">
 
         <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
           <DataTable
