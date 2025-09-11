@@ -184,9 +184,18 @@
     "title": "Meu Perfil",
     "subtitle": "Gerencie suas informações pessoais",
     "updateSuccess": "Perfil atualizado com sucesso!",
+    "myProfile": "Meu Perfil",
     "updateError": "Erro ao atualizar perfil",
+    "language": "Idioma",
+    "selectLanguage": "Selecione o idioma",
+    "saveChanges": "Salvar Alterações",
+    "passwordHint": "Deixe em branco para manter a senha atual",
     "fields": {
       "name": "Nome",
+      "email": "Email",
+      "password": "Senha",
+      "role": "Função",
+      "memberSince": "Membro desde",
       "noData": "Nenhum usuário inativo encontrado",
       "inactiveUsers": "Usuários Inativos (30+ dias)",
       "description": "Usuários que não fizeram login nos últimos 30 dias",
@@ -253,6 +262,14 @@
       "lastLogin": "Último Login",
       "createdAt": "Criado em",
       "daysInactive": "Dias Inativo"
+    },
+    "roles": {
+      "admin": "Administrador",
+      "user": "Usuário"
     }
+  },
+  "languages": {
+    "pt-BR": "Português (Brasil)",
+    "en": "English"
   }
 }

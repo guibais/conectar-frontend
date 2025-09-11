@@ -3,7 +3,6 @@ import { useCepQuery } from "@/services/cep.service";
 import { maskCEP, maskCNPJ, removeMask } from "@/utils/masks";
 import type { FormFieldConfig } from "@/components/ui/DynamicForm";
 import { clientFormFields } from "@/lib/form-fields";
-import { Search } from "lucide-react";
 
 export function useClientForm() {
   const [cepValue, setCepValue] = useState("");
@@ -25,7 +24,6 @@ export function useClientForm() {
         return {
           ...field,
           loading: cepQuery.isLoading,
-          icon: cepQuery.data ? <Search className="h-4 w-4 text-green-500" /> : undefined,
           onChange: handleCepChange,
         };
       }

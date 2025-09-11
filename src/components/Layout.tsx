@@ -1,6 +1,7 @@
 import { type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { Bell, HelpCircle } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { useAuthStore } from "../stores/auth-store";
 import { ProfileDropdown } from "./ui/ProfileDropdown";
 import { MobileBottomNav } from "./ui/MobileBottomNav";
@@ -11,6 +12,20 @@ type LayoutProps = {
 
 export function Layout({ children }: LayoutProps) {
   const { user } = useAuthStore();
+  const { t } = useTranslation();
+
+  const navigationItems = [
+    {
+      to: "/clients",
+      label: t("navigation.clients"),
+      adminOnly: true,
+    },
+    {
+      to: "/notifications", 
+      label: t("navigation.notifications"),
+      adminOnly: true,
+    },
+  ];
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -27,20 +42,18 @@ export function Layout({ children }: LayoutProps) {
 
               {user?.role === "admin" && (
                 <nav className="flex h-16 mb-1">
-                  <Link
-                    to="/clients"
-                    className="px-6 py-4 text-base font-medium bg-[#00B894] hover:bg-[#00A085] transition-colors h-16 flex items-center cursor-pointer border-b-2 border-transparent"
-                    activeProps={{ className: "bg-[#00A085] border-b-white" }}
-                  >
-                    Clientes
-                  </Link>
-                  <Link
-                    to="/notifications"
-                    className="px-6 py-4 text-base font-medium bg-[#00B894] hover:bg-[#00A085] transition-colors h-16 flex items-center cursor-pointer border-b-2 border-transparent"
-                    activeProps={{ className: "bg-[#00A085] border-b-white" }}
-                  >
-                    Notificações
-                  </Link>
+                  {navigationItems
+                    .filter(item => !item.adminOnly || user?.role === "admin")
+                    .map((item) => (
+                      <Link
+                        key={item.to}
+                        to={item.to}
+                        className="px-6 py-4 text-base font-medium bg-[#00B894] hover:bg-[#00A085] transition-colors h-16 flex items-center cursor-pointer border-b-2 border-transparent"
+                        activeProps={{ className: "bg-[#00A085] border-b-white" }}
+                      >
+                        {item.label}
+                      </Link>
+                    ))}
                 </nav>
               )}
             </div>

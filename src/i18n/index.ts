@@ -3,10 +3,14 @@ import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 
 import ptBR from './locales/pt-BR.json';
+import en from './locales/en.json';
 
 const resources = {
   'pt-BR': {
     translation: ptBR,
+  },
+  'en': {
+    translation: en,
   },
 };
 
@@ -26,6 +30,12 @@ i18n
     detection: {
       order: ['localStorage', 'navigator', 'htmlTag'],
       caches: ['localStorage'],
+      lookupLocalStorage: 'i18nextLng',
+      convertDetectedLanguage: (lng: string) => {
+        if (lng.startsWith('en')) return 'en';
+        if (lng.startsWith('pt')) return 'pt-BR';
+        return lng;
+      },
     },
   });
 

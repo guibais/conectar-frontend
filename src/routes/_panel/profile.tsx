@@ -7,6 +7,7 @@ import { DynamicForm } from "@/components/ui/DynamicForm";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { ErrorAlert } from "@/components/ui/ErrorAlert";
 import { SuccessAlert } from "@/components/ui/SuccessAlert";
+import { LanguageSelector } from "@/components/ui/LanguageSelector";
 import { useErrorHandler } from "@/hooks/useErrorHandler";
 import type { UserProfileFormData } from "@/lib/schemas";
 import { userProfileSchema } from "@/lib/schemas";
@@ -39,14 +40,14 @@ export const Route = createFileRoute("/_panel/profile")({
 });
 
 function ProfilePage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const { user, setUser } = useAuthStore();
   const [successMessage, setSuccessMessage] = useState("");
   const { errorMessage, handleError, clearError } = useErrorHandler();
   const profileQuery = useUserProfile();
   const updateProfileMutation = useUpdateUserProfile();
-  
+
   const profileFields = createProfileFields(t);
 
   const defaultValues = profileQuery.data
@@ -105,23 +106,33 @@ function ProfilePage() {
             <h2 id="profile-info" className="sr-only">
               {t("profile.title")}
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm mb-6">
               <div>
-                <span className="text-gray-500">{t("profile.fields.role")}:</span>
+                <span className="text-gray-500">
+                  {t("profile.fields.role")}:
+                </span>
                 <span className="ml-2 font-medium capitalize">
-                  {user?.role === "admin" ? t("profile.roles.admin") : t("profile.roles.user")}
+                  {user?.role === "admin"
+                    ? t("notifications.roles.admin")
+                    : t("notifications.roles.user")}
                 </span>
               </div>
               <div>
-                <span className="text-gray-500">{t("profile.fields.memberSince")}:</span>
+                <span className="text-gray-500">
+                  {t("profile.fields.memberSince")}:
+                </span>
                 <span className="ml-2 font-medium">
                   {profileQuery.data?.createdAt
                     ? new Date(profileQuery.data.createdAt).toLocaleDateString(
-                        "pt-BR"
+                        i18n.language === "en" ? "en-US" : "pt-BR"
                       )
                     : "N/A"}
                 </span>
               </div>
+            </div>
+
+            <div className="mb-6">
+              <LanguageSelector />
             </div>
           </header>
 
@@ -146,7 +157,7 @@ function ProfilePage() {
                   type="button"
                   variant="outline"
                   onClick={() => navigate({ to: "/clients" })}
-                  className="focus:outline-none focus:ring-2 focus:ring-conectar-primary focus:ring-offset-2"
+                  className="px-6 h-auto focus:outline-none focus:ring-2 focus:ring-conectar-primary focus:ring-offset-2"
                   aria-label={t("common.cancel")}
                 >
                   {t("common.cancel")}
