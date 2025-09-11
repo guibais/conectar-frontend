@@ -2,7 +2,7 @@ import { createFileRoute, Outlet } from '@tanstack/react-router';
 import { Layout } from '../components/Layout';
 import { ProtectedRoute } from '../components/ProtectedRoute';
 
-export const Route = createFileRoute('/clients_')({
+export const Route = createFileRoute('/clients')({
   component: ClientsLayout,
 });
 

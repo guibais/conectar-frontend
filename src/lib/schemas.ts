@@ -7,15 +7,18 @@ export const loginSchema = z.object({
 
 export const clientSchema = z.object({
   nomeFachada: z.string().min(1, 'Nome na fachada é obrigatório'),
-  cnpj: z.string().min(14, 'CNPJ inválido'),
+  cnpj: z.string().regex(/^[0-9]{14}$/, 'CNPJ deve conter 14 dígitos'),
   razaoSocial: z.string().min(1, 'Razão social é obrigatória'),
-  cep: z.string().min(8, 'CEP inválido'),
+  status: z.enum(['Ativo', 'Inativo'], { required_error: 'Status é obrigatório' }),
+  cep: z.string().regex(/^[0-9]{8}$|^[0-9]{5}-[0-9]{3}$/, 'CEP deve conter 8 dígitos'),
   rua: z.string().min(1, 'Rua é obrigatória'),
   numero: z.string().min(1, 'Número é obrigatório'),
   bairro: z.string().min(1, 'Bairro é obrigatório'),
   cidade: z.string().min(1, 'Cidade é obrigatória'),
   estado: z.string().min(2, 'Estado é obrigatório'),
   complemento: z.string().optional(),
+  latitude: z.string().optional(),
+  longitude: z.string().optional(),
 });
 
 export const userProfileSchema = z.object({

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tailwind Test</title>
+    <link rel="stylesheet" href="./src/styles.css">
+</head>
+<body class="p-8 bg-gray-50">
+    <div class="max-w-md mx-auto space-y-4">
+        <h1 class="text-2xl font-bold text-conectar-primary">Conectar Theme Test</h1>
+        
+        <div class="p-4 bg-conectar-50 border border-conectar-200 rounded-lg">
+            <p class="text-conectar-700">Light background with conectar colors</p>
+        </div>
+        
+        <button class="px-4 py-2 bg-conectar-primary text-white rounded-lg hover:bg-conectar-600 transition-colors">
+            Primary Button
+        </button>
+        
+        <button class="px-4 py-2 bg-conectar-light text-white rounded-lg hover:bg-conectar-400 transition-colors">
+            Light Button
+        </button>
+        
+        <div class="grid grid-cols-5 gap-2">
+            <div class="h-8 bg-conectar-50 rounded"></div>
+            <div class="h-8 bg-conectar-200 rounded"></div>
+            <div class="h-8 bg-conectar-400 rounded"></div>
+            <div class="h-8 bg-conectar-600 rounded"></div>
+            <div class="h-8 bg-conectar-800 rounded"></div>
+        </div>
+        
+        <div class="p-4 bg-white rounded-lg shadow-md">
+            <p class="text-success">Success color</p>
+            <p class="text-warning">Warning color</p>
+            <p class="text-error">Error color</p>
+            <p class="text-info">Info color</p>
+        </div>
+    </div>
+</body>
+</html>

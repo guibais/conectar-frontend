@@ -1,8 +1,7 @@
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { Link, useNavigate } from '@tanstack/react-router';
-import { LogOut, User, Users, Building2 } from 'lucide-react';
+import { LogOut, HelpCircle, Bell } from 'lucide-react';
 import { useAuthStore } from '../stores/auth-store';
-import { Button } from './ui/Button';
 
 type LayoutProps = {
   children: ReactNode;
@@ -19,60 +18,46 @@ export function Layout({ children }: LayoutProps) {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-[#4ECDC4] text-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <header className="bg-conectar-primary text-white">
+        <div className="max-w-full px-6">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-8">
-              <Link to="/clients" className="text-xl font-bold underline decoration-2 underline-offset-4">
+              <Link to="/clients" className="text-xl font-bold">
                 Conéctar
               </Link>
               
               {user?.role === 'admin' && (
-                <nav className="flex space-x-6">
+                <nav className="flex space-x-1">
                   <Link
                     to="/clients"
-                    className="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium hover:bg-white/10 transition-colors"
-                    activeProps={{ className: 'bg-white/20' }}
+                    className="flex items-center space-x-2 px-3 py-2 text-sm font-medium hover:bg-white/10 transition-colors"
+                    activeProps={{ className: 'bg-white/10' }}
                   >
-                    <Building2 size={16} />
                     <span>Clientes</span>
-                  </Link>
-                  <Link
-                    to="/users"
-                    className="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium hover:bg-white/10 transition-colors"
-                    activeProps={{ className: 'bg-white/20' }}
-                  >
-                    <Users size={16} />
-                    <span>Usuários</span>
                   </Link>
                 </nav>
               )}
             </div>
 
-            <div className="flex items-center space-x-4">
-              <Link
-                to="/profile"
-                className="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium hover:bg-white/10 transition-colors"
-              >
-                <User size={16} />
-                <span>{user?.name}</span>
-              </Link>
-              
-              <Button
-                variant="outline"
-                size="sm"
+            <div className="flex items-center space-x-3">
+              <button className="p-2 hover:bg-white/10 rounded-full transition-colors">
+                <HelpCircle size={20} />
+              </button>
+              <button className="p-2 hover:bg-white/10 rounded-full transition-colors">
+                <Bell size={20} />
+              </button>
+              <button 
                 onClick={handleLogout}
-                className="border-white text-white hover:bg-white hover:text-[#4ECDC4]"
+                className="p-2 hover:bg-white/10 rounded-full transition-colors"
               >
-                <LogOut size={16} className="mr-2" />
-                Sair
-              </Button>
+                <LogOut size={20} />
+              </button>
             </div>
           </div>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="bg-white">
         {children}
       </main>
     </div>

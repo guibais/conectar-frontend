@@ -1,0 +1,110 @@
+import { useState, useEffect } from 'react';
+import type { UseFormSetValue } from 'react-hook-form';
+import { Loader2, MapPin, CheckCircle, AlertCircle } from 'lucide-react';
+import { useCepQuery } from '../../services/cep.service';
+import type { ClientFormData } from '../../lib/schemas';
+
+type CepInputProps = {
+  value: string;
+  onChange: (value: string) => void;
+  setValue: UseFormSetValue<ClientFormData>;
+  error?: string;
+  className?: string;
+};
+
+export const CepInput = ({ value, onChange, setValue, error, className = '' }: CepInputProps) => {
+  const [inputValue, setInputValue] = useState(value);
+  const { data: cepData, isLoading, error: cepError, isSuccess } = useCepQuery(inputValue);
+
+  const formatCepDisplay = (cep: string) => {
+    const cleanCep = cep.replace(/\D/g, '');
+    if (cleanCep.length <= 5) return cleanCep;
+    return `${cleanCep.slice(0, 5)}-${cleanCep.slice(5, 8)}`;
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawValue = e.target.value.replace(/\D/g, '');
+    if (rawValue.length <= 8) {
+      const formattedValue = formatCepDisplay(rawValue);
+      setInputValue(formattedValue);
+      onChange(rawValue);
+    }
+  };
+
+  useEffect(() => {
+    if (cepData && isSuccess) {
+      setValue('rua', cepData.street || '');
+      setValue('bairro', cepData.district || '');
+      setValue('cidade', cepData.city || '');
+      setValue('estado', cepData.state || '');
+      
+      if (cepData.location?.coordinates) {
+        setValue('latitude', cepData.location.coordinates.latitude || '');
+        setValue('longitude', cepData.location.coordinates.longitude || '');
+      }
+    }
+  }, [cepData, isSuccess, setValue]);
+
+  useEffect(() => {
+    setInputValue(formatCepDisplay(value));
+  }, [value]);
+
+  const getStatusIcon = () => {
+    if (isLoading) {
+      return <Loader2 className="h-4 w-4 animate-spin text-gray-400" />;
+    }
+    if (cepError) {
+      return <AlertCircle className="h-4 w-4 text-error" />;
+    }
+    if (isSuccess && cepData) {
+      return <CheckCircle className="h-4 w-4 text-success" />;
+    }
+    return <MapPin className="h-4 w-4 text-gray-400" />;
+  };
+
+  const getStatusMessage = () => {
+    if (isLoading) return 'Buscando CEP...';
+    if (cepError) return 'CEP não encontrado';
+    if (isSuccess && cepData) return `${cepData.city}/${cepData.state}`;
+    return '';
+  };
+
+  return (
+    <div className="space-y-2">
+      <div className="relative">
+        <input
+          type="text"
+          value={inputValue}
+          onChange={handleInputChange}
+          placeholder="00000-000"
+          maxLength={9}
+          className={`w-full px-3 py-2 pr-10 border rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-transparent ${
+            error ? 'border-error' : 'border-gray-200'
+          } ${className}`}
+        />
+        <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+          {getStatusIcon()}
+        </div>
+      </div>
+      
+      {(isLoading || cepError || (isSuccess && cepData)) && (
+        <div className={`text-sm flex items-center gap-1 ${
+          cepError ? 'text-error' : isSuccess ? 'text-success' : 'text-gray-500'
+        }`}>
+          {getStatusMessage()}
+        </div>
+      )}
+      
+      {error && (
+        <p className="text-sm text-error">{error}</p>
+      )}
+      
+      {isSuccess && cepData?.location?.coordinates && (
+        <div className="text-xs text-gray-500 flex items-center gap-1">
+          <MapPin className="h-3 w-3" />
+          Lat: {cepData.location.coordinates.latitude}, Lng: {cepData.location.coordinates.longitude}
+        </div>
+      )}
+    </div>
+  );
+};

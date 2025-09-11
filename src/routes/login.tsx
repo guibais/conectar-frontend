@@ -3,10 +3,9 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
-import { Button } from '../components/ui/Button';
-import { Input } from '../components/ui/Input';
 import { loginSchema, type LoginFormData } from '../lib/schemas';
 import { useAuthStore } from '../stores/auth-store';
+import { useLogin } from '../services/auth.service';
 
 export const Route = createFileRoute('/login')({
   component: LoginPage,
@@ -15,6 +14,7 @@ export const Route = createFileRoute('/login')({
 function LoginPage() {
   const navigate = useNavigate();
   const login = useAuthStore((state) => state.login);
+  const loginMutation = useLogin();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -42,7 +42,7 @@ function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#4ECDC4] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-conectar-primary flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <h1 className="text-white text-4xl font-bold underline decoration-2 underline-offset-4">
@@ -50,55 +50,73 @@ function LoginPage() {
           </h1>
         </div>
 
-        <div className="bg-white rounded-lg shadow-lg p-8">
+        <div className="bg-white rounded-2xl shadow-xl p-8">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <div>
-              <Input
-                label="Email"
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Email
+              </label>
+              <input
                 type="email"
                 placeholder="Digite seu email"
-                error={errors.email?.message}
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-transparent outline-none transition-all"
                 {...register('email')}
               />
+              {errors.email && (
+                <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
+              )}
             </div>
 
             <div className="relative">
-              <Input
-                label="Senha"
-                type={showPassword ? 'text' : 'password'}
-                placeholder="••••••"
-                error={errors.password?.message}
-                {...register('password')}
-              />
-              <button
-                type="button"
-                className="absolute right-3 top-9 text-gray-400 hover:text-gray-600"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-              </button>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Senha
+              </label>
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="••••••"
+                  className="w-full px-4 py-3 pr-12 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-transparent outline-none transition-all"
+                  {...register('password')}
+                />
+                <button
+                  type="button"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-conectar-primary transition-colors"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
+              {errors.password && (
+                <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
+              )}
             </div>
 
             {errors.root && (
-              <div className="text-red-600 text-sm text-center">
+              <div className="text-red-600 text-sm text-center bg-red-50 p-3 rounded-lg">
                 {errors.root.message}
               </div>
             )}
 
-            <Button
+            <button
               type="submit"
-              className="w-full"
-              size="lg"
               disabled={isLoading}
+              className="w-full bg-conectar-primary hover:bg-conectar-600 disabled:bg-gray-300 text-white font-medium py-3 px-4 rounded-lg transition-colors focus:ring-2 focus:ring-conectar-primary focus:ring-offset-2"
             >
               {isLoading ? 'Entrando...' : 'Entrar'}
-            </Button>
+            </button>
           </form>
 
-          <div className="mt-6 text-center text-sm text-gray-600">
-            <p>Credenciais de teste:</p>
-            <p>Admin: admin@conectar.com / 123456</p>
-            <p>Usuário: user@conectar.com / 123456</p>
+          <div className="text-center mt-6">
+            <p className="text-sm text-gray-600">
+              Não tem uma conta?{' '}
+              <button
+                type="button"
+                onClick={() => navigate({ to: '/register' })}
+                className="text-conectar-primary hover:text-conectar-600 font-medium"
+              >
+                Criar conta
+              </button>
+            </p>
           </div>
         </div>
       </div>
