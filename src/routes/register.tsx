@@ -55,10 +55,15 @@ function RegisterPage() {
         navigate({ to: '/login' });
       }, 2000);
     } catch (error: any) {
-      if (error.response?.data?.message === 'Email already exists') {
+      if (
+        error.response?.data?.message === 'Este email já está em uso' ||
+        error.response?.data?.message?.includes('email já está em uso')
+      ) {
         setError('email', { message: 'Este email já está em uso' });
       } else {
-        setError('root', { message: 'Erro ao criar conta. Tente novamente.' });
+        setError('root', { 
+          message: error.response?.data?.message || 'Erro ao criar conta. Tente novamente.' 
+        });
       }
     }
   };
