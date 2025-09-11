@@ -2,10 +2,10 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
-import { User, Save, Layout } from "lucide-react";
-import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { User, Save } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { PageTemplate } from "@/components/ui/PageTemplate";
 import type { UserProfileFormData } from "@/lib/schemas";
 import { userProfileSchema } from "@/lib/schemas";
 import { useUserProfile, useUpdateUserProfile } from "@/services/users.service";
@@ -58,36 +58,25 @@ function ProfilePage() {
     }
   };
 
-  if (profileQuery.isLoading) {
-    return (
-      <ProtectedRoute>
-        <Layout>
-          <div className="flex justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#4ECDC4]"></div>
-          </div>
-        </Layout>
-      </ProtectedRoute>
-    );
-  }
-
   return (
-    <ProtectedRoute>
-      <div className="max-w-2xl mx-auto space-y-6 ">
-        <div className="flex items-center space-x-4 pt-10">
-          <div className="p-3 bg-[#4ECDC4] rounded-full">
-            <User size={24} className="text-white" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Meu Perfil</h1>
-            <p className="text-gray-600">Gerencie suas informações pessoais</p>
-          </div>
-        </div>
-
+    <PageTemplate
+      title="Meu Perfil"
+      description="Gerencie suas informações pessoais"
+      isLoading={profileQuery.isLoading}
+    >
+      <div className="max-w-2xl mx-auto space-y-6">
         <div className="bg-white rounded-lg shadow p-6">
           <div className="mb-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-2">
-              Informações da Conta
-            </h2>
+            <div className="flex items-center space-x-4 mb-4">
+              <div className="p-3 bg-conectar-primary rounded-full">
+                <User size={24} className="text-white" />
+              </div>
+              <div>
+                <h2 className="text-lg font-semibold text-gray-900">
+                  Informações da Conta
+                </h2>
+              </div>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
               <div>
                 <span className="text-gray-500">Role:</span>
@@ -160,6 +149,6 @@ function ProfilePage() {
           </form>
         </div>
       </div>
-    </ProtectedRoute>
+    </PageTemplate>
   );
 }

@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { authStorage } from '../lib/auth-storage';
+import { persist } from 'zustand/middleware';
 import { authApi } from '../lib/api';
 
 type User = {
@@ -24,69 +24,71 @@ type AuthActions = {
   initializeAuth: () => void;
 };
 
-export const useAuthStore = create<AuthState & AuthActions>((set, get) => ({
-  user: null,
-  token: null,
-  isAuthenticated: false,
-  isLoading: true,
-
-  login: async (email: string, password: string) => {
-    try {
-      const response = await authApi.login(email, password);
-      const { access_token, user } = response;
-
-      authStorage.setToken(access_token);
-      authStorage.setUser(user);
-
-      set({
-        user,
-        token: access_token,
-        isAuthenticated: true,
-        isLoading: false,
-      });
-    } catch (error) {
-      throw new Error('Invalid credentials');
-    }
-  },
-
-  logout: () => {
-    authStorage.clear();
-    set({
+export const useAuthStore = create<AuthState & AuthActions>()(
+  persist(
+    (set, get) => ({
       user: null,
       token: null,
       isAuthenticated: false,
-      isLoading: false,
-    });
-  },
+      isLoading: true,
 
-  setUser: (user: User) => {
-    authStorage.setUser(user);
-    set({ user });
-  },
+      login: async (email: string, password: string) => {
+        try {
+          const response = await authApi.login(email, password);
+          const { access_token, user } = response;
 
-  setToken: (token: string) => {
-    authStorage.setToken(token);
-    set({ token, isAuthenticated: true });
-  },
+          set({
+            user,
+            token: access_token,
+            isAuthenticated: true,
+            isLoading: false,
+          });
+        } catch (error) {
+          throw new Error('Invalid credentials');
+        }
+      },
 
-  initializeAuth: () => {
-    const token = authStorage.getToken();
-    const user = authStorage.getUser();
+      logout: () => {
+        set({
+          user: null,
+          token: null,
+          isAuthenticated: false,
+          isLoading: false,
+        });
+      },
 
-    if (token && user) {
-      set({
-        user,
-        token,
-        isAuthenticated: true,
-        isLoading: false,
-      });
-    } else {
-      set({
-        user: null,
-        token: null,
-        isAuthenticated: false,
-        isLoading: false,
-      });
+      setUser: (user: User) => {
+        set({ user });
+      },
+
+      setToken: (token: string) => {
+        set({ token, isAuthenticated: true });
+      },
+
+      initializeAuth: () => {
+        const state = get();
+        if (state.token && state.user) {
+          set({
+            isAuthenticated: true,
+            isLoading: false,
+          });
+        } else {
+          set({
+            user: null,
+            token: null,
+            isAuthenticated: false,
+            isLoading: false,
+          });
+        }
+      },
+    }),
+    {
+      name: 'auth-storage',
+      partialize: (state) => ({
+        user: state.user,
+        token: state.token,
+        isAuthenticated: state.isAuthenticated,
+      }),
     }
-  },
-}));
+  )
+);

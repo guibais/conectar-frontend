@@ -6,9 +6,5 @@ export const Route = createFileRoute("/_panel/clients/clients")({
 });
 
 function ClientsLayout() {
-  return (
-    <ProtectedRoute requireRole="admin">
-      <Outlet />
-    </ProtectedRoute>
-  );
+  return <Outlet />;
 }

@@ -1,13 +1,32 @@
 import axios from 'axios';
-import { authStorage } from './auth-storage';
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000',
   timeout: 10000,
 });
 
+// Function to get token from localStorage (Zustand persist storage)
+const getTokenFromStorage = () => {
+  try {
+    const authStorage = localStorage.getItem('auth-storage');
+    if (authStorage) {
+      const parsed = JSON.parse(authStorage);
+      return parsed.state?.token;
+    }
+  } catch (error) {
+    console.error('Error getting token from storage:', error);
+  }
+  return null;
+};
+
+// Function to clear auth storage and redirect
+const clearAuthAndRedirect = () => {
+  localStorage.removeItem('auth-storage');
+  window.location.href = '/login';
+};
+
 api.interceptors.request.use((config) => {
-  const token = authStorage.getToken();
+  const token = getTokenFromStorage();
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -18,8 +37,7 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      authStorage.clear();
-      window.location.href = '/login';
+      clearAuthAndRedirect();
     }
     return Promise.reject(error);
   }

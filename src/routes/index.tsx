@@ -1,8 +1,8 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router';
-import { useEffect } from 'react';
-import { useAuthStore } from '../stores/auth-store';
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useEffect } from "react";
+import { useAuthStore } from "../stores/auth-store";
 
-export const Route = createFileRoute('/')({
+export const Route = createFileRoute("/")({
   component: HomePage,
 });
 
@@ -17,13 +17,13 @@ function HomePage() {
   useEffect(() => {
     if (!isLoading) {
       if (isAuthenticated) {
-        if (user?.role === 'admin') {
-          navigate({ to: '/clients' });
+        if (user?.role === "admin") {
+          navigate({ to: "/clients" });
         } else {
-          navigate({ to: '/profile' });
+          navigate({ to: "/profile" });
         }
       } else {
-        navigate({ to: '/login' });
+        navigate({ to: "/login" });
       }
     }
   }, [isAuthenticated, isLoading, user, navigate]);

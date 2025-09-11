@@ -1,4 +1,5 @@
 import { Layout } from "@/components/Layout";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_panel")({
@@ -7,8 +8,10 @@ export const Route = createFileRoute("/_panel")({
 
 function RouteComponent() {
   return (
-    <Layout>
-      <Outlet />
-    </Layout>
+    <ProtectedRoute>
+      <Layout>
+        <Outlet />
+      </Layout>
+    </ProtectedRoute>
   );
 }

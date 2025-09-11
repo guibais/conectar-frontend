@@ -26,12 +26,14 @@ import {
   StatusBadge,
   ConectaPlusBadge,
 } from "../../../components/ui/StatusBadge";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 
 const clientsSearchSchema = z.object({
   name: z.string().optional(),
   email: z.string().optional(),
   taxId: z.string().optional(),
   status: z.enum(["Active", "Inactive"]).optional(),
+  conectaPlus: z.enum(["Yes", "No", ""]).optional(),
   sortBy: z.enum(["name", "createdAt"]).optional().default("createdAt"),
   order: z.enum(["asc", "desc"]).optional().default("desc"),
   page: z.number().optional().default(1),
@@ -48,6 +50,7 @@ type ClientFilterQuery = {
   email?: string;
   taxId?: string;
   status?: "Active" | "Inactive";
+  conectaPlus?: "Yes" | "No" | "";
   sortBy?: "name" | "createdAt";
   order?: "asc" | "desc";
   page?: number;
@@ -86,6 +89,7 @@ function ClientsPage() {
     name: search.name || "",
     taxId: search.taxId || "",
     status: search.status,
+    conectaPlus: search.conectaPlus,
   });
 
   const filters: ClientFilterQuery = {
@@ -93,6 +97,7 @@ function ClientsPage() {
     email: search.email,
     taxId: search.taxId,
     status: search.status,
+    conectaPlus: search.conectaPlus,
     sortBy: search.sortBy || "createdAt",
     order: search.order || "desc",
     page: search.page || 1,
@@ -268,6 +273,26 @@ function ClientsPage() {
                     <option value="Inactive">Inativo</option>
                   </select>
                 </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Conecta Plus
+                  </label>
+                  <select
+                    value={tempFilters.conectaPlus || ""}
+                    onChange={(e) =>
+                      setTempFilters({
+                        ...tempFilters,
+                        conectaPlus: e.target.value as "Yes" | "No" | "",
+                      })
+                    }
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white"
+                  >
+                    <option value="">Selecione</option>
+                    <option value="Yes">Sim</option>
+                    <option value="No">Não</option>
+                  </select>
+                </div>
               </div>
 
               <div className="flex items-center gap-3">
@@ -277,6 +302,7 @@ function ClientsPage() {
                       name: "",
                       taxId: "",
                       status: undefined,
+                      conectaPlus: "",
                     });
                     navigate({
                       to: "/clients",
@@ -301,6 +327,7 @@ function ClientsPage() {
                         name: tempFilters.name || undefined,
                         taxId: tempFilters.taxId || undefined,
                         status: tempFilters.status,
+                        conectaPlus: tempFilters.conectaPlus || undefined,
                         page: 1,
                       },
                     });
@@ -695,3 +722,13 @@ function ClientsPage() {
     </div>
   );
 }
+
+function ProtectedClientsPage() {
+  return (
+    <ProtectedRoute requireRole="admin">
+      <ClientsPage />
+    </ProtectedRoute>
+  );
+}
+
+export default ProtectedClientsPage;

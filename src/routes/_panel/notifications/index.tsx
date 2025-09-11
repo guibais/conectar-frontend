@@ -1,8 +1,9 @@
 import { DataTable } from "@/components/ui/DataTable";
 import { RoleBadge } from "@/components/ui/StatusBadge";
+import { PageTemplate } from "@/components/ui/PageTemplate";
 import { useInactiveClients } from "@/services/notifications.service";
 import { createFileRoute } from "@tanstack/react-router";
-import { Bell, Clock, User, Mail, Calendar } from "lucide-react";
+import { Clock, User, Mail, Calendar } from "lucide-react";
 
 export const Route = createFileRoute("/_panel/notifications/")({
   component: NotificationsPage,
@@ -31,17 +32,11 @@ function NotificationsPage() {
   };
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
-      <div className="mb-8">
-        <div className="flex items-center gap-3 mb-2">
-          <Bell className="h-8 w-8 text-conectar-primary" />
-          <h1 className="text-3xl font-bold text-gray-900">Notificações</h1>
-        </div>
-        <p className="text-gray-600">
-          Acompanhe usuários que precisam de atenção da equipe
-        </p>
-      </div>
-
+    <PageTemplate
+      title="Notificações"
+      description="Acompanhe usuários que precisam de atenção da equipe"
+      isLoading={inactiveClientsQuery.isLoading}
+    >
       <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200 bg-orange-50">
           <div className="flex items-center gap-2">
@@ -137,6 +132,20 @@ function NotificationsPage() {
           emptyMessage="Nenhum usuário inativo encontrado"
         />
       </div>
-    </div>
+
+      {inactiveClientsQuery.data && inactiveClientsQuery.data.length > 0 && (
+        <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <h3 className="text-sm font-medium text-blue-800 mb-2">
+            💡 Dicas para reengajar usuários inativos:
+          </h3>
+          <ul className="text-sm text-blue-700 space-y-1">
+            <li>• Entre em contato via e-mail para verificar se precisam de ajuda</li>
+            <li>• Ofereça treinamento ou suporte técnico</li>
+            <li>• Verifique se as credenciais de acesso estão funcionando</li>
+            <li>• Considere desativar contas muito antigas por segurança</li>
+          </ul>
+        </div>
+      )}
+    </PageTemplate>
   );
 }
