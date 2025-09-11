@@ -1,14 +1,14 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { User, Save } from 'lucide-react';
 import { Layout } from '../components/Layout';
 import { ProtectedRoute } from '../components/ProtectedRoute';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { userProfileSchema, type UserProfileFormData } from '../lib/schemas';
-import { usersApi } from '../lib/api';
+import { useUserProfile, useUpdateUserProfile } from '../services/users.service';
 import { useAuthStore } from '../stores/auth-store';
 
 export const Route = createFileRoute('/profile')({
@@ -18,60 +18,47 @@ export const Route = createFileRoute('/profile')({
 function ProfilePage() {
   const navigate = useNavigate();
   const { user, setUser } = useAuthStore();
-  const [isLoading, setIsLoading] = useState(false);
-  const [isLoadingData, setIsLoadingData] = useState(true);
-  const [userProfile, setUserProfile] = useState<any>(null);
+  const profileQuery = useUserProfile();
+  const updateProfileMutation = useUpdateUserProfile();
 
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
+    setError,
   } = useForm<UserProfileFormData>({
     resolver: zodResolver(userProfileSchema),
   });
 
   useEffect(() => {
-    const loadProfile = async () => {
-      try {
-        const response = await usersApi.profile();
-        setUserProfile(response);
-        reset({
-          name: response.name,
-          email: response.email,
-          password: '',
-        });
-      } catch (error) {
-        console.error('Error loading profile:', error);
-      } finally {
-        setIsLoadingData(false);
-      }
-    };
-
-    loadProfile();
-  }, [reset]);
+    if (profileQuery.data) {
+      reset({
+        name: profileQuery.data.name,
+        email: profileQuery.data.email,
+        password: '',
+      });
+    }
+  }, [profileQuery.data, reset]);
 
   const onSubmit = async (data: UserProfileFormData) => {
-    setIsLoading(true);
     try {
       const updateData = { ...data };
       if (!updateData.password) {
         delete updateData.password;
       }
       
-      const response = await usersApi.updateProfile(updateData);
+      const response = await updateProfileMutation.mutateAsync(updateData);
       setUser(response);
       
       alert('Perfil atualizado com sucesso!');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error updating profile:', error);
-      alert('Erro ao atualizar perfil');
-    } finally {
-      setIsLoading(false);
+      setError('root', { message: 'Erro ao atualizar perfil' });
     }
   };
 
-  if (isLoadingData) {
+  if (profileQuery.isLoading) {
     return (
       <ProtectedRoute>
         <Layout>
@@ -110,8 +97,8 @@ function ProfilePage() {
                 <div>
                   <span className="text-gray-500">Membro desde:</span>
                   <span className="ml-2 font-medium">
-                    {userProfile?.createdAt ? 
-                      new Date(userProfile.createdAt).toLocaleDateString('pt-BR') : 
+                    {profileQuery.data?.createdAt ? 
+                      new Date(profileQuery.data.createdAt).toLocaleDateString('pt-BR') : 
                       'N/A'
                     }
                   </span>
@@ -157,9 +144,9 @@ function ProfilePage() {
                 >
                   Cancelar
                 </Button>
-                <Button type="submit" disabled={isLoading}>
+                <Button type="submit" disabled={updateProfileMutation.isPending}>
                   <Save size={16} className="mr-2" />
-                  {isLoading ? 'Salvando...' : 'Salvar Alterações'}
+                  {updateProfileMutation.isPending ? 'Salvando...' : 'Salvar Alterações'}
                 </Button>
               </div>
             </form>

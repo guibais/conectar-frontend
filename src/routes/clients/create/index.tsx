@@ -4,9 +4,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Save, Search } from 'lucide-react';
 import { useAuthStore } from '../../../stores/auth-store';
-import { api } from '../../../lib/api';
 import { useEffect, useState } from 'react';
 import { useCepQuery } from '../../../services/cep.service';
+import { useCreateClient } from '../../../services/clients.service';
 import { maskCEP, maskCNPJ, removeMask } from '../../../utils/masks';
 
 export const Route = createFileRoute('/clients/create/')({
@@ -37,7 +37,7 @@ function CreateClientPage() {
   const navigate = useNavigate();
   const { user: currentUser, isAuthenticated } = useAuthStore();
   const [cepValue, setCepValue] = useState('');
-  const [cnpjValue, setCnpjValue] = useState('');
+  const createClientMutation = useCreateClient();
 
   const {
     register,
@@ -45,7 +45,6 @@ function CreateClientPage() {
     formState: { errors, isSubmitting },
     setError,
     setValue,
-    watch,
   } = useForm<CreateClientFormData>({
     resolver: zodResolver(createClientSchema),
     defaultValues: {
@@ -80,13 +79,26 @@ function CreateClientPage() {
 
   const handleCnpjChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const maskedValue = maskCNPJ(e.target.value);
-    setCnpjValue(removeMask(maskedValue));
     setValue('cnpj', maskedValue);
   };
 
   const handleCreateClient = async (data: CreateClientFormData) => {
     try {
-      await api.post('/clients', data);
+      const clientData = {
+        nomeFachada: data.nomeFachada || '',
+        cnpj: data.cnpj || '',
+        razaoSocial: data.razaoSocial || '',
+        status: data.status,
+        cep: data.cep || '',
+        rua: data.rua || '',
+        numero: data.numero || '',
+        bairro: data.bairro || '',
+        cidade: data.cidade || '',
+        estado: data.estado || '',
+        complemento: data.complemento,
+      };
+      
+      await createClientMutation.mutateAsync(clientData);
       navigate({ to: '/clients' });
     } catch (error: any) {
       if (error.response?.data?.message === 'Email already exists') {

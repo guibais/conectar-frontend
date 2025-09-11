@@ -18,7 +18,7 @@ function HomePage() {
     if (!isLoading) {
       if (isAuthenticated) {
         if (user?.role === 'admin') {
-          navigate({ to: '/users_' });
+          navigate({ to: '/clients' });
         } else {
           navigate({ to: '/profile' });
         }

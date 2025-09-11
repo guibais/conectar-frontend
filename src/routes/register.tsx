@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { Eye, EyeOff, UserPlus, ArrowLeft } from 'lucide-react';
 import { z } from 'zod';
-import { api } from '../lib/api';
+import { useRegister } from '../services/auth.service';
 
 export const Route = createFileRoute('/register')({
   component: RegisterPage,
@@ -26,8 +26,8 @@ function RegisterPage() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
+  const registerMutation = useRegister();
 
   const {
     register,
@@ -39,11 +39,10 @@ function RegisterPage() {
   });
 
   const onSubmit = async (data: RegisterFormData) => {
-    setIsLoading(true);
     setSuccessMessage('');
     
     try {
-      await api.post('/auth/register', {
+      await registerMutation.mutateAsync({
         name: data.name,
         email: data.email,
         password: data.password,
@@ -61,8 +60,6 @@ function RegisterPage() {
       } else {
         setError('root', { message: 'Erro ao criar conta. Tente novamente.' });
       }
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -175,10 +172,10 @@ function RegisterPage() {
 
               <button
                 type="submit"
-                disabled={isLoading}
+                disabled={registerMutation.isPending}
                 className="w-full bg-conectar-primary text-white py-3 px-4 rounded-lg font-medium hover:bg-conectar-600 focus:ring-2 focus:ring-conectar-primary focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isLoading ? (
+                {registerMutation.isPending ? (
                   <div className="flex items-center justify-center gap-2">
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                     Criando conta...
