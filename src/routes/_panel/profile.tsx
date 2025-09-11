@@ -85,8 +85,8 @@ function ProfilePage() {
       description="Gerencie suas informações pessoais"
       isLoading={profileQuery.isLoading}
     >
-      <div className="max-w-2xl mx-auto space-y-6">
-        <div className="bg-white rounded-lg shadow p-6">
+      <div className=" space-y-6 w-full">
+        <div className="bg-white rounded-lg shadow p-6 w-full">
           <div className="mb-6">
             <div className="flex items-center space-x-4 mb-4">
               <div className="p-3 bg-conectar-primary rounded-full">

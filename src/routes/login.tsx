@@ -1,22 +1,27 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useState } from 'react';
-import { Eye, EyeOff } from 'lucide-react';
-import { loginSchema, type LoginFormData } from '../lib/schemas';
-import { useAuthStore } from '../stores/auth-store';
-import { useLogin } from '../services/auth.service';
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useState, useCallback } from "react";
+import { Eye, EyeOff } from "lucide-react";
+import {
+  GoogleLogin,
+  useGoogleLogin,
+  useGoogleOneTapLogin,
+} from "@react-oauth/google";
+import { loginSchema, type LoginFormData } from "../lib/schemas";
+import { useAuthStore } from "../stores/auth-store";
+import { useGoogleLogin as useGoogleLoginMutation } from "../services/google-auth.service";
 
-export const Route = createFileRoute('/login')({
+export const Route = createFileRoute("/login")({
   component: LoginPage,
 });
 
 function LoginPage() {
   const navigate = useNavigate();
-  const login = useAuthStore((state) => state.login);
-  const loginMutation = useLogin();
+  const { login, setUserAndToken } = useAuthStore();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const googleLoginMutation = useGoogleLoginMutation();
 
   const {
     register,
@@ -27,19 +32,62 @@ function LoginPage() {
     resolver: zodResolver(loginSchema),
   });
 
+  const handleGoogleSuccess = useCallback(
+    async (credentialResponse: any) => {
+      if (!credentialResponse.credential) return;
+
+      googleLoginMutation.mutate(credentialResponse.credential, {
+        onSuccess: (data) => {
+          setUserAndToken(data.user, data.access_token);
+          if (data.user.role === "user") {
+            navigate({ to: "/profile" });
+          } else {
+            navigate({ to: "/clients" });
+          }
+        },
+        onError: () => {
+          setError("root", {
+            message: "Erro ao fazer login com Google",
+          });
+        },
+      });
+    },
+    [googleLoginMutation, setUserAndToken, navigate, setError]
+  );
+
+  const handleGoogleError = useCallback(
+    (error?: any) => {
+      console.warn("Google login error:", error);
+      // Não mostrar erro para falhas de status do GSI (403)
+      if (error?.type !== "popup_closed") {
+        setError("root", {
+          message: "Falha no login com Google",
+        });
+      }
+    },
+    [setError]
+  );
+
+  useGoogleOneTapLogin({
+    onSuccess: handleGoogleSuccess,
+    onError: handleGoogleError,
+    cancel_on_tap_outside: false,
+    auto_select: false,
+  });
+
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
     try {
       await login(data.email, data.password);
       const user = useAuthStore.getState().user;
-      if (user?.role === 'user') {
-        navigate({ to: '/profile' });
+      if (user?.role === "user") {
+        navigate({ to: "/profile" });
       } else {
-        navigate({ to: '/clients' });
+        navigate({ to: "/clients" });
       }
     } catch (error) {
-      setError('root', {
-        message: 'Email ou senha inválidos',
+      setError("root", {
+        message: "Email ou senha inválidos",
       });
     } finally {
       setIsLoading(false);
@@ -65,10 +113,12 @@ function LoginPage() {
                 type="email"
                 placeholder="Digite seu email"
                 className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-transparent outline-none transition-all"
-                {...register('email')}
+                {...register("email")}
               />
               {errors.email && (
-                <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.email.message}
+                </p>
               )}
             </div>
 
@@ -78,10 +128,10 @@ function LoginPage() {
               </label>
               <div className="relative">
                 <input
-                  type={showPassword ? 'text' : 'password'}
+                  type={showPassword ? "text" : "password"}
                   placeholder="••••••"
                   className="w-full px-4 py-3 pr-12 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-transparent outline-none transition-all"
-                  {...register('password')}
+                  {...register("password")}
                 />
                 <button
                   type="button"
@@ -92,7 +142,9 @@ function LoginPage() {
                 </button>
               </div>
               {errors.password && (
-                <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.password.message}
+                </p>
               )}
             </div>
 
@@ -107,16 +159,42 @@ function LoginPage() {
               disabled={isLoading}
               className="w-full bg-conectar-primary hover:bg-conectar-600 disabled:bg-gray-300 text-white font-medium py-3 px-4 rounded-lg transition-colors focus:ring-2 focus:ring-conectar-primary focus:ring-offset-2 cursor-pointer"
             >
-              {isLoading ? 'Entrando...' : 'Entrar'}
+              {isLoading ? "Entrando..." : "Entrar"}
             </button>
           </form>
 
+          <div className="mt-6">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300" />
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-white text-gray-500">ou</span>
+              </div>
+            </div>
+
+            <div className="mt-6 flex justify-center">
+              <div className="w-full max-w-sm">
+                <GoogleLogin
+                  onSuccess={handleGoogleSuccess}
+                  onError={handleGoogleError}
+                  text="signin_with"
+                  shape="rectangular"
+                  theme="outline"
+                  size="large"
+                  width="100%"
+                  logo_alignment="center"
+                />
+              </div>
+            </div>
+          </div>
+
           <div className="text-center mt-6">
             <p className="text-sm text-gray-600">
-              Não tem uma conta?{' '}
+              Não tem uma conta?{" "}
               <button
                 type="button"
-                onClick={() => navigate({ to: '/register' })}
+                onClick={() => navigate({ to: "/register" })}
                 className="text-conectar-primary hover:text-conectar-600 font-medium cursor-pointer"
               >
                 Criar conta

@@ -21,6 +21,7 @@ type AuthActions = {
   logout: () => void;
   setUser: (user: User) => void;
   setToken: (token: string) => void;
+  setUserAndToken: (user: User, token: string) => void;
   initializeAuth: () => void;
 };
 
@@ -58,11 +59,24 @@ export const useAuthStore = create<AuthState & AuthActions>()(
       },
 
       setUser: (user: User) => {
-        set({ user });
+        set({ 
+          user, 
+          isAuthenticated: true,
+          isLoading: false 
+        });
       },
 
       setToken: (token: string) => {
         set({ token, isAuthenticated: true });
+      },
+
+      setUserAndToken: (user: User, token: string) => {
+        set({ 
+          user, 
+          token, 
+          isAuthenticated: true,
+          isLoading: false 
+        });
       },
 
       initializeAuth: () => {
