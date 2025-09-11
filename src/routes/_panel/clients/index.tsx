@@ -1,4 +1,8 @@
-import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  useNavigate,
+  useSearch,
+} from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -11,14 +15,17 @@ import {
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
-import { useAuthStore } from "../../stores/auth-store";
+import { useAuthStore } from "../../../stores/auth-store";
 import {
   useClients,
   useCreateClient,
   useDeleteClient,
-} from "../../services/clients.service";
-import { DataTable } from "../../components/ui/DataTable";
-import { StatusBadge, ConectaPlusBadge } from "../../components/ui/StatusBadge";
+} from "../../../services/clients.service";
+import { DataTable } from "../../../components/ui/DataTable";
+import {
+  StatusBadge,
+  ConectaPlusBadge,
+} from "../../../components/ui/StatusBadge";
 
 const clientsSearchSchema = z.object({
   name: z.string().optional(),
@@ -31,7 +38,7 @@ const clientsSearchSchema = z.object({
   limit: z.number().optional().default(10),
 });
 
-export const Route = createFileRoute("/clients/")({
+export const Route = createFileRoute("/_panel/clients/")({
   component: ClientsPage,
   validateSearch: clientsSearchSchema,
 });
@@ -69,7 +76,9 @@ type CreateClientFormData = z.infer<typeof createClientSchema>;
 
 function ClientsPage() {
   const navigate = useNavigate();
-  const search = useSearch({ from: "/clients/" }) as z.infer<typeof clientsSearchSchema>;
+  const search = useSearch({ from: "/_panel/clients/" }) as z.infer<
+    typeof clientsSearchSchema
+  >;
   const { user: currentUser, isAuthenticated } = useAuthStore();
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
@@ -78,7 +87,7 @@ function ClientsPage() {
     taxId: search.taxId || "",
     status: search.status,
   });
-  
+
   const filters: ClientFilterQuery = {
     name: search.name,
     email: search.email,
@@ -125,7 +134,6 @@ function ClientsPage() {
     });
   };
 
-
   const handleCreateClient = async (data: CreateClientFormData) => {
     try {
       const clientData = {
@@ -163,7 +171,6 @@ function ClientsPage() {
       console.error("Error deleting client:", error);
     }
   };
-
 
   if (clientsQuery.isLoading) {
     return (
@@ -261,7 +268,6 @@ function ClientsPage() {
                     <option value="Inactive">Inativo</option>
                   </select>
                 </div>
-
               </div>
 
               <div className="flex items-center gap-3">
@@ -313,56 +319,56 @@ function ClientsPage() {
             data={clientsQuery.data?.clients || []}
             columns={[
               {
-                key: 'name',
-                header: 'Nome do Usuário',
+                key: "name",
+                header: "Nome do Usuário",
                 sortable: true,
                 render: (client) => (
                   <div>
                     <div className="font-medium text-gray-900 text-sm">
                       {client.name}
                     </div>
-                    <div className="text-sm text-gray-500">
-                      {client.email}
-                    </div>
+                    <div className="text-sm text-gray-500">{client.email}</div>
                   </div>
                 ),
               },
               {
-                key: 'companyName',
-                header: 'Razão Social',
+                key: "companyName",
+                header: "Razão Social",
                 render: (client) => (
                   <span className="text-sm text-gray-900">
-                    {client.companyName || '-'}
+                    {client.companyName || "-"}
                   </span>
                 ),
               },
               {
-                key: 'taxId',
-                header: 'CNPJ',
+                key: "taxId",
+                header: "CNPJ",
                 render: (client) => (
                   <span className="text-sm text-gray-900">
-                    {client.taxId || '-'}
+                    {client.taxId || "-"}
                   </span>
                 ),
               },
               {
-                key: 'tradeName',
-                header: 'Nome na Fachada',
+                key: "tradeName",
+                header: "Nome na Fachada",
                 render: (client) => (
                   <span className="text-sm text-gray-900">
-                    {client.tradeName || '-'}
+                    {client.tradeName || "-"}
                   </span>
                 ),
               },
               {
-                key: 'status',
-                header: 'Status',
+                key: "status",
+                header: "Status",
                 render: (client) => <StatusBadge status={client.status} />,
               },
               {
-                key: 'conectaPlus',
-                header: 'Conecta Plus',
-                render: (client) => <ConectaPlusBadge conectaPlus={client.conectaPlus} />,
+                key: "conectaPlus",
+                header: "Conecta Plus",
+                render: (client) => (
+                  <ConectaPlusBadge conectaPlus={client.conectaPlus} />
+                ),
               },
             ]}
             sortBy={search.sortBy}

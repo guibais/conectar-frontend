@@ -1,23 +1,23 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { Save, Search } from 'lucide-react';
-import { useAuthStore } from '../../../stores/auth-store';
-import { useEffect, useState } from 'react';
-import { useCepQuery } from '../../../services/cep.service';
-import { useCreateClient } from '../../../services/clients.service';
-import { maskCEP, maskCNPJ, removeMask } from '../../../utils/masks';
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { Save, Search } from "lucide-react";
+import { useAuthStore } from "@/stores/auth-store";
+import { useEffect, useState } from "react";
+import { useCepQuery } from "@/services/cep.service";
+import { useCreateClient } from "@/services/clients.service";
+import { maskCEP, maskCNPJ, removeMask } from "@/utils/masks";
 
-export const Route = createFileRoute('/clients/create/')({
+export const Route = createFileRoute("/_panel/clients/create/")({
   component: CreateClientPage,
 });
 
 const createClientSchema = z.object({
-  name: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
-  email: z.string().email('Email inválido'),
-  password: z.string().min(6, 'Senha deve ter pelo menos 6 caracteres'),
-  role: z.enum(['admin', 'user']),
+  name: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
+  email: z.string().email("Email inválido"),
+  password: z.string().min(6, "Senha deve ter pelo menos 6 caracteres"),
+  role: z.enum(["admin", "user"]),
   tradeName: z.string().optional(),
   taxId: z.string().optional(),
   companyName: z.string().optional(),
@@ -28,7 +28,7 @@ const createClientSchema = z.object({
   city: z.string().optional(),
   state: z.string().optional(),
   complement: z.string().optional(),
-  status: z.enum(['Active', 'Inactive']).default('Active'),
+  status: z.enum(["Active", "Inactive"]).default("Active"),
   conectaPlus: z.boolean().default(false),
 });
 
@@ -37,7 +37,7 @@ type CreateClientFormData = z.infer<typeof createClientSchema>;
 function CreateClientPage() {
   const navigate = useNavigate();
   const { user: currentUser, isAuthenticated } = useAuthStore();
-  const [cepValue, setCepValue] = useState('');
+  const [cepValue, setCepValue] = useState("");
   const createClientMutation = useCreateClient();
 
   const {
@@ -49,8 +49,8 @@ function CreateClientPage() {
   } = useForm<CreateClientFormData>({
     resolver: zodResolver(createClientSchema),
     defaultValues: {
-      role: 'user',
-      status: 'Active',
+      role: "user",
+      status: "Active",
       conectaPlus: false,
     },
   });
@@ -58,30 +58,30 @@ function CreateClientPage() {
   const cepQuery = useCepQuery(cepValue, cepValue.length >= 8);
 
   useEffect(() => {
-    if (!isAuthenticated || currentUser?.role !== 'admin') {
-      navigate({ to: '/login' });
+    if (!isAuthenticated || currentUser?.role !== "admin") {
+      navigate({ to: "/login" });
       return;
     }
   }, [isAuthenticated, currentUser, navigate]);
 
   useEffect(() => {
     if (cepQuery.data && !cepQuery.isLoading) {
-      setValue('street', cepQuery.data.street || '');
-      setValue('district', cepQuery.data.district || '');
-      setValue('city', cepQuery.data.city || '');
-      setValue('state', cepQuery.data.state || '');
+      setValue("street", cepQuery.data.street || "");
+      setValue("district", cepQuery.data.district || "");
+      setValue("city", cepQuery.data.city || "");
+      setValue("state", cepQuery.data.state || "");
     }
   }, [cepQuery.data, cepQuery.isLoading, setValue]);
 
   const handleCepChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const maskedValue = maskCEP(e.target.value);
     setCepValue(removeMask(maskedValue));
-    setValue('zipCode', maskedValue);
+    setValue("zipCode", maskedValue);
   };
 
   const handleCnpjChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const maskedValue = maskCNPJ(e.target.value);
-    setValue('taxId', maskedValue);
+    setValue("taxId", maskedValue);
   };
 
   const handleCreateClient = async (data: CreateClientFormData) => {
@@ -91,27 +91,29 @@ function CreateClientPage() {
         email: data.email,
         password: data.password,
         role: data.role,
-        tradeName: data.tradeName || '',
-        taxId: data.taxId || '',
-        companyName: data.companyName || '',
-        zipCode: data.zipCode || '',
-        street: data.street || '',
-        number: data.number || '',
-        district: data.district || '',
-        city: data.city || '',
-        state: data.state || '',
-        complement: data.complement || '',
-        status: data.status || 'Active',
+        tradeName: data.tradeName || "",
+        taxId: data.taxId || "",
+        companyName: data.companyName || "",
+        zipCode: data.zipCode || "",
+        street: data.street || "",
+        number: data.number || "",
+        district: data.district || "",
+        city: data.city || "",
+        state: data.state || "",
+        complement: data.complement || "",
+        status: data.status || "Active",
         conectaPlus: data.conectaPlus || false,
       };
       await createClientMutation.mutateAsync(clientData);
-      navigate({ to: '/clients' });
+      navigate({ to: "/clients" });
     } catch (error: any) {
-      if (error.response?.data?.message === 'Email already exists') {
-        setError('email', { message: 'Este email já está em uso' });
+      if (error.response?.data?.message === "Email already exists") {
+        setError("email", { message: "Este email já está em uso" });
       } else {
-        console.error('Error creating client:', error);
-        setError('root', { message: 'Erro ao criar cliente. Tente novamente.' });
+        console.error("Error creating client:", error);
+        setError("root", {
+          message: "Erro ao criar cliente. Tente novamente.",
+        });
       }
     }
   };
@@ -120,11 +122,13 @@ function CreateClientPage() {
     <div className="px-6 py-8">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Novo Cliente</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            Novo Cliente
+          </h1>
           <p className="text-gray-600">Adicione um novo cliente ao sistema</p>
         </div>
         <button
-          onClick={() => navigate({ to: '/clients' })}
+          onClick={() => navigate({ to: "/clients" })}
           className="px-6 py-3 text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors font-medium"
         >
           Cancelar
@@ -138,7 +142,7 @@ function CreateClientPage() {
             </label>
             <input
               type="text"
-              {...register('name')}
+              {...register("name")}
               className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-transparent"
             />
             {errors.name && (
@@ -152,7 +156,7 @@ function CreateClientPage() {
             </label>
             <input
               type="email"
-              {...register('email')}
+              {...register("email")}
               className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-transparent"
             />
             {errors.email && (
@@ -166,11 +170,13 @@ function CreateClientPage() {
             </label>
             <input
               type="password"
-              {...register('password')}
+              {...register("password")}
               className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-conectar-primary text-sm"
             />
             {errors.password && (
-              <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
+              <p className="mt-1 text-sm text-red-600">
+                {errors.password.message}
+              </p>
             )}
           </div>
 
@@ -179,7 +185,7 @@ function CreateClientPage() {
               Tipo *
             </label>
             <select
-              {...register('role')}
+              {...register("role")}
               className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-conectar-primary text-sm"
             >
               <option value="user">Cliente</option>
@@ -192,8 +198,10 @@ function CreateClientPage() {
         </div>
 
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-6">Informações da Empresa</h3>
-          
+          <h3 className="text-lg font-semibold text-gray-900 mb-6">
+            Informações da Empresa
+          </h3>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -201,7 +209,7 @@ function CreateClientPage() {
               </label>
               <input
                 type="text"
-                {...register('tradeName')}
+                {...register("tradeName")}
                 className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-conectar-primary text-sm"
               />
             </div>
@@ -212,7 +220,7 @@ function CreateClientPage() {
               </label>
               <input
                 type="text"
-                {...register('taxId')}
+                {...register("taxId")}
                 onChange={handleCnpjChange}
                 className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-conectar-primary text-sm"
                 placeholder="00.000.000/0000-00"
@@ -225,7 +233,7 @@ function CreateClientPage() {
               </label>
               <input
                 type="text"
-                {...register('companyName')}
+                {...register("companyName")}
                 className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-conectar-primary text-sm"
               />
             </div>
@@ -237,7 +245,7 @@ function CreateClientPage() {
               <div className="relative">
                 <input
                   type="text"
-                  {...register('zipCode')}
+                  {...register("zipCode")}
                   onChange={handleCepChange}
                   className="w-full px-4 py-3 pr-12 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-conectar-primary text-sm"
                   placeholder="00000-000"
@@ -262,7 +270,7 @@ function CreateClientPage() {
               </label>
               <input
                 type="text"
-                {...register('city')}
+                {...register("city")}
                 className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-conectar-primary text-sm"
               />
             </div>
@@ -273,7 +281,7 @@ function CreateClientPage() {
               </label>
               <input
                 type="text"
-                {...register('street')}
+                {...register("street")}
                 className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-conectar-primary text-sm"
               />
             </div>
@@ -284,7 +292,7 @@ function CreateClientPage() {
               </label>
               <input
                 type="text"
-                {...register('number')}
+                {...register("number")}
                 className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-conectar-primary text-sm"
               />
             </div>
@@ -295,7 +303,7 @@ function CreateClientPage() {
               </label>
               <input
                 type="text"
-                {...register('district')}
+                {...register("district")}
                 className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-conectar-primary text-sm"
               />
             </div>
@@ -306,7 +314,7 @@ function CreateClientPage() {
               </label>
               <input
                 type="text"
-                {...register('state')}
+                {...register("state")}
                 maxLength={2}
                 className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-conectar-primary text-sm"
                 placeholder="SP"
@@ -319,7 +327,7 @@ function CreateClientPage() {
               </label>
               <input
                 type="text"
-                {...register('complement')}
+                {...register("complement")}
                 className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-conectar-primary text-sm"
               />
             </div>
@@ -329,7 +337,7 @@ function CreateClientPage() {
                 Status
               </label>
               <select
-                {...register('status')}
+                {...register("status")}
                 className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-conectar-primary text-sm"
               >
                 <option value="Active">Ativo</option>
@@ -342,8 +350,8 @@ function CreateClientPage() {
                 Conecta Plus
               </label>
               <select
-                {...register('conectaPlus', { 
-                  setValueAs: (value) => value === 'true' 
+                {...register("conectaPlus", {
+                  setValueAs: (value) => value === "true",
                 })}
                 className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-conectar-primary text-sm"
               >
@@ -363,7 +371,7 @@ function CreateClientPage() {
         <div className="flex justify-end gap-3 pt-6">
           <button
             type="button"
-            onClick={() => navigate({ to: '/clients' })}
+            onClick={() => navigate({ to: "/clients" })}
             className="px-6 py-3 text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors font-medium"
           >
             Cancelar
@@ -374,7 +382,7 @@ function CreateClientPage() {
             className="flex items-center gap-2 px-6 py-3 bg-conectar-primary text-white rounded-lg hover:bg-conectar-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
           >
             <Save className="h-5 w-5" />
-            {isSubmitting ? 'Criando...' : 'Criar Cliente'}
+            {isSubmitting ? "Criando..." : "Criar Cliente"}
           </button>
         </div>
       </form>

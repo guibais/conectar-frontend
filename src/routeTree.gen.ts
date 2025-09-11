@@ -10,22 +10,19 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as RegisterRouteImport } from './routes/register'
-import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as LoginRouteImport } from './routes/login'
-import { Route as ClientsRouteImport } from './routes/clients'
+import { Route as PanelRouteImport } from './routes/_panel'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as ClientsIndexRouteImport } from './routes/clients/index'
-import { Route as ClientsCreateIndexRouteImport } from './routes/clients/create/index'
-import { Route as ClientsClientIdIndexRouteImport } from './routes/clients/$clientId/index'
+import { Route as PanelProfileRouteImport } from './routes/_panel/profile'
+import { Route as PanelNotificationsIndexRouteImport } from './routes/_panel/notifications/index'
+import { Route as PanelClientsIndexRouteImport } from './routes/_panel/clients/index'
+import { Route as PanelClientsClientsRouteImport } from './routes/_panel/clients/clients'
+import { Route as PanelClientsCreateIndexRouteImport } from './routes/_panel/clients/create/index'
+import { Route as PanelClientsClientIdIndexRouteImport } from './routes/_panel/clients/$clientId/index'
 
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
   path: '/register',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProfileRoute = ProfileRouteImport.update({
-  id: '/profile',
-  path: '/profile',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -33,9 +30,8 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ClientsRoute = ClientsRouteImport.update({
-  id: '/clients',
-  path: '/clients',
+const PanelRoute = PanelRouteImport.update({
+  id: '/_panel',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -43,89 +39,114 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ClientsIndexRoute = ClientsIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => ClientsRoute,
+const PanelProfileRoute = PanelProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => PanelRoute,
 } as any)
-const ClientsCreateIndexRoute = ClientsCreateIndexRouteImport.update({
-  id: '/create/',
-  path: '/create/',
-  getParentRoute: () => ClientsRoute,
+const PanelNotificationsIndexRoute = PanelNotificationsIndexRouteImport.update({
+  id: '/notifications/',
+  path: '/notifications/',
+  getParentRoute: () => PanelRoute,
 } as any)
-const ClientsClientIdIndexRoute = ClientsClientIdIndexRouteImport.update({
-  id: '/$clientId/',
-  path: '/$clientId/',
-  getParentRoute: () => ClientsRoute,
+const PanelClientsIndexRoute = PanelClientsIndexRouteImport.update({
+  id: '/clients/',
+  path: '/clients/',
+  getParentRoute: () => PanelRoute,
 } as any)
+const PanelClientsClientsRoute = PanelClientsClientsRouteImport.update({
+  id: '/clients/clients',
+  path: '/clients/clients',
+  getParentRoute: () => PanelRoute,
+} as any)
+const PanelClientsCreateIndexRoute = PanelClientsCreateIndexRouteImport.update({
+  id: '/clients/create/',
+  path: '/clients/create/',
+  getParentRoute: () => PanelRoute,
+} as any)
+const PanelClientsClientIdIndexRoute =
+  PanelClientsClientIdIndexRouteImport.update({
+    id: '/clients/$clientId/',
+    path: '/clients/$clientId/',
+    getParentRoute: () => PanelRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/clients': typeof ClientsRouteWithChildren
   '/login': typeof LoginRoute
-  '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
-  '/clients/': typeof ClientsIndexRoute
-  '/clients/$clientId': typeof ClientsClientIdIndexRoute
-  '/clients/create': typeof ClientsCreateIndexRoute
+  '/profile': typeof PanelProfileRoute
+  '/clients/clients': typeof PanelClientsClientsRoute
+  '/clients': typeof PanelClientsIndexRoute
+  '/notifications': typeof PanelNotificationsIndexRoute
+  '/clients/$clientId': typeof PanelClientsClientIdIndexRoute
+  '/clients/create': typeof PanelClientsCreateIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
-  '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
-  '/clients': typeof ClientsIndexRoute
-  '/clients/$clientId': typeof ClientsClientIdIndexRoute
-  '/clients/create': typeof ClientsCreateIndexRoute
+  '/profile': typeof PanelProfileRoute
+  '/clients/clients': typeof PanelClientsClientsRoute
+  '/clients': typeof PanelClientsIndexRoute
+  '/notifications': typeof PanelNotificationsIndexRoute
+  '/clients/$clientId': typeof PanelClientsClientIdIndexRoute
+  '/clients/create': typeof PanelClientsCreateIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/clients': typeof ClientsRouteWithChildren
+  '/_panel': typeof PanelRouteWithChildren
   '/login': typeof LoginRoute
-  '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
-  '/clients/': typeof ClientsIndexRoute
-  '/clients/$clientId/': typeof ClientsClientIdIndexRoute
-  '/clients/create/': typeof ClientsCreateIndexRoute
+  '/_panel/profile': typeof PanelProfileRoute
+  '/_panel/clients/clients': typeof PanelClientsClientsRoute
+  '/_panel/clients/': typeof PanelClientsIndexRoute
+  '/_panel/notifications/': typeof PanelNotificationsIndexRoute
+  '/_panel/clients/$clientId/': typeof PanelClientsClientIdIndexRoute
+  '/_panel/clients/create/': typeof PanelClientsCreateIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/clients'
     | '/login'
-    | '/profile'
     | '/register'
-    | '/clients/'
+    | '/profile'
+    | '/clients/clients'
+    | '/clients'
+    | '/notifications'
     | '/clients/$clientId'
     | '/clients/create'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/login'
-    | '/profile'
     | '/register'
+    | '/profile'
+    | '/clients/clients'
     | '/clients'
+    | '/notifications'
     | '/clients/$clientId'
     | '/clients/create'
   id:
     | '__root__'
     | '/'
-    | '/clients'
+    | '/_panel'
     | '/login'
-    | '/profile'
     | '/register'
-    | '/clients/'
-    | '/clients/$clientId/'
-    | '/clients/create/'
+    | '/_panel/profile'
+    | '/_panel/clients/clients'
+    | '/_panel/clients/'
+    | '/_panel/notifications/'
+    | '/_panel/clients/$clientId/'
+    | '/_panel/clients/create/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  ClientsRoute: typeof ClientsRouteWithChildren
+  PanelRoute: typeof PanelRouteWithChildren
   LoginRoute: typeof LoginRoute
-  ProfileRoute: typeof ProfileRoute
   RegisterRoute: typeof RegisterRoute
 }
 
@@ -138,13 +159,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RegisterRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/profile': {
-      id: '/profile'
-      path: '/profile'
-      fullPath: '/profile'
-      preLoaderRoute: typeof ProfileRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -152,11 +166,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/clients': {
-      id: '/clients'
-      path: '/clients'
-      fullPath: '/clients'
-      preLoaderRoute: typeof ClientsRouteImport
+    '/_panel': {
+      id: '/_panel'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof PanelRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -166,50 +180,75 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/clients/': {
-      id: '/clients/'
-      path: '/'
-      fullPath: '/clients/'
-      preLoaderRoute: typeof ClientsIndexRouteImport
-      parentRoute: typeof ClientsRoute
+    '/_panel/profile': {
+      id: '/_panel/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof PanelProfileRouteImport
+      parentRoute: typeof PanelRoute
     }
-    '/clients/create/': {
-      id: '/clients/create/'
-      path: '/create'
+    '/_panel/notifications/': {
+      id: '/_panel/notifications/'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof PanelNotificationsIndexRouteImport
+      parentRoute: typeof PanelRoute
+    }
+    '/_panel/clients/': {
+      id: '/_panel/clients/'
+      path: '/clients'
+      fullPath: '/clients'
+      preLoaderRoute: typeof PanelClientsIndexRouteImport
+      parentRoute: typeof PanelRoute
+    }
+    '/_panel/clients/clients': {
+      id: '/_panel/clients/clients'
+      path: '/clients/clients'
+      fullPath: '/clients/clients'
+      preLoaderRoute: typeof PanelClientsClientsRouteImport
+      parentRoute: typeof PanelRoute
+    }
+    '/_panel/clients/create/': {
+      id: '/_panel/clients/create/'
+      path: '/clients/create'
       fullPath: '/clients/create'
-      preLoaderRoute: typeof ClientsCreateIndexRouteImport
-      parentRoute: typeof ClientsRoute
+      preLoaderRoute: typeof PanelClientsCreateIndexRouteImport
+      parentRoute: typeof PanelRoute
     }
-    '/clients/$clientId/': {
-      id: '/clients/$clientId/'
-      path: '/$clientId'
+    '/_panel/clients/$clientId/': {
+      id: '/_panel/clients/$clientId/'
+      path: '/clients/$clientId'
       fullPath: '/clients/$clientId'
-      preLoaderRoute: typeof ClientsClientIdIndexRouteImport
-      parentRoute: typeof ClientsRoute
+      preLoaderRoute: typeof PanelClientsClientIdIndexRouteImport
+      parentRoute: typeof PanelRoute
     }
   }
 }
 
-interface ClientsRouteChildren {
-  ClientsIndexRoute: typeof ClientsIndexRoute
-  ClientsClientIdIndexRoute: typeof ClientsClientIdIndexRoute
-  ClientsCreateIndexRoute: typeof ClientsCreateIndexRoute
+interface PanelRouteChildren {
+  PanelProfileRoute: typeof PanelProfileRoute
+  PanelClientsClientsRoute: typeof PanelClientsClientsRoute
+  PanelClientsIndexRoute: typeof PanelClientsIndexRoute
+  PanelNotificationsIndexRoute: typeof PanelNotificationsIndexRoute
+  PanelClientsClientIdIndexRoute: typeof PanelClientsClientIdIndexRoute
+  PanelClientsCreateIndexRoute: typeof PanelClientsCreateIndexRoute
 }
 
-const ClientsRouteChildren: ClientsRouteChildren = {
-  ClientsIndexRoute: ClientsIndexRoute,
-  ClientsClientIdIndexRoute: ClientsClientIdIndexRoute,
-  ClientsCreateIndexRoute: ClientsCreateIndexRoute,
+const PanelRouteChildren: PanelRouteChildren = {
+  PanelProfileRoute: PanelProfileRoute,
+  PanelClientsClientsRoute: PanelClientsClientsRoute,
+  PanelClientsIndexRoute: PanelClientsIndexRoute,
+  PanelNotificationsIndexRoute: PanelNotificationsIndexRoute,
+  PanelClientsClientIdIndexRoute: PanelClientsClientIdIndexRoute,
+  PanelClientsCreateIndexRoute: PanelClientsCreateIndexRoute,
 }
 
-const ClientsRouteWithChildren =
-  ClientsRoute._addFileChildren(ClientsRouteChildren)
+const PanelRouteWithChildren = PanelRoute._addFileChildren(PanelRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  ClientsRoute: ClientsRouteWithChildren,
+  PanelRoute: PanelRouteWithChildren,
   LoginRoute: LoginRoute,
-  ProfileRoute: ProfileRoute,
   RegisterRoute: RegisterRoute,
 }
 export const routeTree = rootRouteImport

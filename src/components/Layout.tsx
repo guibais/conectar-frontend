@@ -35,6 +35,13 @@ export function Layout({ children }: LayoutProps) {
                   >
                     <span>Clientes</span>
                   </Link>
+                  <Link
+                    to="/notifications"
+                    className="flex items-center space-x-2 px-3 py-2 text-sm font-medium hover:bg-white/10 transition-colors"
+                    activeProps={{ className: "bg-white/10" }}
+                  >
+                    <span>Notificações</span>
+                  </Link>
                 </nav>
               )}
             </div>
@@ -43,9 +50,12 @@ export function Layout({ children }: LayoutProps) {
               <button className="p-2 hover:bg-white/10 rounded-full transition-colors">
                 <HelpCircle size={20} />
               </button>
-              <button className="p-2 hover:bg-white/10 rounded-full transition-colors">
+              <Link
+                to="/notifications"
+                className="p-2 hover:bg-white/10 rounded-full transition-colors"
+              >
                 <Bell size={20} />
-              </button>
+              </Link>
               <button
                 onClick={handleLogout}
                 className="p-2 hover:bg-white/10 rounded-full transition-colors"
