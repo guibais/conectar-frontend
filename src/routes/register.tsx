@@ -130,7 +130,7 @@ function RegisterPage() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer"
                   >
                     {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                   </button>
@@ -154,7 +154,7 @@ function RegisterPage() {
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer"
                   >
                     {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                   </button>
@@ -173,7 +173,7 @@ function RegisterPage() {
               <button
                 type="submit"
                 disabled={registerMutation.isPending}
-                className="w-full bg-conectar-primary text-white py-3 px-4 rounded-lg font-medium hover:bg-conectar-600 focus:ring-2 focus:ring-conectar-primary focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-conectar-primary text-white py-3 px-4 rounded-lg font-medium hover:bg-conectar-600 focus:ring-2 focus:ring-conectar-primary focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
               >
                 {registerMutation.isPending ? (
                   <div className="flex items-center justify-center gap-2">
@@ -189,7 +189,7 @@ function RegisterPage() {
                 <button
                   type="button"
                   onClick={() => navigate({ to: '/login' })}
-                  className="inline-flex items-center gap-2 text-sm text-conectar-primary hover:text-conectar-600 transition-colors"
+                  className="inline-flex items-center gap-2 text-sm text-conectar-primary hover:text-conectar-600 transition-colors cursor-pointer"
                 >
                   <ArrowLeft className="h-4 w-4" />
                   Voltar para o login

@@ -85,7 +85,7 @@ function LoginPage() {
                 />
                 <button
                   type="button"
-                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-conectar-primary transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-conectar-primary transition-colors cursor-pointer"
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
@@ -105,7 +105,7 @@ function LoginPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-conectar-primary hover:bg-conectar-600 disabled:bg-gray-300 text-white font-medium py-3 px-4 rounded-lg transition-colors focus:ring-2 focus:ring-conectar-primary focus:ring-offset-2"
+              className="w-full bg-conectar-primary hover:bg-conectar-600 disabled:bg-gray-300 text-white font-medium py-3 px-4 rounded-lg transition-colors focus:ring-2 focus:ring-conectar-primary focus:ring-offset-2 cursor-pointer"
             >
               {isLoading ? 'Entrando...' : 'Entrar'}
             </button>
@@ -117,7 +117,7 @@ function LoginPage() {
               <button
                 type="button"
                 onClick={() => navigate({ to: '/register' })}
-                className="text-conectar-primary hover:text-conectar-600 font-medium"
+                className="text-conectar-primary hover:text-conectar-600 font-medium cursor-pointer"
               >
                 Criar conta
               </button>

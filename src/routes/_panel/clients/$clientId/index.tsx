@@ -165,7 +165,7 @@ function ClientEditPage() {
           </p>
           <button
             onClick={() => navigate({ to: "/clients" })}
-            className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+            className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 cursor-pointer"
           >
             Voltar para lista de clientes
           </button>
@@ -183,7 +183,7 @@ function ClientEditPage() {
           </h1>
           <button
             onClick={() => navigate({ to: "/clients" })}
-            className="text-conectar-primary hover:text-conectar-600"
+            className="text-conectar-primary hover:text-conectar-600 cursor-pointer"
           >
             Voltar para lista de clientes
           </button>
@@ -206,14 +206,14 @@ function ClientEditPage() {
         <div className="flex items-center gap-3">
           <button
             onClick={() => navigate({ to: "/clients" })}
-            className="px-4 py-2 text-sm font-medium text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            className="px-4 py-2 text-sm font-medium text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
           >
             Cancelar
           </button>
           {currentUser?.id !== clientQuery.data?.id && (
             <button
               onClick={handleDeleteClient}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-red-600 border border-red-300 rounded-lg hover:bg-red-50 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-red-600 border border-red-300 rounded-lg hover:bg-red-50 transition-colors cursor-pointer"
             >
               <Trash2 className="h-4 w-4" />
               Excluir Cliente
@@ -480,14 +480,14 @@ function ClientEditPage() {
               <button
                 type="button"
                 onClick={() => navigate({ to: "/clients" })}
-                className="px-4 py-2 text-sm font-medium text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                className="px-4 py-2 text-sm font-medium text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
               >
                 Cancelar
               </button>
               <button
                 type="submit"
                 disabled={updateClientMutation.isPending}
-                className="flex items-center gap-2 px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
               >
                 <Save className="h-4 w-4" />
                 {updateClientMutation.isPending

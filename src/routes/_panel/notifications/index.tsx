@@ -132,20 +132,6 @@ function NotificationsPage() {
           emptyMessage="Nenhum usuário inativo encontrado"
         />
       </div>
-
-      {inactiveClientsQuery.data && inactiveClientsQuery.data.length > 0 && (
-        <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-          <h3 className="text-sm font-medium text-blue-800 mb-2">
-            💡 Dicas para reengajar usuários inativos:
-          </h3>
-          <ul className="text-sm text-blue-700 space-y-1">
-            <li>• Entre em contato via e-mail para verificar se precisam de ajuda</li>
-            <li>• Ofereça treinamento ou suporte técnico</li>
-            <li>• Verifique se as credenciais de acesso estão funcionando</li>
-            <li>• Considere desativar contas muito antigas por segurança</li>
-          </ul>
-        </div>
-      )}
     </PageTemplate>
   );
 }

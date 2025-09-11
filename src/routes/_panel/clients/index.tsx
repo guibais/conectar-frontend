@@ -191,7 +191,7 @@ function ClientsPage() {
         </div>
         <button
           onClick={() => navigate({ to: "/clients/create" })}
-          className="flex items-center gap-2 px-6 py-3 bg-conectar-primary text-white rounded-lg hover:bg-conectar-600 transition-colors font-medium"
+          className="flex items-center gap-2 px-6 py-3 bg-conectar-primary text-white rounded-lg hover:bg-conectar-600 transition-colors font-medium cursor-pointer"
         >
           <Plus className="h-5 w-5" />
           Adicionar Cliente
@@ -275,7 +275,7 @@ function ClientsPage() {
                   status: e.target.value as any,
                 })
               }
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white"
+              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white cursor-pointer"
             >
               <option value="">Selecione</option>
               <option value="Active">Ativo</option>
@@ -295,7 +295,7 @@ function ClientsPage() {
                   conectaPlus: e.target.value as "Yes" | "No" | "",
                 })
               }
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white"
+              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white cursor-pointer"
             >
               <option value="">Selecione</option>
               <option value="Yes">Sim</option>
@@ -372,7 +372,7 @@ function ClientsPage() {
               <>
                 <button
                   onClick={() => navigate({ to: `/clients/${client.id}` })}
-                  className="p-2 text-gray-400 hover:text-conectar-primary hover:bg-conectar-50 rounded-lg transition-colors"
+                  className="p-2 text-gray-400 hover:text-conectar-primary hover:bg-conectar-50 rounded-lg transition-colors cursor-pointer"
                   title="Editar cliente"
                 >
                   <Edit className="h-4 w-4" />
@@ -380,7 +380,7 @@ function ClientsPage() {
                 {currentUser?.id !== client.id && (
                   <button
                     onClick={() => handleDeleteClient(client.id)}
-                    className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                    className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
                     title="Excluir cliente"
                   >
                     <Trash2 className="h-4 w-4" />
@@ -418,7 +418,7 @@ function ClientsPage() {
                   })
                 }
                 disabled={Number(clientsQuery.data.pagination.page) <= 1}
-                className="px-3 py-2 text-sm border border-gray-200 rounded-lg hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="px-3 py-2 text-sm border border-gray-200 rounded-lg hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
               >
                 Anterior
               </button>
@@ -440,7 +440,7 @@ function ClientsPage() {
                   Number(clientsQuery.data.pagination.page) >=
                   Number(clientsQuery.data.pagination.totalPages)
                 }
-                className="px-3 py-2 text-sm border border-gray-200 rounded-lg hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="px-3 py-2 text-sm border border-gray-200 rounded-lg hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
               >
                 Próximo
               </button>
