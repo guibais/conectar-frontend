@@ -19,6 +19,7 @@ import { Route as PanelClientsIndexRouteImport } from './routes/_panel/clients/i
 import { Route as PanelClientsClientsRouteImport } from './routes/_panel/clients/clients'
 import { Route as PanelClientsCreateIndexRouteImport } from './routes/_panel/clients/create/index'
 import { Route as PanelClientsClientIdIndexRouteImport } from './routes/_panel/clients/$clientId/index'
+import { Route as PanelClientsClientIdIndexCleanRouteImport } from './routes/_panel/clients/$clientId/index-clean'
 
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
@@ -70,6 +71,12 @@ const PanelClientsClientIdIndexRoute =
     path: '/clients/$clientId/',
     getParentRoute: () => PanelRoute,
   } as any)
+const PanelClientsClientIdIndexCleanRoute =
+  PanelClientsClientIdIndexCleanRouteImport.update({
+    id: '/clients/$clientId/index-clean',
+    path: '/clients/$clientId/index-clean',
+    getParentRoute: () => PanelRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -79,6 +86,7 @@ export interface FileRoutesByFullPath {
   '/clients/clients': typeof PanelClientsClientsRoute
   '/clients': typeof PanelClientsIndexRoute
   '/notifications': typeof PanelNotificationsIndexRoute
+  '/clients/$clientId/index-clean': typeof PanelClientsClientIdIndexCleanRoute
   '/clients/$clientId': typeof PanelClientsClientIdIndexRoute
   '/clients/create': typeof PanelClientsCreateIndexRoute
 }
@@ -90,6 +98,7 @@ export interface FileRoutesByTo {
   '/clients/clients': typeof PanelClientsClientsRoute
   '/clients': typeof PanelClientsIndexRoute
   '/notifications': typeof PanelNotificationsIndexRoute
+  '/clients/$clientId/index-clean': typeof PanelClientsClientIdIndexCleanRoute
   '/clients/$clientId': typeof PanelClientsClientIdIndexRoute
   '/clients/create': typeof PanelClientsCreateIndexRoute
 }
@@ -103,6 +112,7 @@ export interface FileRoutesById {
   '/_panel/clients/clients': typeof PanelClientsClientsRoute
   '/_panel/clients/': typeof PanelClientsIndexRoute
   '/_panel/notifications/': typeof PanelNotificationsIndexRoute
+  '/_panel/clients/$clientId/index-clean': typeof PanelClientsClientIdIndexCleanRoute
   '/_panel/clients/$clientId/': typeof PanelClientsClientIdIndexRoute
   '/_panel/clients/create/': typeof PanelClientsCreateIndexRoute
 }
@@ -116,6 +126,7 @@ export interface FileRouteTypes {
     | '/clients/clients'
     | '/clients'
     | '/notifications'
+    | '/clients/$clientId/index-clean'
     | '/clients/$clientId'
     | '/clients/create'
   fileRoutesByTo: FileRoutesByTo
@@ -127,6 +138,7 @@ export interface FileRouteTypes {
     | '/clients/clients'
     | '/clients'
     | '/notifications'
+    | '/clients/$clientId/index-clean'
     | '/clients/$clientId'
     | '/clients/create'
   id:
@@ -139,6 +151,7 @@ export interface FileRouteTypes {
     | '/_panel/clients/clients'
     | '/_panel/clients/'
     | '/_panel/notifications/'
+    | '/_panel/clients/$clientId/index-clean'
     | '/_panel/clients/$clientId/'
     | '/_panel/clients/create/'
   fileRoutesById: FileRoutesById
@@ -222,6 +235,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PanelClientsClientIdIndexRouteImport
       parentRoute: typeof PanelRoute
     }
+    '/_panel/clients/$clientId/index-clean': {
+      id: '/_panel/clients/$clientId/index-clean'
+      path: '/clients/$clientId/index-clean'
+      fullPath: '/clients/$clientId/index-clean'
+      preLoaderRoute: typeof PanelClientsClientIdIndexCleanRouteImport
+      parentRoute: typeof PanelRoute
+    }
   }
 }
 
@@ -230,6 +250,7 @@ interface PanelRouteChildren {
   PanelClientsClientsRoute: typeof PanelClientsClientsRoute
   PanelClientsIndexRoute: typeof PanelClientsIndexRoute
   PanelNotificationsIndexRoute: typeof PanelNotificationsIndexRoute
+  PanelClientsClientIdIndexCleanRoute: typeof PanelClientsClientIdIndexCleanRoute
   PanelClientsClientIdIndexRoute: typeof PanelClientsClientIdIndexRoute
   PanelClientsCreateIndexRoute: typeof PanelClientsCreateIndexRoute
 }
@@ -239,6 +260,7 @@ const PanelRouteChildren: PanelRouteChildren = {
   PanelClientsClientsRoute: PanelClientsClientsRoute,
   PanelClientsIndexRoute: PanelClientsIndexRoute,
   PanelNotificationsIndexRoute: PanelNotificationsIndexRoute,
+  PanelClientsClientIdIndexCleanRoute: PanelClientsClientIdIndexCleanRoute,
   PanelClientsClientIdIndexRoute: PanelClientsClientIdIndexRoute,
   PanelClientsCreateIndexRoute: PanelClientsCreateIndexRoute,
 }

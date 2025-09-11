@@ -3,34 +3,22 @@ import { useState } from "react";
 import { User } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { PageTemplate } from "@/components/ui/PageTemplate";
-import { DynamicForm, type FormFieldConfig } from "@/components/ui/DynamicForm";
+import { DynamicForm } from "@/components/ui/DynamicForm";
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import type { UserProfileFormData } from "@/lib/schemas";
 import { userProfileSchema } from "@/lib/schemas";
 import { useUserProfile, useUpdateUserProfile } from "@/services/users.service";
 import { useAuthStore } from "@/stores/auth-store";
+import { authFormFields } from "@/lib/form-fields";
 
-const profileFields: FormFieldConfig[] = [
+const profileFields = [
+  authFormFields.profile.find(field => field.name === "name")!,
+  authFormFields.profile.find(field => field.name === "email")!,
   {
-    name: "name",
-    label: "Nome completo",
-    type: "text",
-    placeholder: "Digite seu nome",
-    required: true,
-    gridCols: 1,
-  },
-  {
-    name: "email",
-    label: "Email",
-    type: "email",
-    placeholder: "Digite seu email",
-    required: true,
-    gridCols: 1,
-  },
-  {
-    name: "password",
+    ...authFormFields.profile.find(field => field.name === "password")!,
     label: "Nova senha (opcional)",
-    type: "password",
     placeholder: "Digite uma nova senha",
+    required: false,
     gridCols: 2,
   },
 ];
@@ -81,16 +69,8 @@ function ProfilePage() {
         description="Gerencie suas informações pessoais"
         isLoading={true}
       >
-        <div className="animate-pulse space-y-6">
-          <div className="bg-white rounded-lg border border-gray-200 p-6">
-            <div className="h-6 bg-gray-200 rounded w-1/3 mb-4"></div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="h-10 bg-gray-200 rounded"></div>
-              <div className="h-10 bg-gray-200 rounded"></div>
-              <div className="h-10 bg-gray-200 rounded"></div>
-              <div className="h-10 bg-gray-200 rounded"></div>
-            </div>
-          </div>
+        <div className="flex items-center justify-center min-h-64">
+          <LoadingSpinner size="lg" />
         </div>
       </PageTemplate>
     );

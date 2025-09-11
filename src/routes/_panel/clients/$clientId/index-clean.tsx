@@ -10,11 +10,10 @@ import { DynamicForm, type FormFieldConfig } from "@/components/ui/DynamicForm";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { ActionButton } from "@/components/ui/ActionButton";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
-import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { updateClientSchema, type UpdateClientFormData } from "@/lib/client-schemas";
 import { clientFormFields } from "@/lib/form-fields";
 
-export const Route = createFileRoute("/_panel/clients/$clientId/")({
+export const Route = createFileRoute("/_panel/clients/$clientId/index-clean")({
   component: ClientEditPage,
 });
 
@@ -152,101 +151,56 @@ function ClientEditPage() {
   };
 
   if (clientQuery.isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <LoadingSpinner size="lg" />
-      </div>
-    );
+    return <div>Carregando...</div>;
   }
 
-  if (clientQuery.isError) {
-    return (
-      <div className="p-6">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <h2 className="text-lg font-semibold text-red-800 mb-2">
-            Cliente não encontrado
-          </h2>
-          <p className="text-red-600">
-            O cliente solicitado não foi encontrado.
-          </p>
-          <button
-            onClick={() => navigate({ to: "/clients" })}
-            className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 cursor-pointer"
-          >
-            Voltar para lista de clientes
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  if (!clientQuery.data) {
-    return (
-      <div className="p-6">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900">
-            Cliente não encontrado
-          </h1>
-          <button
-            onClick={() => navigate({ to: "/clients" })}
-            className="text-conectar-primary hover:text-conectar-600 cursor-pointer"
-          >
-            Voltar para lista de clientes
-          </button>
-        </div>
-      </div>
-    );
+  if (clientQuery.error) {
+    return <div>Erro ao carregar cliente</div>;
   }
 
   return (
     <div>
       <TabBar activeTab="dados-basicos" />
-      <div className="p-8">
+      <div className="px-6 py-8">
         <PageHeader
-          title="Editar Cliente"
-          description="Gerencie informações do cliente"
+          title={`Editar Cliente: ${clientQuery.data?.name}`}
+          description="Edite as informações do cliente"
           actions={
             <>
+              <ActionButton
+                onClick={handleDeleteClient}
+                variant="danger"
+                icon={<Trash2 className="h-4 w-4" />}
+                disabled={deleteClientMutation.isPending}
+              >
+                Excluir
+              </ActionButton>
               <ActionButton onClick={() => navigate({ to: "/clients" })}>
                 Cancelar
               </ActionButton>
-              {currentUser?.id !== clientQuery.data?.id && (
-                <ActionButton 
-                  variant="danger" 
-                  onClick={handleDeleteClient}
-                  className="flex items-center gap-2"
-                >
-                  <Trash2 className="h-4 w-4" />
-                  Excluir Cliente
-                </ActionButton>
-              )}
             </>
           }
         />
 
         {errorMessage && <ErrorMessage message={errorMessage} />}
 
-      <div className="bg-white rounded-lg border border-gray-200">
-        <div className="p-6">
-          <DynamicForm
-            fields={getFieldWithCustomHandlers()}
-            schema={updateClientSchema}
-            onSubmit={handleUpdateClient}
-            defaultValues={defaultValues}
-            submitLabel="Salvar Alterações"
-            isLoading={updateClientMutation.isPending}
-            formActions={
-              <button
-                type="button"
-                onClick={() => navigate({ to: "/clients" })}
-                className="px-4 py-2 text-sm font-medium text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
-              >
-                Cancelar
-              </button>
-            }
-          />
-        </div>
-      </div>
+        <DynamicForm
+          fields={getFieldWithCustomHandlers()}
+          schema={updateClientSchema}
+          onSubmit={handleUpdateClient}
+          defaultValues={defaultValues}
+          submitLabel="Atualizar Cliente"
+          isLoading={updateClientMutation.isPending}
+          formActions={
+            <button
+              type="button"
+              onClick={() => navigate({ to: "/clients" })}
+              className="px-6 py-3 text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 hover:scale-105 transition-all duration-200 font-medium cursor-pointer transform active:scale-95"
+            >
+              Cancelar
+            </button>
+          }
+        />
       </div>
     </div>
   );

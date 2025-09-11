@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { useAuthStore } from "../stores/auth-store";
+import { LoadingSpinner } from "../components/ui/LoadingSpinner";
 
 export const Route = createFileRoute("/")({
   component: HomePage,
@@ -30,7 +31,7 @@ function HomePage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#4ECDC4]">
-      <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-white"></div>
+      <LoadingSpinner size="lg" />
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { PageTemplate } from "@/components/ui/PageTemplate";
 import { useInactiveClients } from "@/services/notifications.service";
 import { createFileRoute } from "@tanstack/react-router";
 import { Clock, User, Mail, Calendar } from "lucide-react";
+import { formatDate, getDaysInactive } from "@/utils/date-helpers";
 
 export const Route = createFileRoute("/_panel/notifications/")({
   component: NotificationsPage,
@@ -12,24 +13,6 @@ export const Route = createFileRoute("/_panel/notifications/")({
 function NotificationsPage() {
   const inactiveClientsQuery = useInactiveClients();
 
-  const formatDate = (dateString: string | null) => {
-    if (!dateString) return "Nunca";
-    return new Date(dateString).toLocaleDateString("pt-BR", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-    });
-  };
-
-  const getDaysInactive = (lastLoginAt: string | null, createdAt: string) => {
-    const referenceDate = lastLoginAt
-      ? new Date(lastLoginAt)
-      : new Date(createdAt);
-    const today = new Date();
-    const diffTime = Math.abs(today.getTime() - referenceDate.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays;
-  };
 
   return (
     <PageTemplate

@@ -8,31 +8,13 @@ import { loginSchema, type LoginFormData } from "../lib/schemas";
 import { useAuthStore } from "../stores/auth-store";
 import { useGoogleLogin as useGoogleLoginMutation } from "../services/google-auth.service";
 import { AuthTemplate } from "../components/ui/AuthTemplate";
-import { DynamicForm, type FormFieldConfig } from "../components/ui/DynamicForm";
+import { DynamicForm } from "../components/ui/DynamicForm";
+import { authFormFields } from "../lib/form-fields";
 
 export const Route = createFileRoute("/login")({
   component: LoginPage,
 });
 
-const loginFields: FormFieldConfig[] = [
-  {
-    name: "email",
-    label: "Email",
-    type: "email",
-    placeholder: "Digite seu email",
-    required: true,
-    gridCols: 2,
-  },
-  {
-    name: "password",
-    label: "Senha",
-    type: "password",
-    placeholder: "••••••",
-    required: true,
-    showPasswordToggle: true,
-    gridCols: 2,
-  },
-];
 
 function LoginPage() {
   const navigate = useNavigate();
@@ -106,7 +88,7 @@ function LoginPage() {
       )}
       
       <DynamicForm
-        fields={loginFields}
+        fields={authFormFields.login}
         schema={loginSchema}
         onSubmit={onSubmit}
         submitLabel="Entrar"

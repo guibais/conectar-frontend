@@ -4,7 +4,8 @@ import { UserPlus, ArrowLeft } from "lucide-react";
 import { z } from "zod";
 import { useRegister } from "../services/auth.service";
 import { AuthTemplate } from "../components/ui/AuthTemplate";
-import { DynamicForm, type FormFieldConfig } from "../components/ui/DynamicForm";
+import { DynamicForm } from "../components/ui/DynamicForm";
+import { authFormFields } from "../lib/form-fields";
 
 export const Route = createFileRoute("/register")({
   component: RegisterPage,
@@ -24,40 +25,21 @@ const registerSchema = z
 
 type RegisterFormData = z.infer<typeof registerSchema>;
 
-const registerFields: FormFieldConfig[] = [
+const registerFields = [
   {
-    name: "name",
-    label: "Nome completo",
-    type: "text",
-    placeholder: "Digite seu nome completo",
-    required: true,
+    ...authFormFields.register.find(field => field.name === "name")!,
     gridCols: 2,
   },
   {
-    name: "email",
-    label: "Email",
-    type: "email",
-    placeholder: "Digite seu email",
-    required: true,
+    ...authFormFields.register.find(field => field.name === "email")!,
     gridCols: 2,
   },
+  authFormFields.register.find(field => field.name === "password")!,
   {
-    name: "password",
-    label: "Senha",
-    type: "password",
-    placeholder: "••••••",
-    required: true,
-    showPasswordToggle: true,
-    gridCols: 1,
-  },
-  {
+    ...authFormFields.register.find(field => field.name === "password")!,
     name: "confirmPassword",
     label: "Confirmar senha",
-    type: "password",
     placeholder: "••••••",
-    required: true,
-    showPasswordToggle: true,
-    gridCols: 1,
   },
 ];
 
