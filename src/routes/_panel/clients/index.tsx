@@ -13,6 +13,7 @@ import { DataTable } from "@/components/ui/DataTable";
 import { StatusBadge, ConectaPlusBadge } from "@/components/ui/StatusBadge";
 import { FilterCard } from "@/components/ui/FilterCard";
 import { TabBar } from "@/components/ui/TabBar";
+import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { maskCNPJ } from "@/utils/masks";
 import { TableSkeleton } from "@/components/ui/SkeletonLoader";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
@@ -75,6 +76,15 @@ function ClientsPage() {
 
   const clientsQuery = useClients(filters);
   const deleteClientMutation = useDeleteClient();
+  const [deleteModal, setDeleteModal] = useState<{
+    isOpen: boolean;
+    clientId: string;
+    clientName: string;
+  }>({
+    isOpen: false,
+    clientId: "",
+    clientName: "",
+  });
 
   useEffect(() => {
     if (!isAuthenticated || currentUser?.role !== "admin") {
@@ -97,12 +107,23 @@ function ClientsPage() {
     });
   };
 
-  const handleDeleteClient = async (clientId: string) => {
-    if (!confirm(t("clients.deleteConfirm"))) return;
+  const handleDeleteClient = (clientId: string, clientName: string) => {
+    setDeleteModal({
+      isOpen: true,
+      clientId,
+      clientName,
+    });
+  };
 
+  const confirmDeleteClient = async () => {
     try {
-      await deleteClientMutation.mutateAsync(clientId);
+      await deleteClientMutation.mutateAsync(deleteModal.clientId);
+      setDeleteModal({ isOpen: false, clientId: "", clientName: "" });
     } catch (error) {}
+  };
+
+  const closeDeleteModal = () => {
+    setDeleteModal({ isOpen: false, clientId: "", clientName: "" });
   };
 
   if (clientsQuery.isLoading) {
@@ -362,7 +383,7 @@ function ClientsPage() {
                 </button>
                 {currentUser?.id !== client.id && (
                   <button
-                    onClick={() => handleDeleteClient(client.id)}
+                    onClick={() => handleDeleteClient(client.id, client.name)}
                     className="p-1 text-gray-400 hover:text-red-600 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 rounded"
                     aria-label={t("clients.deleteClient", {
                       name: client.name,
@@ -376,6 +397,18 @@ function ClientsPage() {
           />
         </div>
       </main>
+
+      <ConfirmModal
+        isOpen={deleteModal.isOpen}
+        onClose={closeDeleteModal}
+        onConfirm={confirmDeleteClient}
+        title={t("clients.delete")}
+        message={t("clients.deleteConfirmName", { name: deleteModal.clientName })}
+        confirmText={t("common.delete")}
+        cancelText={t("common.cancel")}
+        variant="danger"
+        isLoading={deleteClientMutation.isPending}
+      />
     </div>
   );
 }

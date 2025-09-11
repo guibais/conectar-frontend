@@ -3,10 +3,13 @@ import { useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useGoogleOneTapLogin } from "@react-oauth/google";
 import { useGoogleLogin as useGoogleLoginMutation } from "../services/google-auth.service";
+import { useLogin } from "../services/auth.service";
 import { useAuthStore } from "../stores/auth-store";
 import { AuthTemplate } from "../components/ui/AuthTemplate";
 import { GoogleLoginButton } from "../components/ui/GoogleLoginButton";
+import { DynamicForm } from "../components/ui/DynamicForm";
 import { ErrorAlert } from "../components/ui/ErrorAlert";
+import { loginSchema, type LoginFormData } from "../lib/schemas";
 
 export const Route = createFileRoute("/login")({
   component: LoginPage,
@@ -18,6 +21,7 @@ function LoginPage() {
   const { setUserAndToken } = useAuthStore();
   const [errorMessage, setErrorMessage] = useState("");
   const googleLoginMutation = useGoogleLoginMutation();
+  const loginMutation = useLogin();
 
   const handleGoogleSuccess = useCallback(
     async (credentialResponse: any) => {
@@ -47,8 +51,44 @@ function LoginPage() {
         setErrorMessage(t("auth.login.loginError"));
       }
     },
-    []
+    [t]
   );
+
+  const handleLogin = async (data: LoginFormData) => {
+    setErrorMessage("");
+    
+    loginMutation.mutate(data, {
+      onSuccess: (response) => {
+        setUserAndToken(response.user, response.access_token);
+        if (response.user.role === "user") {
+          navigate({ to: "/profile" });
+        } else {
+          navigate({ to: "/clients" });
+        }
+      },
+      onError: () => {
+        setErrorMessage(t("auth.login.invalidCredentials"));
+      },
+    });
+  };
+
+  const loginFields = [
+    {
+      name: "email",
+      label: t("auth.login.email"),
+      type: "email" as const,
+      placeholder: "email@exemplo.com",
+      required: true,
+    },
+    {
+      name: "password",
+      label: t("auth.login.password"),
+      type: "password" as const,
+      placeholder: t("auth.login.password"),
+      required: true,
+      showPasswordToggle: true,
+    },
+  ];
 
   useGoogleOneTapLogin({
     onSuccess: handleGoogleSuccess,
@@ -63,6 +103,26 @@ function LoginPage() {
         {errorMessage && (
           <ErrorAlert message={errorMessage} />
         )}
+
+        <DynamicForm
+          fields={loginFields}
+          schema={loginSchema}
+          onSubmit={handleLogin}
+          submitLabel={t("auth.login.loginButton")}
+          isLoading={loginMutation.isPending}
+          fullWidthSubmit={true}
+        />
+
+        <div className="relative">
+          <div className="absolute inset-0 flex items-center">
+            <span className="w-full border-t" />
+          </div>
+          <div className="relative flex justify-center text-xs uppercase">
+            <span className="bg-white px-2 text-muted-foreground">
+              {t("common.or")}
+            </span>
+          </div>
+        </div>
 
         <GoogleLoginButton
           onSuccess={handleGoogleSuccess}

@@ -36,6 +36,7 @@
       "forgotPassword": "Esqueceu sua senha?",
       "noAccount": "Não tem uma conta?",
       "signUp": "Cadastre-se",
+      "createAccount": "Criar conta",
       "invalidCredentials": "Credenciais inválidas",
       "loginError": "Erro ao fazer login"
     },

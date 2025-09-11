@@ -152,45 +152,44 @@ function RegisterPage() {
         message: successMessage
       } : undefined}
     >
-      <DynamicForm
-        fields={registerFields}
-        schema={registerSchema}
-        onSubmit={onSubmit}
-        submitLabel={registerMutation.isPending ? t("common.loading") : t("auth.register.registerButton")}
-        isLoading={registerMutation.isPending}
-        fullWidthSubmit={true}
-        errorMessage={errorMessage}
-        formActions={
-          <div className="space-y-4">
-            <div className="relative" role="separator" aria-label={t("common.or")}>
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300" />
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">{t("common.or")}</span>
-              </div>
-            </div>
+      <div className="space-y-6">
+        <DynamicForm
+          fields={registerFields}
+          schema={registerSchema}
+          onSubmit={onSubmit}
+          submitLabel={registerMutation.isPending ? t("common.loading") : t("auth.register.registerButton")}
+          isLoading={registerMutation.isPending}
+          fullWidthSubmit={true}
+          errorMessage={errorMessage}
+        />
 
-            <GoogleLoginButton
-              onSuccess={handleGoogleSuccess}
-              onError={handleGoogleError}
-              text="signup_with"
-            />
-
-            <div className="text-center">
-              <button
-                type="button"
-                onClick={() => navigate({ to: "/login" })}
-                className="inline-flex items-center gap-2 px-6 py-3 text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 hover:scale-105 transition-all duration-200 font-medium cursor-pointer transform active:scale-95 focus:outline-none focus:ring-2 focus:ring-conectar-primary focus:ring-offset-2"
-                aria-label={t("auth.register.backToLogin")}
-              >
-                <ArrowLeft className="h-4 w-4" aria-hidden="true" />
-                {t("auth.register.backToLogin")}
-              </button>
-            </div>
+        <div className="relative" role="separator" aria-label={t("common.or")}>
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-gray-300" />
           </div>
-        }
-      />
+          <div className="relative flex justify-center text-sm">
+            <span className="px-2 bg-white text-gray-500">{t("common.or")}</span>
+          </div>
+        </div>
+
+        <GoogleLoginButton
+          onSuccess={handleGoogleSuccess}
+          onError={handleGoogleError}
+          text="signup_with"
+        />
+
+        <div className="text-center">
+          <button
+            type="button"
+            onClick={() => navigate({ to: "/login" })}
+            className="inline-flex items-center gap-2 px-6 py-3 text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 hover:scale-105 transition-all duration-200 font-medium cursor-pointer transform active:scale-95 focus:outline-none focus:ring-2 focus:ring-conectar-primary focus:ring-offset-2"
+            aria-label={t("auth.register.backToLogin")}
+          >
+            <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+            {t("auth.register.backToLogin")}
+          </button>
+        </div>
+      </div>
     </AuthTemplate>
   );
 }

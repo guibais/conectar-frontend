@@ -36,6 +36,7 @@
       "forgotPassword": "Forgot your password?",
       "noAccount": "Don't have an account?",
       "signUp": "Register",
+      "createAccount": "Create account",
       "invalidCredentials": "Invalid credentials",
       "loginError": "Error when logging"
     },

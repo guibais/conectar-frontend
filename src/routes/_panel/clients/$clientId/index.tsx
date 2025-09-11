@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Trash2 } from "lucide-react";
 import { useClient, useUpdateClient, useDeleteClient } from "@/services/clients.service";
@@ -9,6 +10,7 @@ import { ActionButton } from "@/components/ui/ActionButton";
 import { ErrorAlert } from "@/components/ui/ErrorAlert";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { FormSection } from "@/components/ui/FormSection";
+import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { useClientForm } from "@/hooks/useClientForm";
 import { useAuthRedirect } from "@/hooks/useAuthRedirect";
 import { useErrorHandler } from "@/hooks/useErrorHandler";
@@ -28,6 +30,7 @@ function ClientEditPage() {
   const clientQuery = useClient(clientId);
   const updateClientMutation = useUpdateClient();
   const deleteClientMutation = useDeleteClient();
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   useAuthRedirect({ requireRole: "admin" });
 
@@ -80,18 +83,21 @@ function ClientEditPage() {
     }
   };
 
-  const handleDeleteClient = async () => {
-    const clientName = clientQuery.data?.name || "este cliente";
-    if (!window.confirm(t("clients.deleteConfirmName", { name: clientName }))) {
-      return;
-    }
+  const handleDeleteClient = () => {
+    setIsDeleteModalOpen(true);
+  };
 
+  const confirmDeleteClient = async () => {
     try {
       await deleteClientMutation.mutateAsync(clientId);
       navigate({ to: "/clients" });
     } catch (error: any) {
       handleError(error, t("clients.deleteError"));
     }
+  };
+
+  const closeDeleteModal = () => {
+    setIsDeleteModalOpen(false);
   };
 
   if (clientQuery.isLoading) {
@@ -177,6 +183,18 @@ function ClientEditPage() {
           />
         </FormSection>
       </main>
+
+      <ConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={closeDeleteModal}
+        onConfirm={confirmDeleteClient}
+        title={t("clients.delete")}
+        message={t("clients.deleteConfirmName", { name: clientQuery.data?.name || "este cliente" })}
+        confirmText={t("common.delete")}
+        cancelText={t("common.cancel")}
+        variant="danger"
+        isLoading={deleteClientMutation.isPending}
+      />
     </div>
   );
 }
