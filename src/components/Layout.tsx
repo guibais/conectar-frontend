@@ -3,6 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { HelpCircle, Bell } from "lucide-react";
 import { useAuthStore } from "../stores/auth-store";
 import { ProfileDropdown } from "./ui/ProfileDropdown";
+import { MobileBottomNav } from "./ui/MobileBottomNav";
 
 type LayoutProps = {
   children: ReactNode;
@@ -13,7 +14,8 @@ export function Layout({ children }: LayoutProps) {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-[#00B894] text-white">
+      {/* Desktop Header */}
+      <header className="bg-[#00B894] text-white hidden md:block">
         <div className="max-w-full">
           <div className="flex items-center h-16">
             <div className="flex items-center">
@@ -64,7 +66,22 @@ export function Layout({ children }: LayoutProps) {
         </div>
       </header>
 
-      <main>{children}</main>
+      {/* Mobile Header - Simple Logo */}
+      <header className="bg-[#00B894] text-white md:hidden">
+        <div className="flex items-center justify-center h-16">
+          <Link
+            to={user?.role === "admin" ? "/clients" : "/profile"}
+            className="text-xl font-bold cursor-pointer"
+          >
+            Conéctar
+          </Link>
+        </div>
+      </header>
+
+      <main className="pb-20 md:pb-0">{children}</main>
+      
+      {/* Mobile Bottom Navigation */}
+      <MobileBottomNav />
     </div>
   );
 }
