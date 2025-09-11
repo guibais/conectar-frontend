@@ -1,37 +1,45 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useState, useCallback } from "react";
-import { Eye, EyeOff } from "lucide-react";
 import {
   GoogleLogin,
-  useGoogleLogin,
   useGoogleOneTapLogin,
 } from "@react-oauth/google";
 import { loginSchema, type LoginFormData } from "../lib/schemas";
 import { useAuthStore } from "../stores/auth-store";
 import { useGoogleLogin as useGoogleLoginMutation } from "../services/google-auth.service";
 import { AuthTemplate } from "../components/ui/AuthTemplate";
+import { DynamicForm, type FormFieldConfig } from "../components/ui/DynamicForm";
 
 export const Route = createFileRoute("/login")({
   component: LoginPage,
 });
 
+const loginFields: FormFieldConfig[] = [
+  {
+    name: "email",
+    label: "Email",
+    type: "email",
+    placeholder: "Digite seu email",
+    required: true,
+    gridCols: 2,
+  },
+  {
+    name: "password",
+    label: "Senha",
+    type: "password",
+    placeholder: "••••••",
+    required: true,
+    showPasswordToggle: true,
+    gridCols: 2,
+  },
+];
+
 function LoginPage() {
   const navigate = useNavigate();
   const { login, setUserAndToken } = useAuthStore();
-  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const googleLoginMutation = useGoogleLoginMutation();
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    setError,
-  } = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema),
-  });
 
   const handleGoogleSuccess = useCallback(
     async (credentialResponse: any) => {
@@ -47,26 +55,21 @@ function LoginPage() {
           }
         },
         onError: () => {
-          setError("root", {
-            message: "Erro ao fazer login com Google",
-          });
+          setErrorMessage("Erro ao fazer login com Google");
         },
       });
     },
-    [googleLoginMutation, setUserAndToken, navigate, setError]
+    [googleLoginMutation, setUserAndToken, navigate]
   );
 
   const handleGoogleError = useCallback(
     (error?: any) => {
       console.warn("Google login error:", error);
-      // Não mostrar erro para falhas de status do GSI (403)
       if (error?.type !== "popup_closed") {
-        setError("root", {
-          message: "Falha no login com Google",
-        });
+        setErrorMessage("Falha no login com Google");
       }
     },
-    [setError]
+    []
   );
 
   useGoogleOneTapLogin({
@@ -78,6 +81,8 @@ function LoginPage() {
 
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
+    setErrorMessage("");
+    
     try {
       await login(data.email, data.password);
       const user = useAuthStore.getState().user;
@@ -87,72 +92,27 @@ function LoginPage() {
         navigate({ to: "/clients" });
       }
     } catch (error) {
-      setError("root", {
-        message: "Email ou senha inválidos",
-      });
+      setErrorMessage("Email ou senha inválidos");
     } finally {
-      setIsLoading(false);
     }
   };
 
   return (
     <AuthTemplate subtitle="Faça login em sua conta">
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Email
-          </label>
-          <input
-            type="email"
-            placeholder="Digite seu email"
-            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-transparent outline-none transition-all"
-            {...register("email")}
-          />
-          {errors.email && (
-            <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
-          )}
+      {errorMessage && (
+        <div className="p-4 bg-red-50 border border-red-200 rounded-lg mb-6">
+          <p className="text-sm text-red-600">{errorMessage}</p>
         </div>
-
-        <div className="relative">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Senha
-          </label>
-          <div className="relative">
-            <input
-              type={showPassword ? "text" : "password"}
-              placeholder="••••••"
-              className="w-full px-4 py-3 pr-12 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-transparent outline-none transition-all"
-              {...register("password")}
-            />
-            <button
-              type="button"
-              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-conectar-primary transition-colors cursor-pointer"
-              onClick={() => setShowPassword(!showPassword)}
-            >
-              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-            </button>
-          </div>
-          {errors.password && (
-            <p className="mt-1 text-sm text-red-600">
-              {errors.password.message}
-            </p>
-          )}
-        </div>
-
-        {errors.root && (
-          <div className="text-red-600 text-sm text-center bg-red-50 p-3 rounded-lg">
-            {errors.root.message}
-          </div>
-        )}
-
-        <button
-          type="submit"
-          disabled={isLoading}
-          className="w-full bg-conectar-primary hover:bg-conectar-600 disabled:bg-gray-300 text-white font-medium py-3 px-4 rounded-lg transition-colors focus:ring-2 focus:ring-conectar-primary focus:ring-offset-2 cursor-pointer"
-        >
-          {isLoading ? "Entrando..." : "Entrar"}
-        </button>
-      </form>
+      )}
+      
+      <DynamicForm
+        fields={loginFields}
+        schema={loginSchema}
+        onSubmit={onSubmit}
+        submitLabel="Entrar"
+        isLoading={isLoading}
+        fullWidthSubmit={true}
+      />
 
       <div className="mt-6">
         <div className="relative">

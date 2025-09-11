@@ -1,11 +1,10 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
-import { Eye, EyeOff, UserPlus, ArrowLeft } from "lucide-react";
+import { UserPlus, ArrowLeft } from "lucide-react";
 import { z } from "zod";
 import { useRegister } from "../services/auth.service";
 import { AuthTemplate } from "../components/ui/AuthTemplate";
+import { DynamicForm, type FormFieldConfig } from "../components/ui/DynamicForm";
 
 export const Route = createFileRoute("/register")({
   component: RegisterPage,
@@ -25,24 +24,52 @@ const registerSchema = z
 
 type RegisterFormData = z.infer<typeof registerSchema>;
 
+const registerFields: FormFieldConfig[] = [
+  {
+    name: "name",
+    label: "Nome completo",
+    type: "text",
+    placeholder: "Digite seu nome completo",
+    required: true,
+    gridCols: 2,
+  },
+  {
+    name: "email",
+    label: "Email",
+    type: "email",
+    placeholder: "Digite seu email",
+    required: true,
+    gridCols: 2,
+  },
+  {
+    name: "password",
+    label: "Senha",
+    type: "password",
+    placeholder: "••••••",
+    required: true,
+    showPasswordToggle: true,
+    gridCols: 1,
+  },
+  {
+    name: "confirmPassword",
+    label: "Confirmar senha",
+    type: "password",
+    placeholder: "••••••",
+    required: true,
+    showPasswordToggle: true,
+    gridCols: 1,
+  },
+];
+
 function RegisterPage() {
   const navigate = useNavigate();
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
   const registerMutation = useRegister();
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    setError,
-  } = useForm<RegisterFormData>({
-    resolver: zodResolver(registerSchema),
-  });
 
   const onSubmit = async (data: RegisterFormData) => {
     setSuccessMessage("");
+    setErrorMessage("");
 
     try {
       await registerMutation.mutateAsync({
@@ -64,13 +91,12 @@ function RegisterPage() {
         error.response?.data?.message === "Este email já está em uso" ||
         error.response?.data?.message?.includes("email já está em uso")
       ) {
-        setError("email", { message: "Este email já está em uso" });
+        setErrorMessage("Este email já está em uso");
       } else {
-        setError("root", {
-          message:
-            error.response?.data?.message ||
-            "Erro ao criar conta. Tente novamente.",
-        });
+        setErrorMessage(
+          error.response?.data?.message ||
+          "Erro ao criar conta. Tente novamente."
+        );
       }
     }
   };
@@ -90,129 +116,25 @@ function RegisterPage() {
           </div>
         </div>
       ) : (
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Nome completo
-            </label>
-            <input
-              type="text"
-              placeholder="Digite seu nome completo"
-              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-transparent outline-none transition-all"
-              {...register("name")}
-            />
-            {errors.name && (
-              <p className="mt-1 text-sm text-error">{errors.name.message}</p>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Email
-            </label>
-            <input
-              type="email"
-              placeholder="Digite seu email"
-              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-transparent outline-none transition-all"
-              {...register("email")}
-            />
-            {errors.email && (
-              <p className="mt-1 text-sm text-error">{errors.email.message}</p>
-            )}
-          </div>
-
-          <div className="relative">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Senha
-            </label>
-            <div className="relative">
-              <input
-                type={showPassword ? "text" : "password"}
-                placeholder="••••••"
-                className="w-full px-4 py-3 pr-12 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-transparent outline-none transition-all"
-                {...register("password")}
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer"
-              >
-                {showPassword ? (
-                  <EyeOff className="h-5 w-5" />
-                ) : (
-                  <Eye className="h-5 w-5" />
-                )}
-              </button>
-            </div>
-            {errors.password && (
-              <p className="mt-1 text-sm text-error">
-                {errors.password.message}
-              </p>
-            )}
-          </div>
-
-          <div className="relative">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Confirmar senha
-            </label>
-            <div className="relative">
-              <input
-                type={showConfirmPassword ? "text" : "password"}
-                placeholder="••••••"
-                className="w-full px-4 py-3 pr-12 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-transparent outline-none transition-all"
-                {...register("confirmPassword")}
-              />
-              <button
-                type="button"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer"
-              >
-                {showConfirmPassword ? (
-                  <EyeOff className="h-5 w-5" />
-                ) : (
-                  <Eye className="h-5 w-5" />
-                )}
-              </button>
-            </div>
-            {errors.confirmPassword && (
-              <p className="mt-1 text-sm text-error">
-                {errors.confirmPassword.message}
-              </p>
-            )}
-          </div>
-
-          {errors.root && (
-            <div className="p-3 bg-error/10 border border-error/20 rounded-lg">
-              <p className="text-sm text-error">{errors.root.message}</p>
-            </div>
-          )}
-
-          <button
-            type="submit"
-            disabled={registerMutation.isPending}
-            className="w-full bg-conectar-primary text-white py-3 px-4 rounded-lg font-medium hover:bg-conectar-600 focus:ring-2 focus:ring-conectar-primary focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-          >
-            {registerMutation.isPending ? (
-              <div className="flex items-center justify-center gap-2">
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                Criando conta...
-              </div>
-            ) : (
-              "Criar conta"
-            )}
-          </button>
-
-          <div className="text-center">
+        <DynamicForm
+          fields={registerFields}
+          schema={registerSchema}
+          onSubmit={onSubmit}
+          submitLabel={registerMutation.isPending ? "Criando conta..." : "Criar conta"}
+          isLoading={registerMutation.isPending}
+          fullWidthSubmit={true}
+          errorMessage={errorMessage}
+          formActions={
             <button
               type="button"
               onClick={() => navigate({ to: "/login" })}
-              className="inline-flex items-center gap-2 text-sm text-conectar-primary hover:text-conectar-600 transition-colors cursor-pointer"
+              className="inline-flex items-center gap-2 px-6 py-3 text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 hover:scale-105 transition-all duration-200 font-medium cursor-pointer transform active:scale-95"
             >
               <ArrowLeft className="h-4 w-4" />
               Voltar para o login
             </button>
-          </div>
-        </form>
+          }
+        />
       )}
     </AuthTemplate>
   );

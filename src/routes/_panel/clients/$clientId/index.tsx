@@ -1,9 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useState, useEffect } from "react";
 import { z } from "zod";
-import { Save, Trash2, Search } from "lucide-react";
+import { Trash2, Search } from "lucide-react";
 import { useAuthStore } from "@/stores/auth-store";
 import { useCepQuery } from "@/services/cep.service";
 import {
@@ -13,6 +11,7 @@ import {
 } from "@/services/clients.service";
 import { maskCEP, maskCNPJ, removeMask } from "@/utils/masks";
 import { TabBar } from "@/components/ui/TabBar";
+import { DynamicForm, type FormFieldConfig } from "@/components/ui/DynamicForm";
 
 export const Route = createFileRoute("/_panel/clients/$clientId/")({
   component: ClientEditPage,
@@ -33,32 +32,149 @@ const updateClientSchema = z.object({
   city: z.string().optional(),
   state: z.string().optional(),
   complement: z.string().optional(),
-  status: z.enum(["Active", "Inactive"]).default("Active"),
-  conectaPlus: z.boolean().default(false),
+  status: z.enum(["Active", "Inactive"]),
+  conectaPlus: z.string(),
 });
 
 type UpdateClientFormData = z.infer<typeof updateClientSchema>;
+
+const updateClientFields: FormFieldConfig[] = [
+  {
+    name: "name",
+    label: "Nome completo",
+    type: "text",
+    placeholder: "Digite o nome completo",
+    required: true,
+    gridCols: 1,
+  },
+  {
+    name: "email",
+    label: "Email",
+    type: "email",
+    placeholder: "Digite o email",
+    required: true,
+    gridCols: 1,
+  },
+  {
+    name: "password",
+    label: "Nova senha (opcional)",
+    type: "password",
+    placeholder: "Deixe em branco para manter a atual",
+    gridCols: 1,
+  },
+  {
+    name: "role",
+    label: "Papel",
+    type: "select",
+    required: true,
+    options: [
+      { value: "user", label: "Cliente" },
+      { value: "admin", label: "Administrador" },
+    ],
+    gridCols: 1,
+  },
+  {
+    name: "tradeName",
+    label: "Nome Fantasia",
+    type: "text",
+    placeholder: "Digite o nome fantasia",
+    gridCols: 1,
+  },
+  {
+    name: "taxId",
+    label: "CNPJ",
+    type: "text",
+    placeholder: "00.000.000/0000-00",
+    gridCols: 1,
+  },
+  {
+    name: "companyName",
+    label: "Razão Social",
+    type: "text",
+    placeholder: "Digite a razão social",
+    gridCols: 2,
+  },
+  {
+    name: "zipCode",
+    label: "CEP",
+    type: "text",
+    placeholder: "00000-000",
+    gridCols: 1,
+  },
+  {
+    name: "street",
+    label: "Rua",
+    type: "text",
+    placeholder: "Digite a rua",
+    gridCols: 1,
+  },
+  {
+    name: "number",
+    label: "Número",
+    type: "text",
+    placeholder: "Digite o número",
+    gridCols: 1,
+  },
+  {
+    name: "district",
+    label: "Bairro",
+    type: "text",
+    placeholder: "Digite o bairro",
+    gridCols: 1,
+  },
+  {
+    name: "city",
+    label: "Cidade",
+    type: "text",
+    placeholder: "Digite a cidade",
+    gridCols: 1,
+  },
+  {
+    name: "state",
+    label: "Estado",
+    type: "text",
+    placeholder: "SP",
+    gridCols: 1,
+  },
+  {
+    name: "complement",
+    label: "Complemento",
+    type: "text",
+    placeholder: "Digite o complemento",
+    gridCols: 2,
+  },
+  {
+    name: "status",
+    label: "Status",
+    type: "select",
+    options: [
+      { value: "Active", label: "Ativo" },
+      { value: "Inactive", label: "Inativo" },
+    ],
+    gridCols: 1,
+  },
+  {
+    name: "conectaPlus",
+    label: "Conecta Plus",
+    type: "select",
+    options: [
+      { value: "false", label: "Não" },
+      { value: "true", label: "Sim" },
+    ],
+    gridCols: 1,
+  },
+];
 
 function ClientEditPage() {
   const navigate = useNavigate();
   const { clientId } = Route.useParams();
   const { user: currentUser, isAuthenticated } = useAuthStore();
   const [cepValue, setCepValue] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const clientQuery = useClient(clientId);
   const updateClientMutation = useUpdateClient();
   const deleteClientMutation = useDeleteClient();
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    setError,
-    setValue,
-    reset,
-  } = useForm<UpdateClientFormData>({
-    resolver: zodResolver(updateClientSchema),
-  });
 
   const cepQuery = useCepQuery(cepValue, cepValue.length >= 8);
 
@@ -71,51 +187,74 @@ function ClientEditPage() {
 
   useEffect(() => {
     if (clientQuery.data) {
-      reset({
-        name: clientQuery.data.name || "",
-        email: clientQuery.data.email || "",
-        role: clientQuery.data.role || "user",
-        tradeName: clientQuery.data.tradeName || "",
-        taxId: clientQuery.data.taxId || "",
-        companyName: clientQuery.data.companyName || "",
-        zipCode: clientQuery.data.zipCode || "",
-        street: clientQuery.data.street || "",
-        number: clientQuery.data.number || "",
-        district: clientQuery.data.district || "",
-        city: clientQuery.data.city || "",
-        state: clientQuery.data.state || "",
-        complement: clientQuery.data.complement || "",
-        status: clientQuery.data.status || "Active",
-        conectaPlus: clientQuery.data.conectaPlus || false,
-      });
-
       setCepValue(removeMask(clientQuery.data.zipCode || ""));
     }
-  }, [clientQuery.data, reset]);
+  }, [clientQuery.data]);
 
-  useEffect(() => {
-    if (cepQuery.data && cepQuery.data.cep) {
-      setValue("street", cepQuery.data.street || "");
-      setValue("district", cepQuery.data.district || "");
-      setValue("city", cepQuery.data.city || "");
-      setValue("state", cepQuery.data.state || "");
-    }
-  }, [cepQuery.data, setValue]);
+  const defaultValues = clientQuery.data ? {
+    name: clientQuery.data.name || "",
+    email: clientQuery.data.email || "",
+    password: "",
+    role: clientQuery.data.role || "user",
+    tradeName: clientQuery.data.tradeName || "",
+    taxId: clientQuery.data.taxId || "",
+    companyName: clientQuery.data.companyName || "",
+    zipCode: clientQuery.data.zipCode || "",
+    street: clientQuery.data.street || "",
+    number: clientQuery.data.number || "",
+    district: clientQuery.data.district || "",
+    city: clientQuery.data.city || "",
+    state: clientQuery.data.state || "",
+    complement: clientQuery.data.complement || "",
+    status: clientQuery.data.status || "Active",
+    conectaPlus: clientQuery.data.conectaPlus ? "true" : "false",
+    ...(cepQuery.data && !cepQuery.isLoading ? {
+      street: cepQuery.data.street || clientQuery.data.street || "",
+      district: cepQuery.data.district || clientQuery.data.district || "",
+      city: cepQuery.data.city || clientQuery.data.city || "",
+      state: cepQuery.data.state || clientQuery.data.state || "",
+    } : {}),
+  } : {};
 
-  const handleCepChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const maskedValue = maskCEP(e.target.value);
+  const handleCepChange = (value: string) => {
+    const maskedValue = maskCEP(value);
     setCepValue(removeMask(maskedValue));
-    setValue("zipCode", maskedValue);
+    return maskedValue;
   };
 
-  const handleCnpjChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const maskedValue = maskCNPJ(e.target.value);
-    setValue("taxId", maskedValue);
+  const handleCnpjChange = (value: string) => {
+    return maskCNPJ(value);
+  };
+
+  const getFieldWithCustomHandlers = (): FormFieldConfig[] => {
+    return updateClientFields.map((field) => {
+      if (field.name === "zipCode") {
+        return {
+          ...field,
+          loading: cepQuery.isLoading,
+          icon: cepQuery.data ? <Search className="h-4 w-4 text-green-500" /> : undefined,
+          onChange: handleCepChange,
+        };
+      }
+      if (field.name === "taxId") {
+        return {
+          ...field,
+          onChange: handleCnpjChange,
+        };
+      }
+      return field;
+    });
   };
 
   const handleUpdateClient = async (data: UpdateClientFormData) => {
+    setErrorMessage("");
+    
     try {
-      const updateData = { ...data };
+      const updateData = {
+        ...data,
+        conectaPlus: data.conectaPlus === "true",
+        password: data.password || undefined,
+      };
 
       await updateClientMutation.mutateAsync({
         id: clientId,
@@ -124,10 +263,15 @@ function ClientEditPage() {
 
       navigate({ to: "/clients" });
     } catch (error: any) {
-      if (error.response?.data?.message) {
-        setError("root", { message: error.response.data.message });
+      if (
+        error.response?.data?.message === "Este email já está em uso" ||
+        error.response?.data?.message?.includes("email já está em uso")
+      ) {
+        setErrorMessage("Este email já está em uso");
       } else {
-        setError("root", { message: "Erro ao atualizar cliente" });
+        setErrorMessage(
+          error.response?.data?.message || "Erro ao atualizar cliente. Tente novamente."
+        );
       }
     }
   };
@@ -223,261 +367,22 @@ function ClientEditPage() {
         </div>
       </div>
 
+      {errorMessage && (
+        <div className="p-4 bg-red-50 border border-red-200 rounded-lg mb-6">
+          <p className="text-sm text-red-600">{errorMessage}</p>
+        </div>
+      )}
+
       <div className="bg-white rounded-lg border border-gray-200">
         <div className="p-6">
-          <form
-            onSubmit={handleSubmit(handleUpdateClient)}
-            className="space-y-6"
-          >
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-900 mb-2">
-                  Nome completo
-                </label>
-                <input
-                  type="text"
-                  {...register("name")}
-                  className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                />
-                {errors.name && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {errors.name.message}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-900 mb-2">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  {...register("email")}
-                  className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                />
-                {errors.email && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {errors.email.message}
-                  </p>
-                )}
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-900 mb-2">
-                  Nova senha (opcional)
-                </label>
-                <input
-                  type="password"
-                  {...register("password")}
-                  placeholder="Deixe em branco para manter a atual"
-                  className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                />
-                {errors.password && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {errors.password.message}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-900 mb-2">
-                  Papel
-                </label>
-                <select
-                  {...register("role")}
-                  className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white"
-                >
-                  <option value="user">Cliente</option>
-                  <option value="admin">Administrador</option>
-                </select>
-                {errors.role && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {errors.role.message}
-                  </p>
-                )}
-              </div>
-            </div>
-
-            <div className="pt-4">
-              <h3 className="text-base font-medium text-gray-900 mb-4">
-                Informações da Empresa
-              </h3>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-900 mb-2">
-                  Nome Fantasia
-                </label>
-                <input
-                  type="text"
-                  {...register("tradeName")}
-                  className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-900 mb-2">
-                  CNPJ
-                </label>
-                <input
-                  type="text"
-                  {...register("taxId")}
-                  onChange={handleCnpjChange}
-                  className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                  placeholder="00.000.000/0000-00"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-900 mb-2">
-                Razão Social
-              </label>
-              <input
-                type="text"
-                {...register("companyName")}
-                className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-              />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-900 mb-2">
-                  CEP
-                </label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    {...register("zipCode")}
-                    onChange={handleCepChange}
-                    className="w-full px-3 py-2.5 pr-10 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                    placeholder="00000-000"
-                  />
-                  {cepQuery.isLoading && (
-                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
-                    </div>
-                  )}
-                  {cepQuery.data && (
-                    <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-green-500" />
-                  )}
-                </div>
-                {cepQuery.error && (
-                  <p className="mt-1 text-sm text-red-600">
-                    CEP não encontrado
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-900 mb-2">
-                  Rua
-                </label>
-                <input
-                  type="text"
-                  {...register("street")}
-                  className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-900 mb-2">
-                  Número
-                </label>
-                <input
-                  type="text"
-                  {...register("number")}
-                  className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-900 mb-2">
-                  Bairro
-                </label>
-                <input
-                  type="text"
-                  {...register("district")}
-                  className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-900 mb-2">
-                  Cidade
-                </label>
-                <input
-                  type="text"
-                  {...register("city")}
-                  className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-900 mb-2">
-                  Estado
-                </label>
-                <input
-                  type="text"
-                  {...register("state")}
-                  className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-900 mb-2">
-                  Complemento
-                </label>
-                <input
-                  type="text"
-                  {...register("complement")}
-                  className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-900 mb-2">
-                Status
-              </label>
-              <select
-                {...register("status")}
-                className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white"
-              >
-                <option value="Active">Ativo</option>
-                <option value="Inactive">Inativo</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-900 mb-2">
-                Conecta Plus
-              </label>
-              <select
-                {...register("conectaPlus", {
-                  setValueAs: (value) => value === "true",
-                })}
-                className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white"
-              >
-                <option value="false">Não</option>
-                <option value="true">Sim</option>
-              </select>
-            </div>
-
-            {errors.root && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-                <p className="text-sm text-red-600">{errors.root.message}</p>
-              </div>
-            )}
-
-            <div className="flex justify-end gap-3 pt-6 border-t border-gray-200">
+          <DynamicForm
+            fields={getFieldWithCustomHandlers()}
+            schema={updateClientSchema}
+            onSubmit={handleUpdateClient}
+            defaultValues={defaultValues}
+            submitLabel="Salvar Alterações"
+            isLoading={updateClientMutation.isPending}
+            formActions={
               <button
                 type="button"
                 onClick={() => navigate({ to: "/clients" })}
@@ -485,18 +390,8 @@ function ClientEditPage() {
               >
                 Cancelar
               </button>
-              <button
-                type="submit"
-                disabled={updateClientMutation.isPending}
-                className="flex items-center gap-2 px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-              >
-                <Save className="h-4 w-4" />
-                {updateClientMutation.isPending
-                  ? "Salvando..."
-                  : "Salvar Alterações"}
-              </button>
-            </div>
-          </form>
+            }
+          />
         </div>
       </div>
       </div>

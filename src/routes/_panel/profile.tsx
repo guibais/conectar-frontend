@@ -1,15 +1,39 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect } from "react";
-import { User, Save } from "lucide-react";
+import { useState } from "react";
+import { User } from "lucide-react";
 import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
 import { PageTemplate } from "@/components/ui/PageTemplate";
+import { DynamicForm, type FormFieldConfig } from "@/components/ui/DynamicForm";
 import type { UserProfileFormData } from "@/lib/schemas";
 import { userProfileSchema } from "@/lib/schemas";
 import { useUserProfile, useUpdateUserProfile } from "@/services/users.service";
 import { useAuthStore } from "@/stores/auth-store";
+
+const profileFields: FormFieldConfig[] = [
+  {
+    name: "name",
+    label: "Nome completo",
+    type: "text",
+    placeholder: "Digite seu nome",
+    required: true,
+    gridCols: 1,
+  },
+  {
+    name: "email",
+    label: "Email",
+    type: "email",
+    placeholder: "Digite seu email",
+    required: true,
+    gridCols: 1,
+  },
+  {
+    name: "password",
+    label: "Nova senha (opcional)",
+    type: "password",
+    placeholder: "Digite uma nova senha",
+    gridCols: 2,
+  },
+];
 
 export const Route = createFileRoute("/_panel/profile")({
   component: ProfilePage,
@@ -18,30 +42,21 @@ export const Route = createFileRoute("/_panel/profile")({
 function ProfilePage() {
   const navigate = useNavigate();
   const { user, setUser } = useAuthStore();
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
   const profileQuery = useUserProfile();
   const updateProfileMutation = useUpdateUserProfile();
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    reset,
-    setError,
-  } = useForm<UserProfileFormData>({
-    resolver: zodResolver(userProfileSchema),
-  });
-
-  useEffect(() => {
-    if (profileQuery.data) {
-      reset({
-        name: profileQuery.data.name,
-        email: profileQuery.data.email,
-        password: "",
-      });
-    }
-  }, [profileQuery.data, reset]);
+  const defaultValues = profileQuery.data ? {
+    name: profileQuery.data.name || "",
+    email: profileQuery.data.email || "",
+    password: "",
+  } : {};
 
   const onSubmit = async (data: UserProfileFormData) => {
+    setErrorMessage("");
+    setSuccessMessage("");
+    
     try {
       const updateData = { ...data };
       if (!updateData.password) {
@@ -51,9 +66,11 @@ function ProfilePage() {
       const response = await updateProfileMutation.mutateAsync(updateData);
       setUser(response);
 
-      alert("Perfil atualizado com sucesso!");
+      setSuccessMessage("Perfil atualizado com sucesso!");
     } catch (error: any) {
-      setError("root", { message: "Erro ao atualizar perfil" });
+      setErrorMessage(
+        error.response?.data?.message || "Erro ao atualizar perfil. Tente novamente."
+      );
     }
   };
 
@@ -118,37 +135,26 @@ function ProfilePage() {
             </div>
           </div>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Input
-                label="Nome completo"
-                placeholder="Digite seu nome"
-                error={errors.name?.message}
-                {...register("name")}
-              />
-              <Input
-                label="Email"
-                type="email"
-                placeholder="Digite seu email"
-                error={errors.email?.message}
-                {...register("email")}
-              />
+          {errorMessage && (
+            <div className="p-4 bg-red-50 border border-red-200 rounded-lg mb-6">
+              <p className="text-sm text-red-600">{errorMessage}</p>
             </div>
+          )}
 
-            <div>
-              <Input
-                label="Nova senha (opcional)"
-                type="password"
-                placeholder="Digite uma nova senha"
-                error={errors.password?.message}
-                {...register("password")}
-              />
-              <p className="text-sm text-gray-500 mt-1">
-                Deixe em branco para manter a senha atual
-              </p>
+          {successMessage && (
+            <div className="p-4 bg-green-50 border border-green-200 rounded-lg mb-6">
+              <p className="text-sm text-green-600">{successMessage}</p>
             </div>
+          )}
 
-            <div className="flex justify-end space-x-4 pt-6 border-t">
+          <DynamicForm
+            fields={profileFields}
+            schema={userProfileSchema}
+            onSubmit={onSubmit}
+            defaultValues={defaultValues}
+            submitLabel="Salvar Alterações"
+            isLoading={updateProfileMutation.isPending}
+            formActions={
               <Button
                 type="button"
                 variant="outline"
@@ -160,14 +166,12 @@ function ProfilePage() {
               >
                 Cancelar
               </Button>
-              <Button type="submit" disabled={updateProfileMutation.isPending}>
-                <Save size={16} className="mr-2" />
-                {updateProfileMutation.isPending
-                  ? "Salvando..."
-                  : "Salvar Alterações"}
-              </Button>
+            }
+          >
+            <div className="text-sm text-gray-500 mt-1">
+              Deixe a senha em branco para manter a atual
             </div>
-          </form>
+          </DynamicForm>
         </div>
       </div>
     </PageTemplate>

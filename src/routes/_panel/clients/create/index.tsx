@@ -1,14 +1,13 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Save, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import { useAuthStore } from "@/stores/auth-store";
 import { useEffect, useState } from "react";
 import { useCepQuery } from "@/services/cep.service";
 import { useCreateClient } from "@/services/clients.service";
 import { maskCEP, maskCNPJ, removeMask } from "@/utils/masks";
 import { TabBar } from "@/components/ui/TabBar";
+import { DynamicForm, type FormFieldConfig } from "@/components/ui/DynamicForm";
 
 export const Route = createFileRoute("/_panel/clients/create/")({
   component: CreateClientPage,
@@ -29,32 +28,146 @@ const createClientSchema = z.object({
   city: z.string().optional(),
   state: z.string().optional(),
   complement: z.string().optional(),
-  status: z.enum(["Active", "Inactive"]).default("Active"),
-  conectaPlus: z.boolean().default(false),
+  status: z.enum(["Active", "Inactive"]),
+  conectaPlus: z.string(),
 });
 
 type CreateClientFormData = z.infer<typeof createClientSchema>;
+
+const createClientFields: FormFieldConfig[] = [
+  {
+    name: "name",
+    label: "Nome completo",
+    type: "text",
+    placeholder: "Digite o nome completo",
+    required: true,
+    gridCols: 1,
+  },
+  {
+    name: "email",
+    label: "Email",
+    type: "email",
+    placeholder: "Digite o email",
+    required: true,
+    gridCols: 1,
+  },
+  {
+    name: "password",
+    label: "Senha",
+    type: "password",
+    placeholder: "••••••",
+    required: true,
+    gridCols: 1,
+  },
+  {
+    name: "role",
+    label: "Tipo",
+    type: "select",
+    required: true,
+    options: [
+      { value: "user", label: "Cliente" },
+      { value: "admin", label: "Administrador" },
+    ],
+    gridCols: 1,
+  },
+  {
+    name: "tradeName",
+    label: "Nome Fantasia",
+    type: "text",
+    placeholder: "Digite o nome fantasia",
+    gridCols: 1,
+  },
+  {
+    name: "taxId",
+    label: "CNPJ",
+    type: "text",
+    placeholder: "00.000.000/0000-00",
+    gridCols: 1,
+  },
+  {
+    name: "companyName",
+    label: "Razão Social",
+    type: "text",
+    placeholder: "Digite a razão social",
+    gridCols: 2,
+  },
+  {
+    name: "zipCode",
+    label: "CEP",
+    type: "text",
+    placeholder: "00000-000",
+    gridCols: 1,
+  },
+  {
+    name: "city",
+    label: "Cidade",
+    type: "text",
+    placeholder: "Digite a cidade",
+    gridCols: 1,
+  },
+  {
+    name: "street",
+    label: "Rua",
+    type: "text",
+    placeholder: "Digite a rua",
+    gridCols: 1,
+  },
+  {
+    name: "number",
+    label: "Número",
+    type: "text",
+    placeholder: "Digite o número",
+    gridCols: 1,
+  },
+  {
+    name: "district",
+    label: "Bairro",
+    type: "text",
+    placeholder: "Digite o bairro",
+    gridCols: 1,
+  },
+  {
+    name: "state",
+    label: "Estado",
+    type: "text",
+    placeholder: "SP",
+    gridCols: 1,
+  },
+  {
+    name: "complement",
+    label: "Complemento",
+    type: "text",
+    placeholder: "Digite o complemento",
+    gridCols: 2,
+  },
+  {
+    name: "status",
+    label: "Status",
+    type: "select",
+    options: [
+      { value: "Active", label: "Ativo" },
+      { value: "Inactive", label: "Inativo" },
+    ],
+    gridCols: 1,
+  },
+  {
+    name: "conectaPlus",
+    label: "Conecta Plus",
+    type: "select",
+    options: [
+      { value: "false", label: "Não" },
+      { value: "true", label: "Sim" },
+    ],
+    gridCols: 1,
+  },
+];
 
 function CreateClientPage() {
   const navigate = useNavigate();
   const { user: currentUser, isAuthenticated } = useAuthStore();
   const [cepValue, setCepValue] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
   const createClientMutation = useCreateClient();
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-    setError,
-    setValue,
-  } = useForm<CreateClientFormData>({
-    resolver: zodResolver(createClientSchema),
-    defaultValues: {
-      role: "user",
-      status: "Active",
-      conectaPlus: false,
-    },
-  });
 
   const cepQuery = useCepQuery(cepValue, cepValue.length >= 8);
 
@@ -65,27 +178,51 @@ function CreateClientPage() {
     }
   }, [isAuthenticated, currentUser, navigate]);
 
-  useEffect(() => {
-    if (cepQuery.data && !cepQuery.isLoading) {
-      setValue("street", cepQuery.data.street || "");
-      setValue("district", cepQuery.data.district || "");
-      setValue("city", cepQuery.data.city || "");
-      setValue("state", cepQuery.data.state || "");
-    }
-  }, [cepQuery.data, cepQuery.isLoading, setValue]);
-
-  const handleCepChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const maskedValue = maskCEP(e.target.value);
-    setCepValue(removeMask(maskedValue));
-    setValue("zipCode", maskedValue);
+  const defaultValues = {
+    role: "user",
+    status: "Active",
+    conectaPlus: "false",
+    ...(cepQuery.data && !cepQuery.isLoading ? {
+      street: cepQuery.data.street || "",
+      district: cepQuery.data.district || "",
+      city: cepQuery.data.city || "",
+      state: cepQuery.data.state || "",
+    } : {}),
   };
 
-  const handleCnpjChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const maskedValue = maskCNPJ(e.target.value);
-    setValue("taxId", maskedValue);
+  const handleCepChange = (value: string) => {
+    const maskedValue = maskCEP(value);
+    setCepValue(removeMask(maskedValue));
+    return maskedValue;
+  };
+
+  const handleCnpjChange = (value: string) => {
+    return maskCNPJ(value);
+  };
+
+  const getFieldWithCustomHandlers = (): FormFieldConfig[] => {
+    return createClientFields.map((field) => {
+      if (field.name === "zipCode") {
+        return {
+          ...field,
+          loading: cepQuery.isLoading,
+          icon: cepQuery.data ? <Search className="h-4 w-4 text-green-500" /> : undefined,
+          onChange: handleCepChange,
+        };
+      }
+      if (field.name === "taxId") {
+        return {
+          ...field,
+          onChange: handleCnpjChange,
+        };
+      }
+      return field;
+    });
   };
 
   const handleCreateClient = async (data: CreateClientFormData) => {
+    setErrorMessage("");
+    
     try {
       const clientData = {
         name: data.name,
@@ -103,7 +240,7 @@ function CreateClientPage() {
         state: data.state || "",
         complement: data.complement || "",
         status: data.status || "Active",
-        conectaPlus: data.conectaPlus || false,
+        conectaPlus: data.conectaPlus === "true",
       };
       await createClientMutation.mutateAsync(clientData);
       navigate({ to: "/clients" });
@@ -112,11 +249,11 @@ function CreateClientPage() {
         error.response?.data?.message === "Este email já está em uso" ||
         error.response?.data?.message?.includes("email já está em uso")
       ) {
-        setError("email", { message: "Este email já está em uso" });
+        setErrorMessage("Este email já está em uso");
       } else {
-        setError("root", {
-          message: error.response?.data?.message || "Erro ao criar cliente. Tente novamente.",
-        });
+        setErrorMessage(
+          error.response?.data?.message || "Erro ao criar cliente. Tente novamente."
+        );
       }
     }
   };
@@ -138,259 +275,31 @@ function CreateClientPage() {
         >
           Cancelar
         </button>
-      </div>
-      <form onSubmit={handleSubmit(handleCreateClient)} className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Nome completo *
-            </label>
-            <input
-              type="text"
-              {...register("name")}
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-transparent"
-            />
-            {errors.name && (
-              <p className="mt-1 text-sm text-error">{errors.name.message}</p>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Email *
-            </label>
-            <input
-              type="email"
-              {...register("email")}
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-transparent"
-            />
-            {errors.email && (
-              <p className="mt-1 text-sm text-error">{errors.email.message}</p>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Senha *
-            </label>
-            <input
-              type="password"
-              {...register("password")}
-              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-conectar-primary text-sm"
-            />
-            {errors.password && (
-              <p className="mt-1 text-sm text-red-600">
-                {errors.password.message}
-              </p>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Tipo *
-            </label>
-            <select
-              {...register("role")}
-              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-conectar-primary text-sm"
-            >
-              <option value="user">Cliente</option>
-              <option value="admin">Administrador</option>
-            </select>
-            {errors.role && (
-              <p className="mt-1 text-sm text-red-600">{errors.role.message}</p>
-            )}
-          </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-6">
-            Informações da Empresa
-          </h3>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Nome Fantasia
-              </label>
-              <input
-                type="text"
-                {...register("tradeName")}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-conectar-primary text-sm"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                CNPJ
-              </label>
-              <input
-                type="text"
-                {...register("taxId")}
-                onChange={handleCnpjChange}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-conectar-primary text-sm"
-                placeholder="00.000.000/0000-00"
-              />
-            </div>
-
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Razão Social
-              </label>
-              <input
-                type="text"
-                {...register("companyName")}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-conectar-primary text-sm"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                CEP
-              </label>
-              <div className="relative">
-                <input
-                  type="text"
-                  {...register("zipCode")}
-                  onChange={handleCepChange}
-                  className="w-full px-4 py-3 pr-12 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-conectar-primary text-sm"
-                  placeholder="00000-000"
-                />
-                {cepQuery.isLoading && (
-                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-conectar-primary"></div>
-                  </div>
-                )}
-                {cepQuery.data && (
-                  <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-green-500" />
-                )}
-              </div>
-              {cepQuery.error && (
-                <p className="mt-1 text-sm text-red-600">CEP não encontrado</p>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Cidade
-              </label>
-              <input
-                type="text"
-                {...register("city")}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-conectar-primary text-sm"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Rua
-              </label>
-              <input
-                type="text"
-                {...register("street")}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-conectar-primary text-sm"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Número
-              </label>
-              <input
-                type="text"
-                {...register("number")}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-conectar-primary text-sm"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Bairro
-              </label>
-              <input
-                type="text"
-                {...register("district")}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-conectar-primary text-sm"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Estado
-              </label>
-              <input
-                type="text"
-                {...register("state")}
-                maxLength={2}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-conectar-primary text-sm"
-                placeholder="SP"
-              />
-            </div>
-
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Complemento
-              </label>
-              <input
-                type="text"
-                {...register("complement")}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-conectar-primary text-sm"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Status
-              </label>
-              <select
-                {...register("status")}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-conectar-primary text-sm"
-              >
-                <option value="Active">Ativo</option>
-                <option value="Inactive">Inativo</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Conecta Plus
-              </label>
-              <select
-                {...register("conectaPlus", {
-                  setValueAs: (value) => value === "true",
-                })}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-conectar-primary text-sm"
-              >
-                <option value="false">Não</option>
-                <option value="true">Sim</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        {errors.root && (
+        {errorMessage && (
           <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-sm text-red-600">{errors.root.message}</p>
+            <p className="text-sm text-red-600">{errorMessage}</p>
           </div>
         )}
 
-        <div className="flex justify-end gap-3 pt-6">
-          <button
-            type="button"
-            onClick={() => navigate({ to: "/clients" })}
-            className="px-6 py-3 text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 hover:scale-105 transition-all duration-200 font-medium cursor-pointer transform active:scale-95"
-          >
-            Cancelar
-          </button>
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="flex items-center gap-2 px-6 py-3 bg-conectar-primary text-white rounded-lg hover:bg-conectar-600 hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed font-medium cursor-pointer transform active:scale-95 disabled:hover:scale-100"
-          >
-            <Save className="h-5 w-5" />
-            {isSubmitting ? "Criando..." : "Criar Cliente"}
-          </button>
-        </div>
-      </form>
+        <DynamicForm
+          fields={getFieldWithCustomHandlers()}
+          schema={createClientSchema}
+          onSubmit={handleCreateClient}
+          defaultValues={defaultValues}
+          submitLabel="Criar Cliente"
+          isLoading={createClientMutation.isPending}
+          formActions={
+            <button
+              type="button"
+              onClick={() => navigate({ to: "/clients" })}
+              className="px-6 py-3 text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 hover:scale-105 transition-all duration-200 font-medium cursor-pointer transform active:scale-95"
+            >
+              Cancelar
+            </button>
+          }
+        />
       </div>
     </div>
   );
