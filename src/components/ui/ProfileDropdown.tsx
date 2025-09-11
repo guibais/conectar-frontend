@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { User, LogOut, ChevronDown } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { useAuthStore } from "../../stores/auth-store";
 
 type ProfileDropdownProps = {
@@ -8,6 +9,7 @@ type ProfileDropdownProps = {
 };
 
 export function ProfileDropdown({ isMobile = false }: ProfileDropdownProps) {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { user, logout } = useAuthStore();
@@ -39,7 +41,7 @@ export function ProfileDropdown({ isMobile = false }: ProfileDropdownProps) {
           className="flex flex-col items-center text-gray-600 transition-colors cursor-pointer"
         >
           <User size={24} />
-          <span className="text-xs mt-1 font-medium">Perfil</span>
+          <span className="text-xs mt-1 font-medium">{t('navigation.profile')}</span>
         </button>
 
         {isOpen && (
@@ -50,7 +52,7 @@ export function ProfileDropdown({ isMobile = false }: ProfileDropdownProps) {
               onClick={() => setIsOpen(false)}
             >
               <User size={16} />
-              Meu Perfil
+              {t('profile.myProfile')}
             </Link>
             <hr className="my-2 border-gray-100" />
             <button
@@ -58,7 +60,7 @@ export function ProfileDropdown({ isMobile = false }: ProfileDropdownProps) {
               className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:scale-105 transition-all duration-150 cursor-pointer w-full text-left transform"
             >
               <LogOut size={16} />
-              Sair
+              {t('auth.logout')}
             </button>
           </div>
         )}
@@ -87,7 +89,7 @@ export function ProfileDropdown({ isMobile = false }: ProfileDropdownProps) {
             onClick={() => setIsOpen(false)}
           >
             <User size={16} />
-            Meu Perfil
+            {t('profile.myProfile')}
           </Link>
           <hr className="my-2 border-gray-100" />
           <button
@@ -95,7 +97,7 @@ export function ProfileDropdown({ isMobile = false }: ProfileDropdownProps) {
             className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:scale-105 transition-all duration-150 cursor-pointer w-full text-left transform"
           >
             <LogOut size={16} />
-            Sair
+            {t('auth.logout')}
           </button>
         </div>
       )}

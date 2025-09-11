@@ -1,9 +1,11 @@
 import { Link } from "@tanstack/react-router";
 import { Users, Bell } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { useAuthStore } from "../../stores/auth-store";
 import { ProfileDropdown } from "./ProfileDropdown";
 
 export function MobileBottomNav() {
+  const { t } = useTranslation();
   const { user } = useAuthStore();
 
   if (user?.role === "admin") {
@@ -16,7 +18,7 @@ export function MobileBottomNav() {
             activeProps={{ className: "text-conectar-primary" }}
           >
             <Users size={24} />
-            <span className="text-xs mt-1 font-medium">Clientes</span>
+            <span className="text-xs mt-1 font-medium">{t('navigation.clients')}</span>
           </Link>
           
           <Link
@@ -25,7 +27,7 @@ export function MobileBottomNav() {
             activeProps={{ className: "text-conectar-primary" }}
           >
             <Bell size={24} />
-            <span className="text-xs mt-1 font-medium">Notificações</span>
+            <span className="text-xs mt-1 font-medium">{t('navigation.notifications')}</span>
           </Link>
           
           <div className="flex flex-col items-center py-2 px-3">

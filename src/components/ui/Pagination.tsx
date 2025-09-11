@@ -1,4 +1,5 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 type PaginationInfo = {
   page: number;
@@ -14,6 +15,7 @@ type PaginationProps = {
 };
 
 export function Pagination({ pagination, onPageChange, className = "" }: PaginationProps) {
+  const { t } = useTranslation();
   const { page, limit, total, totalPages } = pagination;
   
   const startItem = (page - 1) * limit + 1;
@@ -25,7 +27,7 @@ export function Pagination({ pagination, onPageChange, className = "" }: Paginat
   return (
     <div className={`flex items-center justify-between px-6 py-4 border-t border-gray-200 ${className}`}>
       <div className="text-sm text-gray-500">
-        Mostrando {startItem} até {endItem} de {total} resultados
+        {t('pagination.showing', { start: startItem, end: endItem, total })}
       </div>
       
       <div className="flex items-center gap-2">
@@ -35,11 +37,11 @@ export function Pagination({ pagination, onPageChange, className = "" }: Paginat
           className="flex items-center gap-1 px-3 py-2 text-sm border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
         >
           <ChevronLeft className="h-4 w-4" />
-          Anterior
+          {t('common.previous')}
         </button>
         
         <span className="px-3 py-2 text-sm">
-          Página {page} de {totalPages}
+          {t('pagination.pageOf', { page, totalPages })}
         </span>
         
         <button
@@ -47,7 +49,7 @@ export function Pagination({ pagination, onPageChange, className = "" }: Paginat
           disabled={!canGoNext}
           className="flex items-center gap-1 px-3 py-2 text-sm border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
         >
-          Próximo
+          {t('common.next')}
           <ChevronRight className="h-4 w-4" />
         </button>
       </div>

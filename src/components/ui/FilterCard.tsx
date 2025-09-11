@@ -1,5 +1,6 @@
 import { type ReactNode, useState } from "react";
 import { Search, ChevronDown } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 type FilterCardProps = {
   title?: string;
@@ -13,16 +14,21 @@ type FilterCardProps = {
 };
 
 export function FilterCard({
-  title = "Filtros",
+  title,
   itemCount,
   children,
   onClear,
   onApply,
-  clearLabel = "Limpar campos",
-  applyLabel = "Filtrar",
+  clearLabel,
+  applyLabel,
   defaultExpanded = false,
 }: FilterCardProps) {
+  const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
+  
+  const defaultTitle = title || t('common.filters');
+  const defaultClearLabel = clearLabel || t('common.clearFields');
+  const defaultApplyLabel = applyLabel || t('common.filter');
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 shadow-sm mb-6">
@@ -34,11 +40,11 @@ export function FilterCard({
           <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
             <div className="flex items-center gap-2">
               <Search className="h-5 w-5 text-conectar-primary" />
-              <span className="font-medium text-gray-900 text-base">{title}</span>
+              <span className="font-medium text-gray-900 text-base">{defaultTitle}</span>
             </div>
             {itemCount !== undefined && (
               <span className="text-xs sm:text-sm text-gray-500 sm:ml-2">
-                Filtre e busque itens na página
+                {t('common.filterAndSearchItems')}
               </span>
             )}
           </div>
@@ -63,13 +69,13 @@ export function FilterCard({
               onClick={onClear}
               className="w-full sm:w-auto px-6 py-2 text-sm font-medium text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 hover:scale-105 transition-all duration-200 cursor-pointer transform active:scale-95"
             >
-              {clearLabel}
+              {defaultClearLabel}
             </button>
             <button
               onClick={onApply}
               className="w-full sm:w-auto px-6 py-2 text-sm font-medium bg-conectar-primary text-white rounded-lg hover:bg-conectar-600 hover:scale-105 transition-all duration-200 cursor-pointer transform active:scale-95"
             >
-              {applyLabel}
+              {defaultApplyLabel}
             </button>
           </div>
         </div>

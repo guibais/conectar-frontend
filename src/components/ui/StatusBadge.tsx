@@ -1,9 +1,12 @@
+import { useTranslation } from 'react-i18next';
+
 type StatusBadgeProps = {
   status: 'Active' | 'Inactive';
   variant?: 'default' | 'small';
 };
 
 export function StatusBadge({ status, variant = 'default' }: StatusBadgeProps) {
+  const { t } = useTranslation();
   const baseClasses = 'inline-flex items-center rounded-full font-medium';
   const sizeClasses = variant === 'small' ? 'px-2 py-0.5 text-xs' : 'px-2.5 py-0.5 text-xs';
   const colorClasses = status === 'Active' 
@@ -12,7 +15,7 @@ export function StatusBadge({ status, variant = 'default' }: StatusBadgeProps) {
 
   return (
     <span className={`${baseClasses} ${sizeClasses} ${colorClasses}`}>
-      {status === 'Active' ? 'Ativo' : 'Inativo'}
+      {status === 'Active' ? t('clients.options.active') : t('clients.options.inactive')}
     </span>
   );
 }
@@ -23,6 +26,7 @@ type RoleBadgeProps = {
 };
 
 export function RoleBadge({ role, variant = 'default' }: RoleBadgeProps) {
+  const { t } = useTranslation();
   const baseClasses = 'inline-flex items-center rounded-full font-medium';
   const sizeClasses = variant === 'small' ? 'px-2 py-0.5 text-xs' : 'px-2.5 py-0.5 text-xs';
   const colorClasses = role === 'admin' 
@@ -31,7 +35,7 @@ export function RoleBadge({ role, variant = 'default' }: RoleBadgeProps) {
 
   return (
     <span className={`${baseClasses} ${sizeClasses} ${colorClasses}`}>
-      {role === 'admin' ? 'Administrador' : 'Cliente'}
+      {role === 'admin' ? t('users.roles.admin') : t('users.roles.client')}
     </span>
   );
 }
@@ -42,6 +46,7 @@ type ConectaPlusBadgeProps = {
 };
 
 export function ConectaPlusBadge({ conectaPlus, variant = 'default' }: ConectaPlusBadgeProps) {
+  const { t } = useTranslation();
   const baseClasses = 'inline-flex items-center rounded-full font-medium';
   const sizeClasses = variant === 'small' ? 'px-2 py-0.5 text-xs' : 'px-2.5 py-0.5 text-xs';
   const colorClasses = conectaPlus 
@@ -50,7 +55,7 @@ export function ConectaPlusBadge({ conectaPlus, variant = 'default' }: ConectaPl
 
   return (
     <span className={`${baseClasses} ${sizeClasses} ${colorClasses}`}>
-      {conectaPlus ? 'Sim' : 'Não'}
+      {conectaPlus ? t('common.yes') : t('common.no')}
     </span>
   );
 }

@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 type TabBarProps = {
   activeTab?: string;
   tabs?: Array<{
@@ -8,8 +10,9 @@ type TabBarProps = {
 };
 
 export function TabBar({ activeTab = "dados-basicos", tabs }: TabBarProps) {
+  const { t } = useTranslation();
   const defaultTabs = [
-    { id: "dados-basicos", label: "Dados Básicos" }
+    { id: "dados-basicos", label: t('clients.tabs.basicData') }
   ];
 
   const tabsToRender = tabs || defaultTabs;

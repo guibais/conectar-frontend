@@ -1,5 +1,6 @@
 import { type ReactNode } from 'react';
 import { ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Pagination } from './Pagination';
 
 type Column<T> = {
@@ -38,10 +39,12 @@ export function DataTable<T extends Record<string, any>>({
   onSort,
   actions,
   isLoading,
-  emptyMessage = 'Nenhum item encontrado',
+  emptyMessage,
   pagination,
   onPageChange,
 }: DataTableProps<T>) {
+  const { t } = useTranslation();
+  const defaultEmptyMessage = emptyMessage || t('common.noItemsFound');
   const getSortIcon = (column: string) => {
     if (sortBy !== column) {
       return <ArrowUpDown className="h-4 w-4 text-gray-400" />;
@@ -86,7 +89,7 @@ export function DataTable<T extends Record<string, any>>({
               ))}
               {actions && (
                 <th className="px-6 py-4 text-right text-sm font-medium text-gray-600">
-                  Ações
+                  {t('common.actions')}
                 </th>
               )}
             </tr>
@@ -98,7 +101,7 @@ export function DataTable<T extends Record<string, any>>({
                   colSpan={columns.length + (actions ? 1 : 0)}
                   className="px-6 py-12 text-center text-gray-500"
                 >
-                  {emptyMessage}
+                  {defaultEmptyMessage}
                 </td>
               </tr>
             ) : (

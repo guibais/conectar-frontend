@@ -1,10 +1,10 @@
-import { ReactNode, useEffect } from 'react';
-import { useNavigate } from '@tanstack/react-router';
-import { useAuthStore } from '../stores/auth-store';
+import { useEffect, type ReactNode } from "react";
+import { useNavigate } from "@tanstack/react-router";
+import { useAuthStore } from "../stores/auth-store";
 
 type ProtectedRouteProps = {
   children: ReactNode;
-  requireRole?: 'admin' | 'user';
+  requireRole?: "admin" | "user";
 };
 
 export function ProtectedRoute({ children, requireRole }: ProtectedRouteProps) {
@@ -17,12 +17,17 @@ export function ProtectedRoute({ children, requireRole }: ProtectedRouteProps) {
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      navigate({ to: '/login' });
+      navigate({ to: "/login" });
       return;
     }
 
-    if (!isLoading && isAuthenticated && requireRole && user?.role !== requireRole) {
-      navigate({ to: '/clients' });
+    if (
+      !isLoading &&
+      isAuthenticated &&
+      requireRole &&
+      user?.role !== requireRole
+    ) {
+      navigate({ to: "/clients" });
       return;
     }
   }, [isAuthenticated, isLoading, user, requireRole, navigate]);

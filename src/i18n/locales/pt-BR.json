@@ -18,6 +18,11 @@
     "yes": "Sim",
     "no": "Não",
     "or": "ou",
+    "actions": "Ações",
+    "noItemsFound": "Nenhum item encontrado",
+    "filters": "Filtros",
+    "clearFields": "Limpar campos",
+    "filterAndSearchItems": "Filtre e busque itens na página",
     "and": "e"
   },
   "auth": {
@@ -30,10 +35,11 @@
       "googleLogin": "Entrar com Google",
       "forgotPassword": "Esqueceu sua senha?",
       "noAccount": "Não tem uma conta?",
-      "createAccount": "Criar conta",
-      "loginError": "Erro ao fazer login",
-      "invalidCredentials": "Email ou senha inválidos"
+      "signUp": "Cadastre-se",
+      "invalidCredentials": "Credenciais inválidas",
+      "loginError": "Erro ao fazer login"
     },
+    "logout": "Sair",
     "register": {
       "title": "Crie sua conta",
       "subtitle": "Registre-se no sistema",
@@ -93,6 +99,9 @@
     "saveChanges": "Salvar Alterações",
     "notFoundMessage": "O cliente solicitado não foi encontrado.",
     "backToList": "Voltar para lista de clientes",
+    "tabs": {
+      "basicData": "Dados Básicos"
+    },
     "fields": {
       "name": "Nome",
       "email": "Email",
@@ -113,25 +122,55 @@
       "conectaPlus": "Conecta Plus",
       "createdAt": "Criado em"
     },
-    "status": {
+    "placeholders": {
+      "name": "Nome completo",
+      "email": "email@exemplo.com",
+      "password": "Digite a senha",
+      "confirmPassword": "Confirme a senha",
+      "tradeName": "Nome fantasia da empresa",
+      "companyName": "Razão social da empresa",
+      "taxId": "00.000.000/0000-00",
+      "phone": "(00) 00000-0000",
+      "zipCode": "00000-000",
+      "street": "Nome da rua",
+      "number": "123",
+      "complement": "Apto, sala, etc.",
+      "district": "Nome do bairro",
+      "city": "Nome da cidade"
+    },
+    "options": {
+      "selectState": "Selecione o estado",
       "active": "Ativo",
       "inactive": "Inativo"
     },
-    "placeholders": {
-      "name": "Digite o nome",
-      "email": "Digite o email",
-      "password": "Digite a senha",
-      "tradeName": "Digite o nome fantasia",
-      "companyName": "Digite a razão social",
-      "taxId": "Digite o CNPJ",
-      "zipCode": "Digite o CEP",
-      "street": "Digite a rua",
-      "number": "Digite o número",
-      "complement": "Digite o complemento",
-      "district": "Digite o bairro",
-      "city": "Digite a cidade",
-      "state": "Digite o estado",
-      "phone": "Digite o telefone"
+    "states": {
+      "AC": "Acre",
+      "AL": "Alagoas",
+      "AP": "Amapá",
+      "AM": "Amazonas",
+      "BA": "Bahia",
+      "CE": "Ceará",
+      "DF": "Distrito Federal",
+      "ES": "Espírito Santo",
+      "GO": "Goiás",
+      "MA": "Maranhão",
+      "MT": "Mato Grosso",
+      "MS": "Mato Grosso do Sul",
+      "MG": "Minas Gerais",
+      "PA": "Pará",
+      "PB": "Paraíba",
+      "PR": "Paraná",
+      "PE": "Pernambuco",
+      "PI": "Piauí",
+      "RJ": "Rio de Janeiro",
+      "RN": "Rio Grande do Norte",
+      "RS": "Rio Grande do Sul",
+      "RO": "Rondônia",
+      "RR": "Roraima",
+      "SC": "Santa Catarina",
+      "SP": "São Paulo",
+      "SE": "Sergipe",
+      "TO": "Tocantins"
     },
     "sections": {
       "basicInfo": "Informações Básicas",
@@ -148,32 +187,18 @@
     "updateError": "Erro ao atualizar perfil",
     "fields": {
       "name": "Nome",
-      "email": "Email",
-      "password": "Nova senha (opcional)",
-      "role": "Função",
-      "memberSince": "Membro desde"
-    },
-    "roles": {
-      "admin": "Administrador",
-      "user": "Usuário"
-    },
-    "passwordHint": "Deixe a senha em branco para manter a atual",
-    "saveChanges": "Salvar Alterações"
-  },
-  "notifications": {
-    "title": "Notificações",
-    "subtitle": "Acompanhe usuários que precisam de atenção da equipe",
-    "noData": "Nenhum usuário inativo encontrado",
-    "inactiveUsers": "Usuários Inativos (30+ dias)",
-    "description": "Usuários que não fizeram login nos últimos 30 dias",
-    "users": "usuários",
-    "days": "dias",
-    "columns": {
-      "user": "Usuário",
-      "type": "Tipo",
-      "lastLogin": "Último Login",
-      "createdAt": "Criado em",
-      "daysInactive": "Dias Inativo"
+      "noData": "Nenhum usuário inativo encontrado",
+      "inactiveUsers": "Usuários Inativos (30+ dias)",
+      "description": "Usuários que não fizeram login nos últimos 30 dias",
+      "users": "usuários",
+      "days": "dias",
+      "columns": {
+        "user": "Usuário",
+        "type": "Tipo",
+        "lastLogin": "Último Login",
+        "createdAt": "Criado em",
+        "daysInactive": "Dias Inativo"
+      }
     }
   },
   "errors": {
@@ -196,9 +221,10 @@
     "next": "Próximo",
     "page": "Página",
     "of": "de",
-    "showing": "Mostrando",
     "to": "até",
-    "entries": "entradas"
+    "entries": "entradas",
+    "showing": "Mostrando {{start}} até {{end}} de {{total}} resultados",
+    "pageOf": "Página {{page}} de {{totalPages}}"
   },
   "filters": {
     "all": "Todos",
@@ -213,5 +239,20 @@
     "searchTaxIdHelp": "Digite o CNPJ do cliente para filtrar a lista",
     "selectStatusHelp": "Selecione o status do cliente para filtrar a lista",
     "selectConectaPlusHelp": "Selecione se o cliente possui Conecta+ para filtrar a lista"
+  },
+  "notifications": {
+    "title": "Notificações",
+    "subtitle": "Gerencie suas notificações",
+    "inactiveUsers": "Usuários Inativos (30+ dias)",
+    "description": "Usuários que não fizeram login nos últimos 30 dias",
+    "users": "usuários",
+    "days": "dias",
+    "columns": {
+      "user": "Usuário",
+      "type": "Tipo",
+      "lastLogin": "Último Login",
+      "createdAt": "Criado em",
+      "daysInactive": "Dias Inativo"
+    }
   }
 }

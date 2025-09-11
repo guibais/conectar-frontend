@@ -14,7 +14,6 @@ export function Layout({ children }: LayoutProps) {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Desktop Header */}
       <header className="bg-[#00B894] text-white hidden md:block">
         <div className="max-w-full">
           <div className="flex items-center h-16">

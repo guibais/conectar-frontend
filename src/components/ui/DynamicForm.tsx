@@ -2,6 +2,7 @@ import { type ReactNode } from "react";
 import { useForm, type FieldValues } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { type ZodSchema } from "zod";
+import { useTranslation } from "react-i18next";
 import { FormField } from "./FormField";
 import { DynamicInput, type InputType, type SelectOption } from "./DynamicInput";
 
@@ -48,7 +49,7 @@ export function DynamicForm<T extends FieldValues>({
   schema,
   onSubmit,
   defaultValues,
-  submitLabel = "Enviar",
+  submitLabel,
   isLoading = false,
   children,
   className = "",
@@ -57,6 +58,8 @@ export function DynamicForm<T extends FieldValues>({
   successMessage,
   fullWidthSubmit = false,
 }: DynamicFormProps<T>) {
+  const { t } = useTranslation();
+  const defaultSubmitLabel = submitLabel || t('common.submit');
   const form = useForm<T>({
     resolver: zodResolver(schema),
     defaultValues: defaultValues as any,
@@ -145,7 +148,7 @@ export function DynamicForm<T extends FieldValues>({
             fullWidthSubmit ? "w-full" : ""
           }`}
         >
-          {isLoading ? "Carregando..." : submitLabel}
+          {isLoading ? t('common.loading') : defaultSubmitLabel}
         </button>
         {!fullWidthSubmit && formActions}
       </div>
