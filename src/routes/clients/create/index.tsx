@@ -18,17 +18,17 @@ const createClientSchema = z.object({
   email: z.string().email('Email inválido'),
   password: z.string().min(6, 'Senha deve ter pelo menos 6 caracteres'),
   role: z.enum(['admin', 'user']),
-  nomeFachada: z.string().optional(),
-  cnpj: z.string().optional(),
-  razaoSocial: z.string().optional(),
-  cep: z.string().optional(),
-  rua: z.string().optional(),
-  numero: z.string().optional(),
-  bairro: z.string().optional(),
-  cidade: z.string().optional(),
-  estado: z.string().optional(),
-  complemento: z.string().optional(),
-  status: z.enum(['Ativo', 'Inativo']).default('Ativo'),
+  tradeName: z.string().optional(),
+  taxId: z.string().optional(),
+  companyName: z.string().optional(),
+  zipCode: z.string().optional(),
+  street: z.string().optional(),
+  number: z.string().optional(),
+  district: z.string().optional(),
+  city: z.string().optional(),
+  state: z.string().optional(),
+  complement: z.string().optional(),
+  status: z.enum(['Active', 'Inactive']).default('Active'),
 });
 
 type CreateClientFormData = z.infer<typeof createClientSchema>;
@@ -49,7 +49,7 @@ function CreateClientPage() {
     resolver: zodResolver(createClientSchema),
     defaultValues: {
       role: 'user',
-      status: 'Ativo',
+      status: 'Active',
     },
   });
 
@@ -64,40 +64,39 @@ function CreateClientPage() {
 
   useEffect(() => {
     if (cepQuery.data && !cepQuery.isLoading) {
-      setValue('rua', cepQuery.data.street || '');
-      setValue('bairro', cepQuery.data.district || '');
-      setValue('cidade', cepQuery.data.city || '');
-      setValue('estado', cepQuery.data.state || '');
+      setValue('street', cepQuery.data.street || '');
+      setValue('district', cepQuery.data.district || '');
+      setValue('city', cepQuery.data.city || '');
+      setValue('state', cepQuery.data.state || '');
     }
   }, [cepQuery.data, cepQuery.isLoading, setValue]);
 
   const handleCepChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const maskedValue = maskCEP(e.target.value);
     setCepValue(removeMask(maskedValue));
-    setValue('cep', maskedValue);
+    setValue('zipCode', maskedValue);
   };
 
   const handleCnpjChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const maskedValue = maskCNPJ(e.target.value);
-    setValue('cnpj', maskedValue);
+    setValue('taxId', maskedValue);
   };
 
   const handleCreateClient = async (data: CreateClientFormData) => {
     try {
       const clientData = {
-        nomeFachada: data.nomeFachada || '',
-        cnpj: data.cnpj || '',
-        razaoSocial: data.razaoSocial || '',
-        status: data.status,
-        cep: data.cep || '',
-        rua: data.rua || '',
-        numero: data.numero || '',
-        bairro: data.bairro || '',
-        cidade: data.cidade || '',
-        estado: data.estado || '',
-        complemento: data.complemento,
+        tradeName: data.tradeName || '',
+        taxId: data.taxId || '',
+        companyName: data.companyName || '',
+        zipCode: data.zipCode || '',
+        street: data.street || '',
+        number: data.number || '',
+        district: data.district || '',
+        city: data.city || '',
+        state: data.state || '',
+        complement: data.complement || '',
+        status: data.status || 'Active',
       };
-      
       await createClientMutation.mutateAsync(clientData);
       navigate({ to: '/clients' });
     } catch (error: any) {
@@ -191,22 +190,22 @@ function CreateClientPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Nome Fantasia
+                Trade Name
               </label>
               <input
                 type="text"
-                {...register('nomeFachada')}
+                {...register('tradeName')}
                 className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-conectar-primary text-sm"
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                CNPJ
+                Tax ID
               </label>
               <input
                 type="text"
-                {...register('cnpj')}
+                {...register('taxId')}
                 onChange={handleCnpjChange}
                 className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-conectar-primary text-sm"
                 placeholder="00.000.000/0000-00"
@@ -215,23 +214,23 @@ function CreateClientPage() {
 
             <div className="md:col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Razão Social
+                Company Name
               </label>
               <input
                 type="text"
-                {...register('razaoSocial')}
+                {...register('companyName')}
                 className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-conectar-primary text-sm"
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                CEP
+                Zip Code
               </label>
               <div className="relative">
                 <input
                   type="text"
-                  {...register('cep')}
+                  {...register('zipCode')}
                   onChange={handleCepChange}
                   className="w-full px-4 py-3 pr-12 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-conectar-primary text-sm"
                   placeholder="00000-000"
@@ -252,55 +251,55 @@ function CreateClientPage() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Cidade
+                City
               </label>
               <input
                 type="text"
-                {...register('cidade')}
+                {...register('city')}
                 className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-conectar-primary text-sm"
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Rua
+                Street
               </label>
               <input
                 type="text"
-                {...register('rua')}
+                {...register('street')}
                 className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-conectar-primary text-sm"
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Número
+                Number
               </label>
               <input
                 type="text"
-                {...register('numero')}
+                {...register('number')}
                 className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-conectar-primary text-sm"
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Bairro
+                District
               </label>
               <input
                 type="text"
-                {...register('bairro')}
+                {...register('district')}
                 className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-conectar-primary text-sm"
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Estado
+                State
               </label>
               <input
                 type="text"
-                {...register('estado')}
+                {...register('state')}
                 maxLength={2}
                 className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-conectar-primary text-sm"
                 placeholder="SP"
@@ -309,11 +308,11 @@ function CreateClientPage() {
 
             <div className="md:col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Complemento
+                Complement
               </label>
               <input
                 type="text"
-                {...register('complemento')}
+                {...register('complement')}
                 className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-conectar-primary text-sm"
               />
             </div>
@@ -326,8 +325,8 @@ function CreateClientPage() {
                 {...register('status')}
                 className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-conectar-primary text-sm"
               >
-                <option value="Ativo">Ativo</option>
-                <option value="Inativo">Inativo</option>
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
               </select>
             </div>
           </div>

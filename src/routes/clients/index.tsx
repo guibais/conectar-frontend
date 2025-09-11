@@ -1,67 +1,58 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router';
-import { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { Plus, Search, Edit, Trash2, ChevronDown, ChevronUp, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
-import { useAuthStore } from '../../stores/auth-store';
-import { api } from '../../lib/api';
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import {
+  Plus,
+  Search,
+  Edit,
+  Trash2,
+  ChevronDown,
+  ChevronUp,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
+} from "lucide-react";
+import { useAuthStore } from "../../stores/auth-store";
+import {
+  useClients,
+  useCreateClient,
+  useDeleteClient,
+} from "../../services/clients.service";
 
-export const Route = createFileRoute('/clients/')({
+export const Route = createFileRoute("/clients/")({
   component: ClientsPage,
 });
-
-type Client = {
-  id: string;
-  name: string;
-  email: string;
-  role: 'admin' | 'user';
-  nomeFachada?: string;
-  cnpj?: string;
-  razaoSocial?: string;
-  cep?: string;
-  rua?: string;
-  numero?: string;
-  bairro?: string;
-  cidade?: string;
-  estado?: string;
-  complemento?: string;
-  latitude?: number;
-  longitude?: number;
-  status?: 'Ativo' | 'Inativo';
-  createdAt: string;
-  updatedAt: string;
-  lastLoginAt: string | null;
-};
 
 type ClientFilterQuery = {
   name?: string;
   email?: string;
-  role?: 'admin' | 'user';
-  cnpj?: string;
-  status?: 'Ativo' | 'Inativo';
-  sortBy?: 'name' | 'createdAt';
-  order?: 'asc' | 'desc';
+  role?: "admin" | "user";
+  taxId?: string;
+  status?: "Active" | "Inactive";
+  sortBy?: "name" | "createdAt";
+  order?: "asc" | "desc";
   page?: number;
   limit?: number;
 };
 
 const createClientSchema = z.object({
-  name: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
-  email: z.string().email('Email inválido'),
-  password: z.string().min(6, 'Senha deve ter pelo menos 6 caracteres'),
-  role: z.enum(['admin', 'user']),
-  nomeFachada: z.string().optional(),
-  cnpj: z.string().optional(),
-  razaoSocial: z.string().optional(),
-  cep: z.string().optional(),
-  rua: z.string().optional(),
-  numero: z.string().optional(),
-  bairro: z.string().optional(),
-  cidade: z.string().optional(),
-  estado: z.string().optional(),
-  complemento: z.string().optional(),
-  status: z.enum(['Ativo', 'Inativo']).default('Ativo'),
+  name: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
+  email: z.string().email("Email inválido"),
+  password: z.string().min(6, "Senha deve ter pelo menos 6 caracteres"),
+  role: z.enum(["admin", "user"]),
+  tradeName: z.string().optional(),
+  taxId: z.string().optional(),
+  companyName: z.string().optional(),
+  zipCode: z.string().optional(),
+  street: z.string().optional(),
+  number: z.string().optional(),
+  district: z.string().optional(),
+  city: z.string().optional(),
+  state: z.string().optional(),
+  complement: z.string().optional(),
+  status: z.enum(["Active", "Inactive"]).default("Active"),
 });
 
 type CreateClientFormData = z.infer<typeof createClientSchema>;
@@ -69,28 +60,24 @@ type CreateClientFormData = z.infer<typeof createClientSchema>;
 function ClientsPage() {
   const navigate = useNavigate();
   const { user: currentUser, isAuthenticated } = useAuthStore();
-  const [clients, setClients] = useState<Client[]>([]);
-  const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [tempFilters, setTempFilters] = useState<ClientFilterQuery>({
-    name: '',
-    cnpj: '',
+    name: "",
+    taxId: "",
     status: undefined,
     role: undefined,
   });
   const [filters, setFilters] = useState<ClientFilterQuery>({
-    sortBy: 'createdAt',
-    order: 'desc',
+    sortBy: "createdAt",
+    order: "desc",
     page: 1,
     limit: 10,
   });
-  const [pagination, setPagination] = useState({
-    page: 1,
-    limit: 10,
-    total: 0,
-    totalPages: 0,
-  });
+
+  const clientsQuery = useClients(filters);
+  const createClientMutation = useCreateClient();
+  const deleteClientMutation = useDeleteClient();
 
   const {
     register,
@@ -103,31 +90,15 @@ function ClientsPage() {
   });
 
   useEffect(() => {
-    if (!isAuthenticated || currentUser?.role !== 'admin') {
-      navigate({ to: '/login' });
+    if (!isAuthenticated || currentUser?.role !== "admin") {
+      navigate({ to: "/login" });
       return;
     }
-    loadClients();
-  }, [isAuthenticated, currentUser, navigate, filters]);
+  }, [isAuthenticated, currentUser, navigate]);
 
-  const loadClients = async () => {
-    try {
-      setLoading(true);
-      const cleanFilters = Object.fromEntries(
-        Object.entries(filters).filter(([_, value]) => value !== undefined && value !== '')
-      );
-      const response = await api.get('/clients', { params: cleanFilters });
-      setClients(response.data.clients);
-      setPagination(response.data.pagination);
-    } catch (error) {
-      console.error('Error loading clients:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSort = (column: 'name' | 'createdAt') => {
-    const newOrder = filters.sortBy === column && filters.order === 'asc' ? 'desc' : 'asc';
+  const handleSort = (column: "name" | "createdAt") => {
+    const newOrder =
+      filters.sortBy === column && filters.order === "asc" ? "desc" : "asc";
     setFilters({
       ...filters,
       sortBy: column,
@@ -136,55 +107,67 @@ function ClientsPage() {
     });
   };
 
-  const getSortIcon = (column: 'name' | 'createdAt') => {
+  const getSortIcon = (column: "name" | "createdAt") => {
     if (filters.sortBy !== column) {
       return <ArrowUpDown className="h-4 w-4 text-gray-400" />;
     }
-    return filters.order === 'asc' 
-      ? <ArrowUp className="h-4 w-4 text-blue-600" />
-      : <ArrowDown className="h-4 w-4 text-blue-600" />;
+    return filters.order === "asc" ? (
+      <ArrowUp className="h-4 w-4 text-blue-600" />
+    ) : (
+      <ArrowDown className="h-4 w-4 text-blue-600" />
+    );
   };
-
 
   const handleCreateClient = async (data: CreateClientFormData) => {
     try {
-      await api.post('/clients', data);
+      const clientData = {
+        tradeName: data.tradeName || "",
+        taxId: data.taxId || "",
+        companyName: data.companyName || "",
+        zipCode: data.zipCode || "",
+        street: data.street || "",
+        number: data.number || "",
+        district: data.district || "",
+        city: data.city || "",
+        state: data.state || "",
+        complement: data.complement || "",
+        status: data.status || "Active",
+      };
+
+      await createClientMutation.mutateAsync(clientData);
       setShowCreateModal(false);
       reset();
-      loadClients();
     } catch (error: any) {
-      if (error.response?.data?.message === 'Email already exists') {
-        setError('email', { message: 'Este email já está em uso' });
+      if (error.response?.data?.message === "Email already exists") {
+        setError("email", { message: "Este email já está em uso" });
       } else {
-        console.error('Error creating client:', error);
+        console.error("Error creating client:", error);
       }
     }
   };
 
   const handleDeleteClient = async (clientId: string) => {
-    if (!confirm('Tem certeza que deseja excluir este cliente?')) return;
-    
+    if (!confirm("Tem certeza que deseja excluir este cliente?")) return;
+
     try {
-      await api.delete(`/clients/${clientId}`);
-      loadClients();
+      await deleteClientMutation.mutateAsync(clientId);
     } catch (error) {
-      console.error('Error deleting client:', error);
+      console.error("Error deleting client:", error);
     }
   };
 
   const formatDate = (dateString: string | null) => {
-    if (!dateString) return 'Nunca';
-    return new Date(dateString).toLocaleDateString('pt-BR', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
+    if (!dateString) return "Nunca";
+    return new Date(dateString).toLocaleDateString("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
-
-  if (loading) {
+  if (clientsQuery.isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-conectar-primary"></div>
@@ -200,7 +183,7 @@ function ClientsPage() {
           <p className="text-gray-600">Gerencie seus clientes e informações</p>
         </div>
         <button
-          onClick={() => navigate({ to: '/clients/create' })}
+          onClick={() => navigate({ to: "/clients/create" })}
           className="flex items-center gap-2 px-6 py-3 bg-conectar-primary text-white rounded-lg hover:bg-conectar-600 transition-colors font-medium"
         >
           <Plus className="h-5 w-5" />
@@ -217,7 +200,9 @@ function ClientsPage() {
             >
               <Search className="h-4 w-4" />
               Filtros
-              <span className="text-xs text-gray-500">• 4 opções items na página</span>
+              <span className="text-xs text-gray-500">
+                • 4 opções items na página
+              </span>
               {showFilters ? (
                 <ChevronUp className="h-4 w-4 ml-auto" />
               ) : (
@@ -225,7 +210,7 @@ function ClientsPage() {
               )}
             </button>
           </div>
-          
+
           {showFilters && (
             <div className="px-6 pb-6 bg-gray-50">
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
@@ -236,12 +221,14 @@ function ClientsPage() {
                   <input
                     type="text"
                     placeholder="Digite o nome"
-                    value={tempFilters.name || ''}
-                    onChange={(e) => setTempFilters({ ...tempFilters, name: e.target.value })}
+                    value={tempFilters.name || ""}
+                    onChange={(e) =>
+                      setTempFilters({ ...tempFilters, name: e.target.value })
+                    }
                     className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                   />
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Buscar por CNPJ
@@ -249,19 +236,26 @@ function ClientsPage() {
                   <input
                     type="text"
                     placeholder="Digite o CNPJ"
-                    value={tempFilters.cnpj || ''}
-                    onChange={(e) => setTempFilters({ ...tempFilters, cnpj: e.target.value })}
+                    value={tempFilters.taxId || ""}
+                    onChange={(e) =>
+                      setTempFilters({ ...tempFilters, taxId: e.target.value })
+                    }
                     className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                   />
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Buscar por status
                   </label>
                   <select
-                    value={tempFilters.status || ''}
-                    onChange={(e) => setTempFilters({ ...tempFilters, status: e.target.value as any })}
+                    value={tempFilters.status || ""}
+                    onChange={(e) =>
+                      setTempFilters({
+                        ...tempFilters,
+                        status: e.target.value as any,
+                      })
+                    }
                     className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white"
                   >
                     <option value="">Selecione</option>
@@ -269,14 +263,19 @@ function ClientsPage() {
                     <option value="Inativo">Inativo</option>
                   </select>
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Buscar por conector+
                   </label>
                   <select
-                    value={tempFilters.role || ''}
-                    onChange={(e) => setTempFilters({ ...tempFilters, role: e.target.value as any })}
+                    value={tempFilters.role || ""}
+                    onChange={(e) =>
+                      setTempFilters({
+                        ...tempFilters,
+                        role: e.target.value as any,
+                      })
+                    }
                     className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white"
                   >
                     <option value="">Selecione</option>
@@ -285,13 +284,13 @@ function ClientsPage() {
                   </select>
                 </div>
               </div>
-              
+
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => {
                     setTempFilters({
-                      name: '',
-                      cnpj: '',
+                      name: "",
+                      taxId: "",
                       status: undefined,
                       role: undefined,
                     });
@@ -305,7 +304,7 @@ function ClientsPage() {
                     setFilters({
                       ...filters,
                       name: tempFilters.name,
-                      cnpj: tempFilters.cnpj,
+                      taxId: tempFilters.taxId,
                       status: tempFilters.status,
                       role: tempFilters.role,
                       page: 1,
@@ -320,18 +319,17 @@ function ClientsPage() {
           )}
         </div>
 
-
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
               <tr className="border-b border-gray-100">
                 <th className="px-6 py-4 text-left">
                   <button
-                    onClick={() => handleSort('name')}
+                    onClick={() => handleSort("name")}
                     className="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
                   >
                     Cliente
-                    {getSortIcon('name')}
+                    {getSortIcon("name")}
                   </button>
                 </th>
                 <th className="px-6 py-4 text-left text-sm font-medium text-gray-600">
@@ -342,11 +340,11 @@ function ClientsPage() {
                 </th>
                 <th className="px-6 py-4 text-left">
                   <button
-                    onClick={() => handleSort('createdAt')}
+                    onClick={() => handleSort("createdAt")}
                     className="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
                   >
                     Criado em
-                    {getSortIcon('createdAt')}
+                    {getSortIcon("createdAt")}
                   </button>
                 </th>
                 <th className="px-6 py-4 text-right text-sm font-medium text-gray-600">
@@ -355,32 +353,35 @@ function ClientsPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
-              {clients.map((client: Client) => (
-                <tr key={client.id} className="hover:bg-gray-25 transition-colors">
+              {clientsQuery.data?.clients?.map((client) => (
+                <tr
+                  key={client.id}
+                  className="hover:bg-gray-25 transition-colors"
+                >
                   <td className="px-6 py-4">
                     <div>
-                      <div className="font-medium text-gray-900 text-sm">{client.name}</div>
-                      <div className="text-sm text-gray-500">{client.email}</div>
+                      <div className="font-medium text-gray-900 text-sm">
+                        {client.tradeName || client.companyName}
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        {client.taxId}
+                      </div>
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      client.role === 'admin' 
-                        ? 'bg-conectar-50 text-conectar-700' 
-                        : 'bg-gray-100 text-gray-700'
-                    }`}>
-                      {client.role === 'admin' ? 'Administrador' : 'Cliente'}
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
+                      Cliente
                     </span>
                   </td>
                   <td className="px-6 py-4">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      !client.lastLoginAt || new Date(client.lastLoginAt) < new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
-                        ? 'bg-red-50 text-red-700'
-                        : 'bg-green-50 text-green-700'
-                    }`}>
-                      {!client.lastLoginAt || new Date(client.lastLoginAt) < new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
-                        ? 'Inativo'
-                        : 'Ativo'}
+                    <span
+                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        client.status === "Active"
+                          ? "bg-green-50 text-green-700"
+                          : "bg-red-50 text-red-700"
+                      }`}
+                    >
+                      {client.status}
                     </span>
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-500">
@@ -389,7 +390,9 @@ function ClientsPage() {
                   <td className="px-6 py-4 text-right">
                     <div className="flex items-center justify-end gap-1">
                       <button
-                        onClick={() => navigate({ to: `/clients/${client.id}` })}
+                        onClick={() =>
+                          navigate({ to: `/clients/${client.id}` })
+                        }
                         className="p-2 text-gray-400 hover:text-conectar-primary hover:bg-conectar-50 rounded-lg transition-colors"
                         title="Editar cliente"
                       >
@@ -412,49 +415,79 @@ function ClientsPage() {
           </table>
         </div>
 
-        <div className="px-6 py-4 border-t border-gray-100 bg-gray-50 flex items-center justify-between">
-          <div className="text-sm text-gray-600">
-            Mostrando {(pagination.page - 1) * pagination.limit + 1} a{' '}
-            {Math.min(pagination.page * pagination.limit, pagination.total)} de {pagination.total} clientes
+        {clientsQuery.data?.pagination && (
+          <div className="px-6 py-4 border-t border-gray-100 bg-gray-50 flex items-center justify-between">
+            <div className="text-sm text-gray-600">
+              Mostrando{" "}
+              {(clientsQuery.data.pagination.page - 1) *
+                clientsQuery.data.pagination.limit +
+                1}{" "}
+              a{" "}
+              {Math.min(
+                clientsQuery.data.pagination.page *
+                  clientsQuery.data.pagination.limit,
+                clientsQuery.data.pagination.total
+              )}{" "}
+              de {clientsQuery.data.pagination.total} clientes
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() =>
+                  setFilters({
+                    ...filters,
+                    page: clientsQuery.data.pagination.page - 1,
+                  })
+                }
+                disabled={clientsQuery.data.pagination.page === 1}
+                className="px-3 py-2 text-sm border border-gray-200 rounded-lg hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                Anterior
+              </button>
+              <span className="px-3 py-2 text-sm text-gray-600">
+                {clientsQuery.data.pagination.page} de{" "}
+                {clientsQuery.data.pagination.totalPages}
+              </span>
+              <button
+                onClick={() =>
+                  setFilters({
+                    ...filters,
+                    page: clientsQuery.data.pagination.page + 1,
+                  })
+                }
+                disabled={
+                  clientsQuery.data.pagination.page ===
+                  clientsQuery.data.pagination.totalPages
+                }
+                className="px-3 py-2 text-sm border border-gray-200 rounded-lg hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                Próximo
+              </button>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setFilters({ ...filters, page: pagination.page - 1 })}
-              disabled={pagination.page === 1}
-              className="px-3 py-2 text-sm border border-gray-200 rounded-lg hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              Anterior
-            </button>
-            <span className="px-3 py-2 text-sm text-gray-600">
-              {pagination.page} de {pagination.totalPages}
-            </span>
-            <button
-              onClick={() => setFilters({ ...filters, page: pagination.page + 1 })}
-              disabled={pagination.page === pagination.totalPages}
-              className="px-3 py-2 text-sm border border-gray-200 rounded-lg hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              Próximo
-            </button>
-          </div>
-        </div>
+        )}
       </div>
 
       {showCreateModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <h2 className="text-xl font-bold mb-4">Criar Novo Cliente</h2>
-            <form onSubmit={handleSubmit(handleCreateClient)} className="space-y-4">
+            <form
+              onSubmit={handleSubmit(handleCreateClient)}
+              className="space-y-4"
+            >
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Nome
                 </label>
                 <input
                   type="text"
-                  {...register('name')}
+                  {...register("name")}
                   className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-transparent"
                 />
                 {errors.name && (
-                  <p className="mt-1 text-sm text-error">{errors.name.message}</p>
+                  <p className="mt-1 text-sm text-error">
+                    {errors.name.message}
+                  </p>
                 )}
               </div>
 
@@ -464,11 +497,13 @@ function ClientsPage() {
                 </label>
                 <input
                   type="email"
-                  {...register('email')}
+                  {...register("email")}
                   className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-transparent"
                 />
                 {errors.email && (
-                  <p className="mt-1 text-sm text-error">{errors.email.message}</p>
+                  <p className="mt-1 text-sm text-error">
+                    {errors.email.message}
+                  </p>
                 )}
               </div>
 
@@ -478,11 +513,13 @@ function ClientsPage() {
                 </label>
                 <input
                   type="password"
-                  {...register('password')}
+                  {...register("password")}
                   className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-transparent"
                 />
                 {errors.password && (
-                  <p className="mt-1 text-sm text-error">{errors.password.message}</p>
+                  <p className="mt-1 text-sm text-error">
+                    {errors.password.message}
+                  </p>
                 )}
               </div>
 
@@ -491,28 +528,32 @@ function ClientsPage() {
                   Papel
                 </label>
                 <select
-                  {...register('role')}
+                  {...register("role")}
                   className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-transparent"
                 >
                   <option value="user">Usuário</option>
                   <option value="admin">Administrador</option>
                 </select>
                 {errors.role && (
-                  <p className="mt-1 text-sm text-error">{errors.role.message}</p>
+                  <p className="mt-1 text-sm text-error">
+                    {errors.role.message}
+                  </p>
                 )}
               </div>
 
               <div className="border-t pt-4">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Informações da Empresa (Opcional)</h3>
-                
+                <h3 className="text-lg font-medium text-gray-900 mb-4">
+                  Informações da Empresa (Opcional)
+                </h3>
+
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Nome Fachada
+                      Trade Name
                     </label>
                     <input
                       type="text"
-                      {...register('nomeFachada')}
+                      {...register("tradeName")}
                       className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-transparent"
                     />
                   </div>
@@ -523,7 +564,7 @@ function ClientsPage() {
                     </label>
                     <input
                       type="text"
-                      {...register('cnpj')}
+                      {...register("taxId")}
                       className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-transparent"
                     />
                   </div>
@@ -531,11 +572,11 @@ function ClientsPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Razão Social
+                    Company Name
                   </label>
                   <input
                     type="text"
-                    {...register('razaoSocial')}
+                    {...register("companyName")}
                     className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-transparent"
                   />
                 </div>
@@ -543,22 +584,22 @@ function ClientsPage() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      CEP
+                      Zip Code
                     </label>
                     <input
                       type="text"
-                      {...register('cep')}
+                      {...register("zipCode")}
                       className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-transparent"
                     />
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Cidade
+                      City
                     </label>
                     <input
                       type="text"
-                      {...register('cidade')}
+                      {...register("city")}
                       className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-transparent"
                     />
                   </div>
@@ -567,33 +608,33 @@ function ClientsPage() {
                 <div className="grid grid-cols-3 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Rua
+                      Street
                     </label>
                     <input
                       type="text"
-                      {...register('rua')}
+                      {...register("street")}
                       className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-transparent"
                     />
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Número
+                      Number
                     </label>
                     <input
                       type="text"
-                      {...register('numero')}
+                      {...register("number")}
                       className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-transparent"
                     />
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Bairro
+                      District
                     </label>
                     <input
                       type="text"
-                      {...register('bairro')}
+                      {...register("district")}
                       className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-transparent"
                     />
                   </div>
@@ -602,11 +643,11 @@ function ClientsPage() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Estado
+                      State
                     </label>
                     <input
                       type="text"
-                      {...register('estado')}
+                      {...register("state")}
                       className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-transparent"
                     />
                   </div>
@@ -616,22 +657,22 @@ function ClientsPage() {
                       Status
                     </label>
                     <select
-                      {...register('status')}
+                      {...register("status")}
                       className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-transparent"
                     >
-                      <option value="Ativo">Ativo</option>
-                      <option value="Inativo">Inativo</option>
+                      <option value="Active">Active</option>
+                      <option value="Inactive">Inactive</option>
                     </select>
                   </div>
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Complemento
+                    Complement
                   </label>
                   <input
                     type="text"
-                    {...register('complemento')}
+                    {...register("complement")}
                     className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-transparent"
                   />
                 </div>
@@ -650,9 +691,12 @@ function ClientsPage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-conectar-primary text-white rounded-lg hover:bg-conectar-600"
+                  disabled={createClientMutation.isPending}
+                  className="px-4 py-2 bg-conectar-primary text-white rounded-lg hover:bg-conectar-600 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Criar Usuário
+                  {createClientMutation.isPending
+                    ? "Criando..."
+                    : "Criar Cliente"}
                 </button>
               </div>
             </form>

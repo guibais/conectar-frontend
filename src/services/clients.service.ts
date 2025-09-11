@@ -3,17 +3,17 @@ import { api } from '../lib/api';
 
 export type Client = {
   id: string;
-  nomeFachada: string;
-  cnpj: string;
-  razaoSocial: string;
-  status: 'Ativo' | 'Inativo';
-  cep: string;
-  rua: string;
-  numero: string;
-  bairro: string;
-  cidade: string;
-  estado: string;
-  complemento?: string;
+  tradeName: string;
+  taxId: string;
+  companyName: string;
+  status: 'Active' | 'Inactive';
+  zipCode: string;
+  street: string;
+  number: string;
+  district: string;
+  city: string;
+  state: string;
+  complement?: string;
   latitude?: string;
   longitude?: string;
   createdAt: string;
@@ -22,14 +22,27 @@ export type Client = {
 
 type ClientFilterQuery = {
   name?: string;
-  cnpj?: string;
-  status?: 'Ativo' | 'Inativo' | '';
-  conectaPlus?: 'Sim' | 'Não' | '';
+  taxId?: string;
+  status?: 'Active' | 'Inactive' | '';
+  conectaPlus?: 'Yes' | 'No' | '';
   page?: number;
   limit?: number;
 };
 
-type CreateClientData = Omit<Client, 'id' | 'createdAt' | 'updatedAt'>;
+export type CreateClientData = {
+  tradeName: string;
+  taxId: string;
+  companyName: string;
+  status: 'Active' | 'Inactive';
+  zipCode: string;
+  street: string;
+  number: string;
+  district: string;
+  city: string;
+  state: string;
+  complement?: string;
+};
+
 type UpdateClientData = Partial<CreateClientData>;
 
 type ClientsResponse = {
