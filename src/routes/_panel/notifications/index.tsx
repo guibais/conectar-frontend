@@ -64,7 +64,11 @@ function NotificationsPage() {
               render: (client) => (
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
-                    <User className="h-4 w-4 text-gray-600" />
+                    {inactiveClientsQuery.isLoading ? (
+                      <div className="w-4 h-4 bg-gray-200 rounded-full"></div>
+                    ) : (
+                      <User className="h-4 w-4 text-gray-600" />
+                    )}
                   </div>
                   <div>
                     <div className="font-medium text-gray-900 text-sm">

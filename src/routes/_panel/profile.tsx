@@ -57,6 +57,28 @@ function ProfilePage() {
     }
   };
 
+  if (profileQuery.isLoading) {
+    return (
+      <PageTemplate
+        title="Meu Perfil"
+        description="Gerencie suas informações pessoais"
+        isLoading={true}
+      >
+        <div className="animate-pulse space-y-6">
+          <div className="bg-white rounded-lg border border-gray-200 p-6">
+            <div className="h-6 bg-gray-200 rounded w-1/3 mb-4"></div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="h-10 bg-gray-200 rounded"></div>
+              <div className="h-10 bg-gray-200 rounded"></div>
+              <div className="h-10 bg-gray-200 rounded"></div>
+              <div className="h-10 bg-gray-200 rounded"></div>
+            </div>
+          </div>
+        </div>
+      </PageTemplate>
+    );
+  }
+
   return (
     <PageTemplate
       title="Meu Perfil"

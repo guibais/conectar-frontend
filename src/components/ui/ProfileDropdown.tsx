@@ -43,10 +43,10 @@ export function ProfileDropdown({ isMobile = false }: ProfileDropdownProps) {
         </button>
 
         {isOpen && (
-          <div className="absolute bottom-full right-0 mb-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+          <div className="absolute bottom-full right-0 mb-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50 animate-in slide-in-from-bottom-2 fade-in duration-200">
             <Link
               to="/profile"
-              className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer"
+              className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:scale-105 transition-all duration-150 cursor-pointer transform"
               onClick={() => setIsOpen(false)}
             >
               <User size={16} />
@@ -55,7 +55,7 @@ export function ProfileDropdown({ isMobile = false }: ProfileDropdownProps) {
             <hr className="my-2 border-gray-100" />
             <button
               onClick={handleLogout}
-              className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer w-full text-left"
+              className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:scale-105 transition-all duration-150 cursor-pointer w-full text-left transform"
             >
               <LogOut size={16} />
               Sair
@@ -80,10 +80,10 @@ export function ProfileDropdown({ isMobile = false }: ProfileDropdownProps) {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+        <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50 animate-in slide-in-from-top-2 fade-in duration-200">
           <Link
             to="/profile"
-            className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer"
+            className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:scale-105 transition-all duration-150 cursor-pointer transform"
             onClick={() => setIsOpen(false)}
           >
             <User size={16} />
@@ -92,7 +92,7 @@ export function ProfileDropdown({ isMobile = false }: ProfileDropdownProps) {
           <hr className="my-2 border-gray-100" />
           <button
             onClick={handleLogout}
-            className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer w-full text-left"
+            className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:scale-105 transition-all duration-150 cursor-pointer w-full text-left transform"
           >
             <LogOut size={16} />
             Sair

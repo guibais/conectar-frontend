@@ -131,7 +131,7 @@ function CreateClientPage() {
           </div>
         <button
           onClick={() => navigate({ to: "/clients" })}
-          className="px-6 py-3 text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors font-medium cursor-pointer"
+          className="px-6 py-3 text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 hover:scale-105 transition-all duration-200 font-medium cursor-pointer transform active:scale-95"
         >
           Cancelar
         </button>
@@ -374,14 +374,14 @@ function CreateClientPage() {
           <button
             type="button"
             onClick={() => navigate({ to: "/clients" })}
-            className="px-6 py-3 text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors font-medium cursor-pointer"
+            className="px-6 py-3 text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 hover:scale-105 transition-all duration-200 font-medium cursor-pointer transform active:scale-95"
           >
             Cancelar
           </button>
           <button
             type="submit"
             disabled={isSubmitting}
-            className="flex items-center gap-2 px-6 py-3 bg-conectar-primary text-white rounded-lg hover:bg-conectar-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium cursor-pointer"
+            className="flex items-center gap-2 px-6 py-3 bg-conectar-primary text-white rounded-lg hover:bg-conectar-600 hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed font-medium cursor-pointer transform active:scale-95 disabled:hover:scale-100"
           >
             <Save className="h-5 w-5" />
             {isSubmitting ? "Criando..." : "Criar Cliente"}

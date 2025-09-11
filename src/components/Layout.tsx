@@ -1,6 +1,6 @@
-import type { ReactNode } from "react";
+import { type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
-import { HelpCircle, Bell } from "lucide-react";
+import { Bell, HelpCircle } from "lucide-react";
 import { useAuthStore } from "../stores/auth-store";
 import { ProfileDropdown } from "./ui/ProfileDropdown";
 import { MobileBottomNav } from "./ui/MobileBottomNav";

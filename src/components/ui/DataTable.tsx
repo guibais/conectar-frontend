@@ -59,7 +59,7 @@ export function DataTable<T extends Record<string, any>>({
                 {column.sortable && onSort ? (
                   <button
                     onClick={() => onSort(column.key)}
-                    className="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
+                    className="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:scale-105 transition-all duration-150 cursor-pointer transform active:scale-95"
                   >
                     {column.header}
                     {getSortIcon(column.key)}
