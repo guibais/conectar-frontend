@@ -29,6 +29,7 @@ const updateClientSchema = z.object({
   state: z.string().optional(),
   complement: z.string().optional(),
   status: z.enum(['Active', 'Inactive']).default('Active'),
+  conectaPlus: z.boolean().default(false),
 });
 
 type UpdateClientFormData = z.infer<typeof updateClientSchema>;
@@ -81,6 +82,7 @@ function ClientEditPage() {
         state: clientQuery.data.state || '',
         complement: clientQuery.data.complement || '',
         status: clientQuery.data.status || 'Active',
+        conectaPlus: clientQuery.data.conectaPlus || false,
       });
       
       setCepValue(removeMask(clientQuery.data.zipCode || ''));
@@ -424,6 +426,17 @@ function ClientEditPage() {
                 <option value="Active">Ativo</option>
                 <option value="Inactive">Inativo</option>
               </select>
+            </div>
+
+            <div>
+              <label className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  {...register('conectaPlus')}
+                  className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                />
+                <span className="text-sm font-medium text-gray-900">Conecta Plus</span>
+              </label>
             </div>
 
             {errors.root && (

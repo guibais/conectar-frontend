@@ -31,7 +31,12 @@ function LoginPage() {
     setIsLoading(true);
     try {
       await login(data.email, data.password);
-      navigate({ to: '/clients' });
+      const user = useAuthStore.getState().user;
+      if (user?.role === 'user') {
+        navigate({ to: '/profile' });
+      } else {
+        navigate({ to: '/clients' });
+      }
     } catch (error) {
       setError('root', {
         message: 'Email ou senha inválidos',

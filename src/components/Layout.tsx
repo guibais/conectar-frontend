@@ -1,7 +1,7 @@
-import type { ReactNode } from 'react';
-import { Link, useNavigate } from '@tanstack/react-router';
-import { LogOut, HelpCircle, Bell } from 'lucide-react';
-import { useAuthStore } from '../stores/auth-store';
+import type { ReactNode } from "react";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { LogOut, HelpCircle, Bell } from "lucide-react";
+import { useAuthStore } from "../stores/auth-store";
 
 type LayoutProps = {
   children: ReactNode;
@@ -13,7 +13,7 @@ export function Layout({ children }: LayoutProps) {
 
   const handleLogout = () => {
     logout();
-    navigate({ to: '/login' });
+    navigate({ to: "/login" });
   };
 
   return (
@@ -25,13 +25,13 @@ export function Layout({ children }: LayoutProps) {
               <Link to="/clients" className="text-xl font-bold">
                 Conéctar
               </Link>
-              
-              {user?.role === 'admin' && (
+
+              {user?.role === "admin" && (
                 <nav className="flex space-x-1">
                   <Link
                     to="/clients"
                     className="flex items-center space-x-2 px-3 py-2 text-sm font-medium hover:bg-white/10 transition-colors"
-                    activeProps={{ className: 'bg-white/10' }}
+                    activeProps={{ className: "bg-white/10" }}
                   >
                     <span>Clientes</span>
                   </Link>
@@ -46,7 +46,7 @@ export function Layout({ children }: LayoutProps) {
               <button className="p-2 hover:bg-white/10 rounded-full transition-colors">
                 <Bell size={20} />
               </button>
-              <button 
+              <button
                 onClick={handleLogout}
                 className="p-2 hover:bg-white/10 rounded-full transition-colors"
               >
@@ -57,9 +57,7 @@ export function Layout({ children }: LayoutProps) {
         </div>
       </header>
 
-      <main className="bg-white">
-        {children}
-      </main>
+      <main>{children}</main>
     </div>
   );
 }

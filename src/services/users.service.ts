@@ -45,12 +45,12 @@ type UsersResponse = {
 
 const usersService = {
   getProfile: async (): Promise<User> => {
-    const response = await api.get('/users/profile');
+    const response = await api.get('/clients/profile');
     return response.data;
   },
 
   updateProfile: async (data: UpdateUserData): Promise<User> => {
-    const response = await api.patch('/users/profile', data);
+    const response = await api.patch('/clients/profile', data);
     return response.data;
   },
 

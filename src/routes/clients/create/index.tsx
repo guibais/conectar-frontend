@@ -29,6 +29,7 @@ const createClientSchema = z.object({
   state: z.string().optional(),
   complement: z.string().optional(),
   status: z.enum(['Active', 'Inactive']).default('Active'),
+  conectaPlus: z.boolean().default(false),
 });
 
 type CreateClientFormData = z.infer<typeof createClientSchema>;
@@ -50,6 +51,7 @@ function CreateClientPage() {
     defaultValues: {
       role: 'user',
       status: 'Active',
+      conectaPlus: false,
     },
   });
 
@@ -100,6 +102,7 @@ function CreateClientPage() {
         state: data.state || '',
         complement: data.complement || '',
         status: data.status || 'Active',
+        conectaPlus: data.conectaPlus || false,
       };
       await createClientMutation.mutateAsync(clientData);
       navigate({ to: '/clients' });
@@ -332,6 +335,17 @@ function CreateClientPage() {
                 <option value="Active">Ativo</option>
                 <option value="Inactive">Inativo</option>
               </select>
+            </div>
+
+            <div>
+              <label className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  {...register('conectaPlus')}
+                  className="w-4 h-4 text-conectar-primary bg-gray-100 border-gray-300 rounded focus:ring-conectar-primary focus:ring-2"
+                />
+                <span className="text-sm font-medium text-gray-700">Conecta Plus</span>
+              </label>
             </div>
           </div>
         </div>

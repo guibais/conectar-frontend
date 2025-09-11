@@ -348,6 +348,9 @@ function ClientsPage() {
                 <th className="px-6 py-4 text-left text-sm font-medium text-gray-600">
                   Status
                 </th>
+                <th className="px-6 py-4 text-left text-sm font-medium text-gray-600">
+                  Conecta Plus
+                </th>
                 <th className="px-6 py-4 text-left">
                   <button
                     onClick={() => handleSort("createdAt")}
@@ -371,16 +374,20 @@ function ClientsPage() {
                   <td className="px-6 py-4">
                     <div>
                       <div className="font-medium text-gray-900 text-sm">
-                        {client.tradeName || client.companyName}
+                        {client.name}
                       </div>
                       <div className="text-sm text-gray-500">
-                        {client.taxId}
+                        {client.email}
                       </div>
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
-                      Cliente
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                      client.role === 'admin' 
+                        ? 'bg-purple-100 text-purple-700' 
+                        : 'bg-gray-100 text-gray-700'
+                    }`}>
+                      {client.role === 'admin' ? 'Administrador' : 'Cliente'}
                     </span>
                   </td>
                   <td className="px-6 py-4">
@@ -392,6 +399,17 @@ function ClientsPage() {
                       }`}
                     >
                       {client.status === "Active" ? "Ativo" : "Inativo"}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4">
+                    <span
+                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        client.conectaPlus
+                          ? "bg-blue-50 text-blue-700"
+                          : "bg-gray-50 text-gray-700"
+                      }`}
+                    >
+                      {client.conectaPlus ? "Sim" : "Não"}
                     </span>
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-500">

@@ -3,6 +3,9 @@ import { api } from '../lib/api';
 
 export type Client = {
   id: string;
+  name: string;
+  email: string;
+  role: 'admin' | 'user';
   tradeName: string;
   taxId: string;
   companyName: string;
@@ -16,8 +19,10 @@ export type Client = {
   complement?: string;
   latitude?: string;
   longitude?: string;
+  conectaPlus: boolean;
   createdAt: string;
   updatedAt: string;
+  lastLoginAt?: string;
 };
 
 type ClientFilterQuery = {
