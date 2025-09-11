@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import { Trash2 } from "lucide-react";
 import { useClient, useUpdateClient, useDeleteClient } from "@/services/clients.service";
 import { TabBar } from "@/components/ui/TabBar";
@@ -18,6 +19,7 @@ export const Route = createFileRoute("/_panel/clients/$clientId/")({
 });
 
 function ClientEditPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { clientId } = Route.useParams();
   const { getFieldsWithHandlers, getDefaultValuesWithCep } = useClientForm();
@@ -74,13 +76,13 @@ function ClientEditPage() {
       await updateClientMutation.mutateAsync({ id: clientId, data: updateData });
       navigate({ to: "/clients" });
     } catch (error: any) {
-      handleError(error, "Erro ao atualizar cliente. Tente novamente.");
+      handleError(error, t("clients.updateError"));
     }
   };
 
   const handleDeleteClient = async () => {
     const clientName = clientQuery.data?.name || "este cliente";
-    if (!window.confirm(`Tem certeza que deseja excluir ${clientName}?`)) {
+    if (!window.confirm(t("clients.deleteConfirmName", { name: clientName }))) {
       return;
     }
 
@@ -88,7 +90,7 @@ function ClientEditPage() {
       await deleteClientMutation.mutateAsync(clientId);
       navigate({ to: "/clients" });
     } catch (error: any) {
-      handleError(error, "Erro ao excluir cliente. Tente novamente.");
+      handleError(error, t("clients.deleteError"));
     }
   };
 
@@ -105,16 +107,16 @@ function ClientEditPage() {
       <div className="p-6">
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
           <h2 className="text-lg font-semibold text-red-800 mb-2">
-            Cliente não encontrado
+            {t("clients.notFound")}
           </h2>
           <p className="text-red-600">
-            O cliente solicitado não foi encontrado.
+            {t("clients.notFoundMessage")}
           </p>
           <button
             onClick={() => navigate({ to: "/clients" })}
             className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 cursor-pointer"
           >
-            Voltar para lista de clientes
+            {t("clients.backToList")}
           </button>
         </div>
       </div>
@@ -126,13 +128,13 @@ function ClientEditPage() {
       <div className="p-6">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900">
-            Cliente não encontrado
+            {t("clients.notFound")}
           </h1>
           <button
             onClick={() => navigate({ to: "/clients" })}
             className="text-conectar-primary hover:text-conectar-600 cursor-pointer"
           >
-            Voltar para lista de clientes
+            {t("clients.backToList")}
           </button>
         </div>
       </div>
@@ -144,8 +146,8 @@ function ClientEditPage() {
       <TabBar activeTab="dados-basicos" />
       <main className="px-6 py-8" role="main">
         <PageHeader
-          title="Editar Cliente"
-          description="Atualize as informações do cliente"
+          title={t("clients.edit")}
+          description={t("clients.editDescription")}
           actions={
             <ActionButton
               variant="danger"
@@ -154,8 +156,8 @@ function ClientEditPage() {
               className="focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 flex items-center gap-2"
             >
               <Trash2 className="h-4 w-4" aria-hidden="true" />
-              <span className="sr-only">Excluir cliente {clientQuery.data?.name || ''}</span>
-              {deleteClientMutation.isPending ? "Excluindo..." : "Excluir Cliente"}
+              <span className="sr-only">{t("clients.deleteClient", { name: clientQuery.data?.name || '' })}</span>
+              {deleteClientMutation.isPending ? t("clients.deleting") : t("clients.delete")}
             </ActionButton>
           }
         />
@@ -164,13 +166,13 @@ function ClientEditPage() {
           <ErrorAlert message={errorMessage} className="mb-6" />
         )}
 
-        <FormSection title="Formulário de edição do cliente">
+        <FormSection title={t("clients.editForm")}>
           <DynamicForm
             fields={getFieldsWithHandlers()}
             schema={updateClientSchema}
             onSubmit={handleUpdateClient}
             defaultValues={defaultValues}
-            submitLabel={updateClientMutation.isPending ? "Salvando..." : "Salvar Alterações"}
+            submitLabel={updateClientMutation.isPending ? t("clients.saving") : t("clients.saveChanges")}
             isLoading={updateClientMutation.isPending}
           />
         </FormSection>

@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/Button";
 import { PageTemplate } from "@/components/ui/PageTemplate";
 import { DynamicForm } from "@/components/ui/DynamicForm";
@@ -13,12 +14,20 @@ import { useUserProfile, useUpdateUserProfile } from "@/services/users.service";
 import { useAuthStore } from "@/stores/auth-store";
 import { authFormFields } from "@/lib/form-fields";
 
-const profileFields = [
-  authFormFields.profile.find((field) => field.name === "name")!,
-  authFormFields.profile.find((field) => field.name === "email")!,
+const createProfileFields = (t: any) => [
+  {
+    ...authFormFields.profile.find((field) => field.name === "name")!,
+    label: t("profile.fields.name"),
+    placeholder: t("clients.placeholders.name"),
+  },
+  {
+    ...authFormFields.profile.find((field) => field.name === "email")!,
+    label: t("profile.fields.email"),
+    placeholder: t("clients.placeholders.email"),
+  },
   {
     ...authFormFields.profile.find((field) => field.name === "password")!,
-    label: "Nova senha (opcional)",
+    label: t("profile.fields.password"),
     placeholder: "Digite uma nova senha",
     required: false,
     gridCols: 2,
@@ -30,12 +39,15 @@ export const Route = createFileRoute("/_panel/profile")({
 });
 
 function ProfilePage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { user, setUser } = useAuthStore();
   const [successMessage, setSuccessMessage] = useState("");
   const { errorMessage, handleError, clearError } = useErrorHandler();
   const profileQuery = useUserProfile();
   const updateProfileMutation = useUpdateUserProfile();
+  
+  const profileFields = createProfileFields(t);
 
   const defaultValues = profileQuery.data
     ? {
@@ -58,17 +70,17 @@ function ProfilePage() {
       const response = await updateProfileMutation.mutateAsync(updateData);
       setUser(response);
 
-      setSuccessMessage("Perfil atualizado com sucesso!");
+      setSuccessMessage(t("profile.updateSuccess"));
     } catch (error: any) {
-      handleError(error, "Erro ao atualizar perfil. Tente novamente.");
+      handleError(error, t("profile.updateError"));
     }
   };
 
   if (profileQuery.isLoading) {
     return (
       <PageTemplate
-        title="Meu Perfil"
-        description="Gerencie suas informações pessoais"
+        title={t("profile.title")}
+        description={t("profile.subtitle")}
         isLoading={true}
       >
         <div className="flex items-center justify-center min-h-64">
@@ -80,8 +92,8 @@ function ProfilePage() {
 
   return (
     <PageTemplate
-      title="Meu Perfil"
-      description="Gerencie suas informações pessoais"
+      title={t("profile.title")}
+      description={t("profile.subtitle")}
       isLoading={profileQuery.isLoading}
     >
       <main className="space-y-6 w-full" role="main">
@@ -91,17 +103,17 @@ function ProfilePage() {
         >
           <header className="mb-6">
             <h2 id="profile-info" className="sr-only">
-              Informações do perfil
+              {t("profile.title")}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
               <div>
-                <span className="text-gray-500">Role:</span>
+                <span className="text-gray-500">{t("profile.fields.role")}:</span>
                 <span className="ml-2 font-medium capitalize">
-                  {user?.role === "admin" ? "Administrador" : "Usuário"}
+                  {user?.role === "admin" ? t("profile.roles.admin") : t("profile.roles.user")}
                 </span>
               </div>
               <div>
-                <span className="text-gray-500">Membro desde:</span>
+                <span className="text-gray-500">{t("profile.fields.memberSince")}:</span>
                 <span className="ml-2 font-medium">
                   {profileQuery.data?.createdAt
                     ? new Date(profileQuery.data.createdAt).toLocaleDateString(
@@ -126,7 +138,7 @@ function ProfilePage() {
             schema={userProfileSchema}
             onSubmit={onSubmit}
             defaultValues={defaultValues}
-            submitLabel="Salvar Alterações"
+            submitLabel={t("profile.saveChanges")}
             isLoading={updateProfileMutation.isPending}
             formActions={
               user?.role === "admin" ? (
@@ -135,15 +147,15 @@ function ProfilePage() {
                   variant="outline"
                   onClick={() => navigate({ to: "/clients" })}
                   className="focus:outline-none focus:ring-2 focus:ring-conectar-primary focus:ring-offset-2"
-                  aria-label="Cancelar alterações no perfil"
+                  aria-label={t("common.cancel")}
                 >
-                  Cancelar
+                  {t("common.cancel")}
                 </Button>
               ) : undefined
             }
           >
             <div className="text-sm text-gray-500 mt-1">
-              Deixe a senha em branco para manter a atual
+              {t("profile.passwordHint")}
             </div>
           </DynamicForm>
         </section>

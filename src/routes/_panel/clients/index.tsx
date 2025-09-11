@@ -4,6 +4,7 @@ import {
   useSearch,
 } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { z } from "zod";
 import { Plus, Edit, Trash2 } from "lucide-react";
 import { useAuthStore } from "@/stores/auth-store";
@@ -47,6 +48,7 @@ type ClientFilterQuery = {
 };
 
 function ClientsPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const search = useSearch({ from: "/_panel/clients/" }) as z.infer<
     typeof clientsSearchSchema
@@ -96,7 +98,7 @@ function ClientsPage() {
   };
 
   const handleDeleteClient = async (clientId: string) => {
-    if (!confirm("Tem certeza que deseja excluir este cliente?")) return;
+    if (!confirm(t("clients.deleteConfirm"))) return;
 
     try {
       await deleteClientMutation.mutateAsync(clientId);
@@ -155,7 +157,7 @@ function ClientsPage() {
   const columns = [
     {
       key: "name",
-      header: "Nome",
+      header: t("clients.fields.name"),
       sortable: true,
       render: (client: any) => (
         <div>
@@ -166,7 +168,7 @@ function ClientsPage() {
     },
     {
       key: "taxId",
-      header: "CNPJ",
+      header: t("clients.fields.taxId"),
       render: (client: any) => (
         <span className="text-sm text-gray-600">
           {client.taxId ? maskCNPJ(client.taxId) : "-"}
@@ -175,19 +177,19 @@ function ClientsPage() {
     },
     {
       key: "status",
-      header: "Status",
+      header: t("clients.fields.status"),
       render: (client: any) => <StatusBadge status={client.status} />,
     },
     {
       key: "conectaPlus",
-      header: "Conecta+",
+      header: t("clients.fields.conectaPlus"),
       render: (client: any) => (
         <ConectaPlusBadge conectaPlus={client.conectaPlus} />
       ),
     },
     {
       key: "createdAt",
-      header: "Criado em",
+      header: t("clients.fields.createdAt"),
       sortable: true,
       render: (client: any) => (
         <span className="text-sm text-gray-600">
@@ -203,23 +205,23 @@ function ClientsPage() {
       <main className="px-6 py-8" role="main">
         <header className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Clientes</h1>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">{t("clients.title")}</h1>
             <p className="text-gray-600">
-              Gerencie seus clientes e informações
+              {t("clients.subtitle")}
             </p>
           </div>
           <button
             onClick={() => navigate({ to: "/clients/create" })}
             className="flex items-center gap-2 px-4 py-2 bg-conectar-primary text-white rounded-lg hover:bg-conectar-600 transition-colors focus:outline-none focus:ring-2 focus:ring-conectar-primary focus:ring-offset-2"
-            aria-label="Criar novo cliente"
+            aria-label={t("clients.create")}
           >
             <Plus className="h-4 w-4" aria-hidden="true" />
-            Novo Cliente
+            {t("clients.create")}
           </button>
         </header>
 
         <FilterCard
-          title="Filtros"
+          title={t("filters.title")}
           itemCount={clientsQuery.data?.clients?.length || 0}
           onClear={handleClearFilters}
           onApply={handleApplyFilters}
@@ -227,7 +229,7 @@ function ClientsPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
               <label htmlFor="filter-name" className="block text-sm font-medium text-gray-700 mb-1">
-                Nome
+                {t("clients.fields.name")}
               </label>
               <input
                 id="filter-name"
@@ -237,15 +239,15 @@ function ClientsPage() {
                   setTempFilters({ ...tempFilters, name: e.target.value })
                 }
                 className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-transparent"
-                placeholder="Buscar por nome..."
+                placeholder={t("filters.searchName")}
                 aria-describedby="filter-name-help"
               />
-              <span id="filter-name-help" className="sr-only">Digite o nome do cliente para filtrar a lista</span>
+              <span id="filter-name-help" className="sr-only">{t("filters.searchNameHelp")}</span>
             </div>
 
             <div>
               <label htmlFor="filter-cnpj" className="block text-sm font-medium text-gray-700 mb-1">
-                CNPJ
+                {t("clients.fields.taxId")}
               </label>
               <input
                 id="filter-cnpj"
@@ -255,15 +257,15 @@ function ClientsPage() {
                   setTempFilters({ ...tempFilters, taxId: e.target.value })
                 }
                 className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-transparent"
-                placeholder="Buscar por CNPJ..."
+                placeholder={t("filters.searchTaxId")}
                 aria-describedby="filter-cnpj-help"
               />
-              <span id="filter-cnpj-help" className="sr-only">Digite o CNPJ do cliente para filtrar a lista</span>
+              <span id="filter-cnpj-help" className="sr-only">{t("filters.searchTaxIdHelp")}</span>
             </div>
 
             <div>
               <label htmlFor="filter-status" className="block text-sm font-medium text-gray-700 mb-1">
-                Status
+                {t("clients.fields.status")}
               </label>
               <select
                 id="filter-status"
@@ -283,12 +285,12 @@ function ClientsPage() {
                   </option>
                 ))}
               </select>
-              <span id="filter-status-help" className="sr-only">Selecione o status do cliente para filtrar a lista</span>
+              <span id="filter-status-help" className="sr-only">{t("filters.selectStatusHelp")}</span>
             </div>
 
             <div>
               <label htmlFor="filter-conecta-plus" className="block text-sm font-medium text-gray-700 mb-1">
-                Conecta+
+                {t("clients.fields.conectaPlus")}
               </label>
               <select
                 id="filter-conecta-plus"
@@ -312,7 +314,7 @@ function ClientsPage() {
                   </option>
                 ))}
               </select>
-              <span id="filter-conecta-plus-help" className="sr-only">Selecione se o cliente possui Conecta+ para filtrar a lista</span>
+              <span id="filter-conecta-plus-help" className="sr-only">{t("filters.selectConectaPlusHelp")}</span>
             </div>
           </div>
         </FilterCard>
@@ -336,7 +338,7 @@ function ClientsPage() {
                 <button
                   onClick={() => navigate({ to: `/clients/${client.id}` })}
                   className="p-1 text-gray-400 hover:text-conectar-primary transition-colors focus:outline-none focus:ring-2 focus:ring-conectar-primary focus:ring-offset-2 rounded"
-                  aria-label={`Editar cliente ${client.name}`}
+                  aria-label={t("clients.editClient", { name: client.name })}
                 >
                   <Edit className="h-4 w-4" aria-hidden="true" />
                 </button>
@@ -344,7 +346,7 @@ function ClientsPage() {
                   <button
                     onClick={() => handleDeleteClient(client.id)}
                     className="p-1 text-gray-400 hover:text-red-600 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 rounded"
-                    aria-label={`Excluir cliente ${client.name}`}
+                    aria-label={t("clients.deleteClient", { name: client.name })}
                   >
                     <Trash2 className="h-4 w-4" aria-hidden="true" />
                   </button>

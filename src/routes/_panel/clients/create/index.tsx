@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import { TabBar } from "@/components/ui/TabBar";
 import { DynamicForm } from "@/components/ui/DynamicForm";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -16,6 +17,7 @@ export const Route = createFileRoute("/_panel/clients/create/")({
 });
 
 function CreateClientPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const createClientMutation = useCreateClient();
   const { getFieldsWithHandlers, getDefaultValuesWithCep } = useClientForm();
@@ -67,9 +69,9 @@ function CreateClientPage() {
       );
       
       if (isEmailInUse) {
-        handleError(error, "Este email já está em uso");
+        handleError(error, t("auth.register.emailInUse"));
       } else {
-        handleError(error, "Erro ao criar cliente. Tente novamente.");
+        handleError(error, t("clients.createError"));
       }
     }
   };
@@ -79,14 +81,14 @@ function CreateClientPage() {
       <TabBar activeTab="dados-basicos" />
       <main className="px-6 py-8" role="main">
         <PageHeader
-          title="Novo Cliente"
-          description="Adicione um novo cliente ao sistema"
+          title={t("clients.create")}
+          description={t("clients.createDescription")}
           actions={
             <ActionButton 
               onClick={() => navigate({ to: "/clients" })}
               className="focus:outline-none focus:ring-2 focus:ring-conectar-primary focus:ring-offset-2"
             >
-              Cancelar
+              {t("common.cancel")}
             </ActionButton>
           }
         />
@@ -95,22 +97,22 @@ function CreateClientPage() {
           <ErrorAlert message={errorMessage} className="mb-6" />
         )}
 
-        <FormSection title="Formulário de criação de cliente">
+        <FormSection title={t("clients.createForm")}>
           <DynamicForm
             fields={getFieldsWithHandlers()}
             schema={createClientSchema}
             onSubmit={handleCreateClient}
             defaultValues={defaultValues}
-            submitLabel="Criar Cliente"
+            submitLabel={t("clients.create")}
             isLoading={createClientMutation.isPending}
             formActions={
               <button
                 type="button"
                 onClick={() => navigate({ to: "/clients" })}
                 className="px-6 py-3 text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 hover:scale-105 transition-all duration-200 font-medium cursor-pointer transform active:scale-95 focus:outline-none focus:ring-2 focus:ring-conectar-primary focus:ring-offset-2"
-                aria-label="Cancelar criação do cliente"
+                aria-label={t("clients.cancelCreate")}
               >
-                Cancelar
+                {t("common.cancel")}
               </button>
             }
           />

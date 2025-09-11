@@ -1,0 +1,217 @@
+{
+  "common": {
+    "loading": "Carregando...",
+    "save": "Salvar",
+    "cancel": "Cancelar",
+    "delete": "Excluir",
+    "edit": "Editar",
+    "create": "Criar",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "clear": "Limpar",
+    "submit": "Enviar",
+    "back": "Voltar",
+    "next": "Próximo",
+    "previous": "Anterior",
+    "close": "Fechar",
+    "confirm": "Confirmar",
+    "yes": "Sim",
+    "no": "Não",
+    "or": "ou",
+    "and": "e"
+  },
+  "auth": {
+    "login": {
+      "title": "Faça seu login",
+      "subtitle": "Entre na sua conta",
+      "email": "Email",
+      "password": "Senha",
+      "loginButton": "Entrar",
+      "googleLogin": "Entrar com Google",
+      "forgotPassword": "Esqueceu sua senha?",
+      "noAccount": "Não tem uma conta?",
+      "createAccount": "Criar conta",
+      "loginError": "Erro ao fazer login",
+      "invalidCredentials": "Email ou senha inválidos"
+    },
+    "register": {
+      "title": "Crie sua conta",
+      "subtitle": "Registre-se no sistema",
+      "name": "Nome",
+      "email": "Email",
+      "password": "Senha",
+      "confirmPassword": "Confirmar senha",
+      "registerButton": "Criar conta",
+      "googleRegister": "Registrar com Google",
+      "hasAccount": "Já tem uma conta?",
+      "backToLogin": "Voltar para o login",
+      "registerSuccess": "Conta criada com sucesso! Redirecionando para o login...",
+      "registerError": "Erro ao criar conta",
+      "emailInUse": "Este email já está em uso",
+      "passwordMismatch": "Senhas não coincidem"
+    },
+    "validation": {
+      "required": "Este campo é obrigatório",
+      "email": "Email inválido",
+      "minLength": "Deve ter pelo menos {{count}} caracteres",
+      "maxLength": "Deve ter no máximo {{count}} caracteres",
+      "passwordMinLength": "Senha deve ter pelo menos 6 caracteres",
+      "nameMinLength": "Nome deve ter pelo menos 2 caracteres"
+    }
+  },
+  "navigation": {
+    "dashboard": "Dashboard",
+    "clients": "Clientes",
+    "profile": "Perfil",
+    "notifications": "Notificações",
+    "logout": "Sair"
+  },
+  "clients": {
+    "title": "Clientes",
+    "subtitle": "Gerencie seus clientes e informações",
+    "create": "Novo Cliente",
+    "edit": "Editar Cliente",
+    "delete": "Excluir Cliente",
+    "deleteConfirm": "Tem certeza que deseja excluir este cliente?",
+    "deleteSuccess": "Cliente excluído com sucesso",
+    "createSuccess": "Cliente criado com sucesso",
+    "updateSuccess": "Cliente atualizado com sucesso",
+    "notFound": "Cliente não encontrado",
+    "editClient": "Editar cliente {{name}}",
+    "deleteClient": "Excluir cliente {{name}}",
+    "createDescription": "Adicione um novo cliente ao sistema",
+    "createForm": "Formulário de criação de cliente",
+    "createError": "Erro ao criar cliente. Tente novamente.",
+    "cancelCreate": "Cancelar criação do cliente",
+    "editDescription": "Atualize as informações do cliente",
+    "editForm": "Formulário de edição do cliente",
+    "updateError": "Erro ao atualizar cliente. Tente novamente.",
+    "deleteError": "Erro ao excluir cliente. Tente novamente.",
+    "deleteConfirmName": "Tem certeza que deseja excluir {{name}}?",
+    "deleting": "Excluindo...",
+    "saving": "Salvando...",
+    "saveChanges": "Salvar Alterações",
+    "notFoundMessage": "O cliente solicitado não foi encontrado.",
+    "backToList": "Voltar para lista de clientes",
+    "fields": {
+      "name": "Nome",
+      "email": "Email",
+      "password": "Senha",
+      "confirmPassword": "Confirmar senha",
+      "tradeName": "Nome Fantasia",
+      "companyName": "Razão Social",
+      "taxId": "CNPJ",
+      "zipCode": "CEP",
+      "street": "Rua",
+      "number": "Número",
+      "complement": "Complemento",
+      "district": "Bairro",
+      "city": "Cidade",
+      "state": "Estado",
+      "phone": "Telefone",
+      "status": "Status",
+      "conectaPlus": "Conecta Plus",
+      "createdAt": "Criado em"
+    },
+    "status": {
+      "active": "Ativo",
+      "inactive": "Inativo"
+    },
+    "placeholders": {
+      "name": "Digite o nome",
+      "email": "Digite o email",
+      "password": "Digite a senha",
+      "tradeName": "Digite o nome fantasia",
+      "companyName": "Digite a razão social",
+      "taxId": "Digite o CNPJ",
+      "zipCode": "Digite o CEP",
+      "street": "Digite a rua",
+      "number": "Digite o número",
+      "complement": "Digite o complemento",
+      "district": "Digite o bairro",
+      "city": "Digite a cidade",
+      "state": "Digite o estado",
+      "phone": "Digite o telefone"
+    },
+    "sections": {
+      "basicInfo": "Informações Básicas",
+      "companyInfo": "Informações da Empresa",
+      "address": "Endereço",
+      "contact": "Contato",
+      "settings": "Configurações"
+    }
+  },
+  "profile": {
+    "title": "Meu Perfil",
+    "subtitle": "Gerencie suas informações pessoais",
+    "updateSuccess": "Perfil atualizado com sucesso!",
+    "updateError": "Erro ao atualizar perfil",
+    "fields": {
+      "name": "Nome",
+      "email": "Email",
+      "password": "Nova senha (opcional)",
+      "role": "Função",
+      "memberSince": "Membro desde"
+    },
+    "roles": {
+      "admin": "Administrador",
+      "user": "Usuário"
+    },
+    "passwordHint": "Deixe a senha em branco para manter a atual",
+    "saveChanges": "Salvar Alterações"
+  },
+  "notifications": {
+    "title": "Notificações",
+    "subtitle": "Acompanhe usuários que precisam de atenção da equipe",
+    "noData": "Nenhum usuário inativo encontrado",
+    "inactiveUsers": "Usuários Inativos (30+ dias)",
+    "description": "Usuários que não fizeram login nos últimos 30 dias",
+    "users": "usuários",
+    "days": "dias",
+    "columns": {
+      "user": "Usuário",
+      "type": "Tipo",
+      "lastLogin": "Último Login",
+      "createdAt": "Criado em",
+      "daysInactive": "Dias Inativo"
+    }
+  },
+  "errors": {
+    "generic": "Ocorreu um erro inesperado",
+    "network": "Erro de conexão",
+    "unauthorized": "Não autorizado",
+    "forbidden": "Acesso negado",
+    "notFound": "Não encontrado",
+    "validation": "Erro de validação",
+    "tryAgain": "Tente novamente"
+  },
+  "success": {
+    "saved": "Salvo com sucesso!",
+    "created": "Criado com sucesso!",
+    "updated": "Atualizado com sucesso!",
+    "deleted": "Excluído com sucesso!"
+  },
+  "pagination": {
+    "previous": "Anterior",
+    "next": "Próximo",
+    "page": "Página",
+    "of": "de",
+    "showing": "Mostrando",
+    "to": "até",
+    "entries": "entradas"
+  },
+  "filters": {
+    "all": "Todos",
+    "active": "Ativos",
+    "inactive": "Inativos",
+    "search": "Buscar...",
+    "clearFilters": "Limpar filtros",
+    "title": "Filtros",
+    "searchName": "Buscar por nome...",
+    "searchTaxId": "Buscar por CNPJ...",
+    "searchNameHelp": "Digite o nome do cliente para filtrar a lista",
+    "searchTaxIdHelp": "Digite o CNPJ do cliente para filtrar a lista",
+    "selectStatusHelp": "Selecione o status do cliente para filtrar a lista",
+    "selectConectaPlusHelp": "Selecione se o cliente possui Conecta+ para filtrar a lista"
+  }
+}
