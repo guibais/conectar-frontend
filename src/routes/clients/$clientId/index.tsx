@@ -429,14 +429,18 @@ function ClientEditPage() {
             </div>
 
             <div>
-              <label className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  {...register('conectaPlus')}
-                  className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
-                />
-                <span className="text-sm font-medium text-gray-900">Conecta Plus</span>
+              <label className="block text-sm font-medium text-gray-900 mb-2">
+                Conecta Plus
               </label>
+              <select
+                {...register('conectaPlus', { 
+                  setValueAs: (value) => value === 'true' 
+                })}
+                className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white"
+              >
+                <option value="false">Não</option>
+                <option value="true">Sim</option>
+              </select>
             </div>
 
             {errors.root && (

@@ -10,9 +10,6 @@ import {
   Trash2,
   ChevronDown,
   ChevronUp,
-  ArrowUpDown,
-  ArrowUp,
-  ArrowDown,
 } from "lucide-react";
 import { useAuthStore } from "../../stores/auth-store";
 import {
@@ -20,6 +17,8 @@ import {
   useCreateClient,
   useDeleteClient,
 } from "../../services/clients.service";
+import { DataTable } from "../../components/ui/DataTable";
+import { StatusBadge, ConectaPlusBadge } from "../../components/ui/StatusBadge";
 
 const clientsSearchSchema = z.object({
   name: z.string().optional(),
@@ -126,16 +125,6 @@ function ClientsPage() {
     });
   };
 
-  const getSortIcon = (column: "name" | "createdAt") => {
-    if (filters.sortBy !== column) {
-      return <ArrowUpDown className="h-4 w-4 text-gray-400" />;
-    }
-    return filters.order === "asc" ? (
-      <ArrowUp className="h-4 w-4 text-blue-600" />
-    ) : (
-      <ArrowDown className="h-4 w-4 text-blue-600" />
-    );
-  };
 
   const handleCreateClient = async (data: CreateClientFormData) => {
     try {
@@ -175,16 +164,6 @@ function ClientsPage() {
     }
   };
 
-  const formatDate = (dateString: string | null) => {
-    if (!dateString) return "Nunca";
-    return new Date(dateString).toLocaleDateString("pt-BR", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
 
   if (clientsQuery.isLoading) {
     return (
@@ -329,118 +308,88 @@ function ClientsPage() {
           )}
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-gray-100">
-                <th className="px-6 py-4 text-left">
-                  <button
-                    onClick={() => handleSort("name")}
-                    className="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
-                  >
-                    Cliente
-                    {getSortIcon("name")}
-                  </button>
-                </th>
-                <th className="px-6 py-4 text-left text-sm font-medium text-gray-600">
-                  Tipo
-                </th>
-                <th className="px-6 py-4 text-left text-sm font-medium text-gray-600">
-                  Status
-                </th>
-                <th className="px-6 py-4 text-left text-sm font-medium text-gray-600">
-                  Conecta Plus
-                </th>
-                <th className="px-6 py-4 text-left">
-                  <button
-                    onClick={() => handleSort("createdAt")}
-                    className="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
-                  >
-                    Criado em
-                    {getSortIcon("createdAt")}
-                  </button>
-                </th>
-                <th className="px-6 py-4 text-right text-sm font-medium text-gray-600">
-                  Ações
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-50">
-              {clientsQuery.data?.clients?.map((client) => (
-                <tr
-                  key={client.id}
-                  className="hover:bg-gray-25 transition-colors"
+        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+          <DataTable
+            data={clientsQuery.data?.clients || []}
+            columns={[
+              {
+                key: 'name',
+                header: 'Nome do Usuário',
+                sortable: true,
+                render: (client) => (
+                  <div>
+                    <div className="font-medium text-gray-900 text-sm">
+                      {client.name}
+                    </div>
+                    <div className="text-sm text-gray-500">
+                      {client.email}
+                    </div>
+                  </div>
+                ),
+              },
+              {
+                key: 'companyName',
+                header: 'Razão Social',
+                render: (client) => (
+                  <span className="text-sm text-gray-900">
+                    {client.companyName || '-'}
+                  </span>
+                ),
+              },
+              {
+                key: 'taxId',
+                header: 'CNPJ',
+                render: (client) => (
+                  <span className="text-sm text-gray-900">
+                    {client.taxId || '-'}
+                  </span>
+                ),
+              },
+              {
+                key: 'tradeName',
+                header: 'Nome na Fachada',
+                render: (client) => (
+                  <span className="text-sm text-gray-900">
+                    {client.tradeName || '-'}
+                  </span>
+                ),
+              },
+              {
+                key: 'status',
+                header: 'Status',
+                render: (client) => <StatusBadge status={client.status} />,
+              },
+              {
+                key: 'conectaPlus',
+                header: 'Conecta Plus',
+                render: (client) => <ConectaPlusBadge conectaPlus={client.conectaPlus} />,
+              },
+            ]}
+            sortBy={search.sortBy}
+            sortOrder={search.order}
+            onSort={(column) => handleSort(column as "name" | "createdAt")}
+            isLoading={clientsQuery.isLoading}
+            actions={(client) => (
+              <>
+                <button
+                  onClick={() => navigate({ to: `/clients/${client.id}` })}
+                  className="p-2 text-gray-400 hover:text-conectar-primary hover:bg-conectar-50 rounded-lg transition-colors"
+                  title="Editar cliente"
                 >
-                  <td className="px-6 py-4">
-                    <div>
-                      <div className="font-medium text-gray-900 text-sm">
-                        {client.name}
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        {client.email}
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      client.role === 'admin' 
-                        ? 'bg-purple-100 text-purple-700' 
-                        : 'bg-gray-100 text-gray-700'
-                    }`}>
-                      {client.role === 'admin' ? 'Administrador' : 'Cliente'}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span
-                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        client.status === "Active"
-                          ? "bg-green-50 text-green-700"
-                          : "bg-red-50 text-red-700"
-                      }`}
-                    >
-                      {client.status === "Active" ? "Ativo" : "Inativo"}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span
-                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        client.conectaPlus
-                          ? "bg-blue-50 text-blue-700"
-                          : "bg-gray-50 text-gray-700"
-                      }`}
-                    >
-                      {client.conectaPlus ? "Sim" : "Não"}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-500">
-                    {formatDate(client.createdAt)}
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <div className="flex items-center justify-end gap-1">
-                      <button
-                        onClick={() =>
-                          navigate({ to: `/clients/${client.id}` })
-                        }
-                        className="p-2 text-gray-400 hover:text-conectar-primary hover:bg-conectar-50 rounded-lg transition-colors"
-                        title="Editar cliente"
-                      >
-                        <Edit className="h-4 w-4" />
-                      </button>
-                      {currentUser?.id !== client.id && (
-                        <button
-                          onClick={() => handleDeleteClient(client.id)}
-                          className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                          title="Excluir cliente"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                  <Edit className="h-4 w-4" />
+                </button>
+                {currentUser?.id !== client.id && (
+                  <button
+                    onClick={() => handleDeleteClient(client.id)}
+                    className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                    title="Excluir cliente"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                )}
+              </>
+            )}
+          />
         </div>
 
         {clientsQuery.data?.pagination && (

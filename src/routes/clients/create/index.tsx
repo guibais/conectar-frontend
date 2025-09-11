@@ -338,14 +338,18 @@ function CreateClientPage() {
             </div>
 
             <div>
-              <label className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  {...register('conectaPlus')}
-                  className="w-4 h-4 text-conectar-primary bg-gray-100 border-gray-300 rounded focus:ring-conectar-primary focus:ring-2"
-                />
-                <span className="text-sm font-medium text-gray-700">Conecta Plus</span>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Conecta Plus
               </label>
+              <select
+                {...register('conectaPlus', { 
+                  setValueAs: (value) => value === 'true' 
+                })}
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-conectar-primary text-sm"
+              >
+                <option value="false">Não</option>
+                <option value="true">Sim</option>
+              </select>
             </div>
           </div>
         </div>
