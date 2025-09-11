@@ -1,17 +1,16 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { z } from "zod";
-import { Trash2, Search } from "lucide-react";
+import { Search, Trash2 } from "lucide-react";
 import { useAuthStore } from "@/stores/auth-store";
 import { useCepQuery } from "@/services/cep.service";
-import {
-  useClient,
-  useUpdateClient,
-  useDeleteClient,
-} from "@/services/clients.service";
+import { useClient, useUpdateClient, useDeleteClient } from "@/services/clients.service";
 import { maskCEP, maskCNPJ, removeMask } from "@/utils/masks";
 import { TabBar } from "@/components/ui/TabBar";
 import { DynamicForm, type FormFieldConfig } from "@/components/ui/DynamicForm";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { ActionButton } from "@/components/ui/ActionButton";
+import { ErrorMessage } from "@/components/ui/ErrorMessage";
 
 export const Route = createFileRoute("/_panel/clients/$clientId/")({
   component: ClientEditPage,
@@ -339,39 +338,29 @@ function ClientEditPage() {
     <div>
       <TabBar activeTab="dados-basicos" />
       <div className="p-8">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-2xl font-semibold text-gray-900 mb-1">
-              Editar Cliente
-            </h1>
-            <p className="text-sm text-gray-500">
-              Gerencie informações do cliente
-            </p>
-          </div>
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => navigate({ to: "/clients" })}
-            className="px-4 py-2 text-sm font-medium text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
-          >
-            Cancelar
-          </button>
-          {currentUser?.id !== clientQuery.data?.id && (
-            <button
-              onClick={handleDeleteClient}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-red-600 border border-red-300 rounded-lg hover:bg-red-50 transition-colors cursor-pointer"
-            >
-              <Trash2 className="h-4 w-4" />
-              Excluir Cliente
-            </button>
-          )}
-        </div>
-      </div>
+        <PageHeader
+          title="Editar Cliente"
+          description="Gerencie informações do cliente"
+          actions={
+            <>
+              <ActionButton onClick={() => navigate({ to: "/clients" })}>
+                Cancelar
+              </ActionButton>
+              {currentUser?.id !== clientQuery.data?.id && (
+                <ActionButton 
+                  variant="danger" 
+                  onClick={handleDeleteClient}
+                  className="flex items-center gap-2"
+                >
+                  <Trash2 className="h-4 w-4" />
+                  Excluir Cliente
+                </ActionButton>
+              )}
+            </>
+          }
+        />
 
-      {errorMessage && (
-        <div className="p-4 bg-red-50 border border-red-200 rounded-lg mb-6">
-          <p className="text-sm text-red-600">{errorMessage}</p>
-        </div>
-      )}
+        {errorMessage && <ErrorMessage message={errorMessage} />}
 
       <div className="bg-white rounded-lg border border-gray-200">
         <div className="p-6">

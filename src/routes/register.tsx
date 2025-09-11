@@ -102,40 +102,33 @@ function RegisterPage() {
   };
 
   return (
-    <AuthTemplate subtitle="Crie sua conta">
-      {successMessage ? (
-        <div className="text-center space-y-4">
-          <div className="w-16 h-16 bg-success/10 rounded-full flex items-center justify-center mx-auto">
-            <UserPlus className="w-8 h-8 text-success" />
-          </div>
-          <div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">
-              Conta criada!
-            </h2>
-            <p className="text-success">{successMessage}</p>
-          </div>
-        </div>
-      ) : (
-        <DynamicForm
-          fields={registerFields}
-          schema={registerSchema}
-          onSubmit={onSubmit}
-          submitLabel={registerMutation.isPending ? "Criando conta..." : "Criar conta"}
-          isLoading={registerMutation.isPending}
-          fullWidthSubmit={true}
-          errorMessage={errorMessage}
-          formActions={
-            <button
-              type="button"
-              onClick={() => navigate({ to: "/login" })}
-              className="inline-flex items-center gap-2 px-6 py-3 text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 hover:scale-105 transition-all duration-200 font-medium cursor-pointer transform active:scale-95"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Voltar para o login
-            </button>
-          }
-        />
-      )}
+    <AuthTemplate 
+      subtitle="Crie sua conta"
+      success={successMessage ? {
+        icon: <UserPlus className="w-8 h-8 text-success" />,
+        title: "Conta criada!",
+        message: successMessage
+      } : undefined}
+    >
+      <DynamicForm
+        fields={registerFields}
+        schema={registerSchema}
+        onSubmit={onSubmit}
+        submitLabel={registerMutation.isPending ? "Criando conta..." : "Criar conta"}
+        isLoading={registerMutation.isPending}
+        fullWidthSubmit={true}
+        errorMessage={errorMessage}
+        formActions={
+          <button
+            type="button"
+            onClick={() => navigate({ to: "/login" })}
+            className="inline-flex items-center gap-2 px-6 py-3 text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 hover:scale-105 transition-all duration-200 font-medium cursor-pointer transform active:scale-95"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Voltar para o login
+          </button>
+        }
+      />
     </AuthTemplate>
   );
 }

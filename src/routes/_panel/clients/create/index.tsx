@@ -8,6 +8,9 @@ import { useCreateClient } from "@/services/clients.service";
 import { maskCEP, maskCNPJ, removeMask } from "@/utils/masks";
 import { TabBar } from "@/components/ui/TabBar";
 import { DynamicForm, type FormFieldConfig } from "@/components/ui/DynamicForm";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { ActionButton } from "@/components/ui/ActionButton";
+import { ErrorMessage } from "@/components/ui/ErrorMessage";
 
 export const Route = createFileRoute("/_panel/clients/create/")({
   component: CreateClientPage,
@@ -262,26 +265,17 @@ function CreateClientPage() {
     <div>
       <TabBar activeTab="dados-basicos" />
       <div className="px-6 py-8">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              Novo Cliente
-            </h1>
-            <p className="text-gray-600">Adicione um novo cliente ao sistema</p>
-          </div>
-        <button
-          onClick={() => navigate({ to: "/clients" })}
-          className="px-6 py-3 text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 hover:scale-105 transition-all duration-200 font-medium cursor-pointer transform active:scale-95"
-        >
-          Cancelar
-        </button>
-        </div>
+        <PageHeader
+          title="Novo Cliente"
+          description="Adicione um novo cliente ao sistema"
+          actions={
+            <ActionButton onClick={() => navigate({ to: "/clients" })}>
+              Cancelar
+            </ActionButton>
+          }
+        />
 
-        {errorMessage && (
-          <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-sm text-red-600">{errorMessage}</p>
-          </div>
-        )}
+        {errorMessage && <ErrorMessage message={errorMessage} />}
 
         <DynamicForm
           fields={getFieldWithCustomHandlers()}
