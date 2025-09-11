@@ -1,14 +1,13 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useCallback } from "react";
-import {
-  GoogleLogin,
-  useGoogleOneTapLogin,
-} from "@react-oauth/google";
+import { useGoogleOneTapLogin } from "@react-oauth/google";
 import { loginSchema, type LoginFormData } from "../lib/schemas";
 import { useAuthStore } from "../stores/auth-store";
 import { useGoogleLogin as useGoogleLoginMutation } from "../services/google-auth.service";
 import { AuthTemplate } from "../components/ui/AuthTemplate";
 import { DynamicForm } from "../components/ui/DynamicForm";
+import { GoogleLoginButton } from "../components/ui/GoogleLoginButton";
+import { ErrorAlert } from "../components/ui/ErrorAlert";
 import { authFormFields } from "../lib/form-fields";
 
 export const Route = createFileRoute("/login")({
@@ -82,13 +81,7 @@ function LoginPage() {
   return (
     <AuthTemplate subtitle="Faça login em sua conta">
       {errorMessage && (
-        <div 
-          className="p-4 bg-red-50 border border-red-200 rounded-lg mb-6"
-          role="alert"
-          aria-live="polite"
-        >
-          <p className="text-sm text-red-600">{errorMessage}</p>
-        </div>
+        <ErrorAlert message={errorMessage} className="mb-6" />
       )}
       
       <DynamicForm
@@ -109,17 +102,11 @@ function LoginPage() {
               </div>
             </div>
 
-            <div className="flex items-center justify-center">
-              <GoogleLogin
-                onSuccess={handleGoogleSuccess}
-                onError={handleGoogleError}
-                text="signin_with"
-                shape="rectangular"
-                theme="outline"
-                size="large"
-                logo_alignment="center"
-              />
-            </div>
+            <GoogleLoginButton
+              onSuccess={handleGoogleSuccess}
+              onError={handleGoogleError}
+              text="signin_with"
+            />
 
             <div className="text-center">
               <p className="text-sm text-gray-600">

@@ -1,10 +1,8 @@
 import { type ReactNode } from 'react';
-import { type UseFormReturn } from 'react-hook-form';
-import { FormField } from '../ui/FormField';
-import { Input } from '../ui/Input';
-import { Select } from '../ui/Select';
+import { type ZodSchema } from 'zod';
+import { DynamicForm, type FormFieldConfig } from '../ui/DynamicForm';
 
-type ClientFormData = {
+export type ClientFormData = {
   name: string;
   email: string;
   password?: string;
@@ -16,7 +14,7 @@ type ClientFormData = {
   street?: string;
   number?: string;
   complement?: string;
-  neighborhood?: string;
+  district?: string;
   city?: string;
   state?: string;
   phone?: string;
@@ -25,229 +23,194 @@ type ClientFormData = {
 };
 
 type ClientFormProps = {
-  form: UseFormReturn<ClientFormData>;
+  schema: ZodSchema<ClientFormData>;
   onSubmit: (data: ClientFormData) => void;
+  defaultValues?: Partial<ClientFormData>;
   isLoading?: boolean;
   submitText?: string;
   showPasswordFields?: boolean;
   children?: ReactNode;
+  formActions?: ReactNode;
+  fields?: FormFieldConfig[];
 };
 
+const defaultClientFields: FormFieldConfig[] = [
+  {
+    name: "name",
+    label: "Nome",
+    type: "text",
+    placeholder: "Nome completo",
+    required: true,
+  },
+  {
+    name: "email",
+    label: "E-mail",
+    type: "email",
+    placeholder: "email@exemplo.com",
+    required: true,
+  },
+  {
+    name: "tradeName",
+    label: "Nome Fantasia",
+    type: "text",
+    placeholder: "Nome fantasia da empresa",
+  },
+  {
+    name: "companyName",
+    label: "Razão Social",
+    type: "text",
+    placeholder: "Razão social da empresa",
+  },
+  {
+    name: "taxId",
+    label: "CNPJ",
+    type: "text",
+    placeholder: "00.000.000/0000-00",
+  },
+  {
+    name: "phone",
+    label: "Telefone",
+    type: "text",
+    placeholder: "(00) 00000-0000",
+  },
+  {
+    name: "zipCode",
+    label: "CEP",
+    type: "text",
+    placeholder: "00000-000",
+  },
+  {
+    name: "street",
+    label: "Rua",
+    type: "text",
+    placeholder: "Nome da rua",
+    gridCols: 2,
+  },
+  {
+    name: "number",
+    label: "Número",
+    type: "text",
+    placeholder: "123",
+  },
+  {
+    name: "complement",
+    label: "Complemento",
+    type: "text",
+    placeholder: "Apto, sala, etc.",
+  },
+  {
+    name: "district",
+    label: "Bairro",
+    type: "text",
+    placeholder: "Nome do bairro",
+  },
+  {
+    name: "city",
+    label: "Cidade",
+    type: "text",
+    placeholder: "Nome da cidade",
+  },
+  {
+    name: "state",
+    label: "Estado",
+    type: "select",
+    options: [
+      { value: "", label: "Selecione o estado" },
+      { value: "AC", label: "Acre" },
+      { value: "AL", label: "Alagoas" },
+      { value: "AP", label: "Amapá" },
+      { value: "AM", label: "Amazonas" },
+      { value: "BA", label: "Bahia" },
+      { value: "CE", label: "Ceará" },
+      { value: "DF", label: "Distrito Federal" },
+      { value: "ES", label: "Espírito Santo" },
+      { value: "GO", label: "Goiás" },
+      { value: "MA", label: "Maranhão" },
+      { value: "MT", label: "Mato Grosso" },
+      { value: "MS", label: "Mato Grosso do Sul" },
+      { value: "MG", label: "Minas Gerais" },
+      { value: "PA", label: "Pará" },
+      { value: "PB", label: "Paraíba" },
+      { value: "PR", label: "Paraná" },
+      { value: "PE", label: "Pernambuco" },
+      { value: "PI", label: "Piauí" },
+      { value: "RJ", label: "Rio de Janeiro" },
+      { value: "RN", label: "Rio Grande do Norte" },
+      { value: "RS", label: "Rio Grande do Sul" },
+      { value: "RO", label: "Rondônia" },
+      { value: "RR", label: "Roraima" },
+      { value: "SC", label: "Santa Catarina" },
+      { value: "SP", label: "São Paulo" },
+      { value: "SE", label: "Sergipe" },
+      { value: "TO", label: "Tocantins" },
+    ],
+  },
+  {
+    name: "status",
+    label: "Status",
+    type: "select",
+    required: true,
+    options: [
+      { value: "Active", label: "Ativo" },
+      { value: "Inactive", label: "Inativo" },
+    ],
+  },
+  {
+    name: "conectaPlus",
+    label: "Conecta Plus",
+    type: "select",
+    options: [
+      { value: "false", label: "Não" },
+      { value: "true", label: "Sim" },
+    ],
+  },
+];
+
 export function ClientForm({
-  form,
+  schema,
   onSubmit,
+  defaultValues,
   isLoading = false,
-  submitText = 'Salvar',
+  submitText = "Salvar",
   showPasswordFields = false,
   children,
+  formActions,
+  fields,
 }: ClientFormProps) {
-  const { register, handleSubmit, formState: { errors } } = form;
+  const clientFields = fields || defaultClientFields;
+  
+  const formFields = showPasswordFields
+    ? [
+        ...clientFields.slice(0, 2),
+        {
+          name: "password",
+          label: "Senha",
+          type: "password" as const,
+          placeholder: "Digite a senha",
+          required: true,
+        },
+        {
+          name: "confirmPassword",
+          label: "Confirmar Senha",
+          type: "password" as const,
+          placeholder: "Confirme a senha",
+          required: true,
+        },
+        ...clientFields.slice(2),
+      ]
+    : clientFields;
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <FormField label="Nome" error={errors.name} required>
-          <Input
-            {...register('name')}
-            placeholder="Nome completo"
-            error={errors.name?.message}
-          />
-        </FormField>
-
-        <FormField label="E-mail" error={errors.email} required>
-          <Input
-            {...register('email')}
-            type="email"
-            placeholder="email@exemplo.com"
-            error={errors.email?.message}
-          />
-        </FormField>
-
-        {showPasswordFields && (
-          <>
-            <FormField label="Senha" error={errors.password} required>
-              <Input
-                {...register('password')}
-                type="password"
-                placeholder="Digite a senha"
-                error={errors.password?.message}
-              />
-            </FormField>
-
-            <FormField label="Confirmar Senha" error={errors.confirmPassword} required>
-              <Input
-                {...register('confirmPassword')}
-                type="password"
-                placeholder="Confirme a senha"
-                error={errors.confirmPassword?.message}
-              />
-            </FormField>
-          </>
-        )}
-
-        <FormField label="Nome Fantasia" error={errors.tradeName}>
-          <Input
-            {...register('tradeName')}
-            placeholder="Nome fantasia da empresa"
-            error={errors.tradeName?.message}
-          />
-        </FormField>
-
-        <FormField label="Razão Social" error={errors.companyName}>
-          <Input
-            {...register('companyName')}
-            placeholder="Razão social da empresa"
-            error={errors.companyName?.message}
-          />
-        </FormField>
-
-        <FormField label="CNPJ" error={errors.taxId}>
-          <Input
-            {...register('taxId')}
-            placeholder="00.000.000/0000-00"
-            error={errors.taxId?.message}
-          />
-        </FormField>
-
-        <FormField label="Telefone" error={errors.phone}>
-          <Input
-            {...register('phone')}
-            placeholder="(00) 00000-0000"
-            error={errors.phone?.message}
-          />
-        </FormField>
-      </div>
-
-      <div className="border-t border-gray-200 pt-6">
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Endereço</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <FormField label="CEP" error={errors.zipCode}>
-            <Input
-              {...register('zipCode')}
-              placeholder="00000-000"
-              error={errors.zipCode?.message}
-            />
-          </FormField>
-
-          <FormField label="Rua" error={errors.street} className="lg:col-span-2">
-            <Input
-              {...register('street')}
-              placeholder="Nome da rua"
-              error={errors.street?.message}
-            />
-          </FormField>
-
-          <FormField label="Número" error={errors.number}>
-            <Input
-              {...register('number')}
-              placeholder="123"
-              error={errors.number?.message}
-            />
-          </FormField>
-
-          <FormField label="Complemento" error={errors.complement}>
-            <Input
-              {...register('complement')}
-              placeholder="Apto, sala, etc."
-              error={errors.complement?.message}
-            />
-          </FormField>
-
-          <FormField label="Bairro" error={errors.neighborhood}>
-            <Input
-              {...register('neighborhood')}
-              placeholder="Nome do bairro"
-              error={errors.neighborhood?.message}
-            />
-          </FormField>
-
-          <FormField label="Cidade" error={errors.city}>
-            <Input
-              {...register('city')}
-              placeholder="Nome da cidade"
-              error={errors.city?.message}
-            />
-          </FormField>
-
-          <FormField label="Estado" error={errors.state}>
-            <Select
-              {...register('state')}
-              options={[
-                { value: '', label: 'Selecione o estado' },
-                { value: 'AC', label: 'Acre' },
-                { value: 'AL', label: 'Alagoas' },
-                { value: 'AP', label: 'Amapá' },
-                { value: 'AM', label: 'Amazonas' },
-                { value: 'BA', label: 'Bahia' },
-                { value: 'CE', label: 'Ceará' },
-                { value: 'DF', label: 'Distrito Federal' },
-                { value: 'ES', label: 'Espírito Santo' },
-                { value: 'GO', label: 'Goiás' },
-                { value: 'MA', label: 'Maranhão' },
-                { value: 'MT', label: 'Mato Grosso' },
-                { value: 'MS', label: 'Mato Grosso do Sul' },
-                { value: 'MG', label: 'Minas Gerais' },
-                { value: 'PA', label: 'Pará' },
-                { value: 'PB', label: 'Paraíba' },
-                { value: 'PR', label: 'Paraná' },
-                { value: 'PE', label: 'Pernambuco' },
-                { value: 'PI', label: 'Piauí' },
-                { value: 'RJ', label: 'Rio de Janeiro' },
-                { value: 'RN', label: 'Rio Grande do Norte' },
-                { value: 'RS', label: 'Rio Grande do Sul' },
-                { value: 'RO', label: 'Rondônia' },
-                { value: 'RR', label: 'Roraima' },
-                { value: 'SC', label: 'Santa Catarina' },
-                { value: 'SP', label: 'São Paulo' },
-                { value: 'SE', label: 'Sergipe' },
-                { value: 'TO', label: 'Tocantins' },
-              ]}
-              error={errors.state?.message}
-            />
-          </FormField>
-        </div>
-      </div>
-
-      <div className="border-t border-gray-200 pt-6">
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Configurações</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <FormField label="Status" error={errors.status} required>
-            <Select
-              {...register('status')}
-              options={[
-                { value: 'Active', label: 'Ativo' },
-                { value: 'Inactive', label: 'Inativo' },
-              ]}
-              error={errors.status?.message}
-            />
-          </FormField>
-
-          <FormField label="Conecta Plus" error={errors.conectaPlus}>
-            <Select
-              {...register('conectaPlus', { 
-                setValueAs: (value) => value === 'true' 
-              })}
-              options={[
-                { value: 'false', label: 'Não' },
-                { value: 'true', label: 'Sim' },
-              ]}
-              error={errors.conectaPlus?.message}
-            />
-          </FormField>
-        </div>
-      </div>
-
+    <DynamicForm
+      fields={formFields}
+      schema={schema}
+      onSubmit={onSubmit}
+      defaultValues={defaultValues}
+      submitLabel={submitText}
+      isLoading={isLoading}
+      formActions={formActions}
+    >
       {children}
-
-      <div className="flex justify-end gap-3 pt-6 border-t border-gray-200">
-        <button
-          type="submit"
-          disabled={isLoading}
-          className="px-6 py-3 bg-conectar-primary text-white rounded-lg hover:bg-conectar-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-        >
-          {isLoading ? 'Salvando...' : submitText}
-        </button>
-      </div>
-    </form>
+    </DynamicForm>
   );
 }

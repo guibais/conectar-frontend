@@ -66,7 +66,6 @@ export function Layout({ children }: LayoutProps) {
         </div>
       </header>
 
-      {/* Mobile Header - Simple Logo */}
       <header className="bg-[#00B894] text-white md:hidden">
         <div className="flex items-center justify-center h-16">
           <Link
@@ -80,7 +79,6 @@ export function Layout({ children }: LayoutProps) {
 
       <main className="pb-20 md:pb-0">{children}</main>
 
-      {/* Mobile Bottom Navigation */}
       <MobileBottomNav />
     </div>
   );

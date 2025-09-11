@@ -1,10 +1,12 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { User } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { PageTemplate } from "@/components/ui/PageTemplate";
 import { DynamicForm } from "@/components/ui/DynamicForm";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
+import { ErrorAlert } from "@/components/ui/ErrorAlert";
+import { SuccessAlert } from "@/components/ui/SuccessAlert";
+import { useErrorHandler } from "@/hooks/useErrorHandler";
 import type { UserProfileFormData } from "@/lib/schemas";
 import { userProfileSchema } from "@/lib/schemas";
 import { useUserProfile, useUpdateUserProfile } from "@/services/users.service";
@@ -30,8 +32,8 @@ export const Route = createFileRoute("/_panel/profile")({
 function ProfilePage() {
   const navigate = useNavigate();
   const { user, setUser } = useAuthStore();
-  const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const { errorMessage, handleError, clearError } = useErrorHandler();
   const profileQuery = useUserProfile();
   const updateProfileMutation = useUpdateUserProfile();
 
@@ -44,7 +46,7 @@ function ProfilePage() {
     : {};
 
   const onSubmit = async (data: UserProfileFormData) => {
-    setErrorMessage("");
+    clearError();
     setSuccessMessage("");
 
     try {
@@ -58,10 +60,7 @@ function ProfilePage() {
 
       setSuccessMessage("Perfil atualizado com sucesso!");
     } catch (error: any) {
-      setErrorMessage(
-        error.response?.data?.message ||
-          "Erro ao atualizar perfil. Tente novamente."
-      );
+      handleError(error, "Erro ao atualizar perfil. Tente novamente.");
     }
   };
 
@@ -115,23 +114,11 @@ function ProfilePage() {
           </header>
 
           {errorMessage && (
-            <div
-              className="p-4 bg-red-50 border border-red-200 rounded-lg mb-6"
-              role="alert"
-              aria-live="polite"
-            >
-              <p className="text-sm text-red-600">{errorMessage}</p>
-            </div>
+            <ErrorAlert message={errorMessage} className="mb-6" />
           )}
 
           {successMessage && (
-            <div
-              className="p-4 bg-green-50 border border-green-200 rounded-lg mb-6"
-              role="alert"
-              aria-live="polite"
-            >
-              <p className="text-sm text-green-600">{successMessage}</p>
-            </div>
+            <SuccessAlert message={successMessage} className="mb-6" />
           )}
 
           <DynamicForm
@@ -142,19 +129,17 @@ function ProfilePage() {
             submitLabel="Salvar Alterações"
             isLoading={updateProfileMutation.isPending}
             formActions={
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() =>
-                  navigate({
-                    to: user?.role === "admin" ? "/clients" : "/profile",
-                  })
-                }
-                className="focus:outline-none focus:ring-2 focus:ring-conectar-primary focus:ring-offset-2"
-                aria-label="Cancelar alterações no perfil"
-              >
-                Cancelar
-              </Button>
+              user?.role === "admin" ? (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => navigate({ to: "/clients" })}
+                  className="focus:outline-none focus:ring-2 focus:ring-conectar-primary focus:ring-offset-2"
+                  aria-label="Cancelar alterações no perfil"
+                >
+                  Cancelar
+                </Button>
+              ) : undefined
             }
           >
             <div className="text-sm text-gray-500 mt-1">

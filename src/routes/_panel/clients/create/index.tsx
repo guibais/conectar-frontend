@@ -1,17 +1,15 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Search } from "lucide-react";
-import { useAuthStore } from "@/stores/auth-store";
-import { useEffect, useState } from "react";
-import { useCepQuery } from "@/services/cep.service";
-import { useCreateClient } from "@/services/clients.service";
-import { maskCEP, maskCNPJ, removeMask } from "@/utils/masks";
 import { TabBar } from "@/components/ui/TabBar";
-import { DynamicForm, type FormFieldConfig } from "@/components/ui/DynamicForm";
+import { DynamicForm } from "@/components/ui/DynamicForm";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { ActionButton } from "@/components/ui/ActionButton";
-import { ErrorMessage } from "@/components/ui/ErrorMessage";
+import { ErrorAlert } from "@/components/ui/ErrorAlert";
+import { FormSection } from "@/components/ui/FormSection";
+import { useCreateClient } from "@/services/clients.service";
+import { useClientForm } from "@/hooks/useClientForm";
+import { useAuthRedirect } from "@/hooks/useAuthRedirect";
+import { useErrorHandler } from "@/hooks/useErrorHandler";
 import { createClientSchema, type CreateClientFormData } from "@/lib/client-schemas";
-import { clientFormFields } from "@/lib/form-fields";
 
 export const Route = createFileRoute("/_panel/clients/create/")({
   component: CreateClientPage,
@@ -19,64 +17,23 @@ export const Route = createFileRoute("/_panel/clients/create/")({
 
 function CreateClientPage() {
   const navigate = useNavigate();
-  const { user: currentUser, isAuthenticated } = useAuthStore();
-  const [cepValue, setCepValue] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
   const createClientMutation = useCreateClient();
+  const { getFieldsWithHandlers, getDefaultValuesWithCep } = useClientForm();
+  const { errorMessage, handleError, clearError } = useErrorHandler();
+  
+  useAuthRedirect({ requireRole: "admin" });
 
-  const cepQuery = useCepQuery(cepValue, cepValue.length >= 8);
-
-  useEffect(() => {
-    if (!isAuthenticated || currentUser?.role !== "admin") {
-      navigate({ to: "/login" });
-      return;
-    }
-  }, [isAuthenticated, currentUser, navigate]);
-
-  const defaultValues = {
+  const baseValues = {
     role: "user",
     status: "Active",
     conectaPlus: "false",
-    ...(cepQuery.data && !cepQuery.isLoading ? {
-      street: cepQuery.data.street || "",
-      district: cepQuery.data.district || "",
-      city: cepQuery.data.city || "",
-      state: cepQuery.data.state || "",
-    } : {}),
   };
+  
+  const defaultValues = getDefaultValuesWithCep(baseValues);
 
-  const handleCepChange = (value: string) => {
-    const maskedValue = maskCEP(value);
-    setCepValue(removeMask(maskedValue));
-    return maskedValue;
-  };
-
-  const handleCnpjChange = (value: string) => {
-    return maskCNPJ(value);
-  };
-
-  const getFieldWithCustomHandlers = (): FormFieldConfig[] => {
-    return clientFormFields.map((field) => {
-      if (field.name === "zipCode") {
-        return {
-          ...field,
-          loading: cepQuery.isLoading,
-          icon: cepQuery.data ? <Search className="h-4 w-4 text-green-500" /> : undefined,
-          onChange: handleCepChange,
-        };
-      }
-      if (field.name === "taxId") {
-        return {
-          ...field,
-          onChange: handleCnpjChange,
-        };
-      }
-      return field;
-    });
-  };
 
   const handleCreateClient = async (data: CreateClientFormData) => {
-    setErrorMessage("");
+    clearError();
     
     try {
       const clientData = {
@@ -100,15 +57,19 @@ function CreateClientPage() {
       await createClientMutation.mutateAsync(clientData);
       navigate({ to: "/clients" });
     } catch (error: any) {
-      if (
-        error.response?.data?.message === "Este email já está em uso" ||
-        error.response?.data?.message?.includes("email já está em uso")
-      ) {
-        setErrorMessage("Este email já está em uso");
+      const emailInUseMessages = [
+        "Este email já está em uso",
+        "email já está em uso"
+      ];
+      
+      const isEmailInUse = emailInUseMessages.some(msg => 
+        error.response?.data?.message?.includes(msg)
+      );
+      
+      if (isEmailInUse) {
+        handleError(error, "Este email já está em uso");
       } else {
-        setErrorMessage(
-          error.response?.data?.message || "Erro ao criar cliente. Tente novamente."
-        );
+        handleError(error, "Erro ao criar cliente. Tente novamente.");
       }
     }
   };
@@ -131,15 +92,12 @@ function CreateClientPage() {
         />
 
         {errorMessage && (
-          <div role="alert" aria-live="polite">
-            <ErrorMessage message={errorMessage} />
-          </div>
+          <ErrorAlert message={errorMessage} className="mb-6" />
         )}
 
-        <section className="bg-white rounded-lg shadow p-6" aria-labelledby="client-create-form">
-          <h2 id="client-create-form" className="sr-only">Formulário de criação de cliente</h2>
+        <FormSection title="Formulário de criação de cliente">
           <DynamicForm
-            fields={getFieldWithCustomHandlers()}
+            fields={getFieldsWithHandlers()}
             schema={createClientSchema}
             onSubmit={handleCreateClient}
             defaultValues={defaultValues}
@@ -156,7 +114,7 @@ function CreateClientPage() {
               </button>
             }
           />
-        </section>
+        </FormSection>
       </main>
     </div>
   );

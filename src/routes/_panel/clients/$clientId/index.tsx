@@ -1,18 +1,17 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState, useEffect } from "react";
-import { Search, Trash2 } from "lucide-react";
-import { useAuthStore } from "@/stores/auth-store";
-import { useCepQuery } from "@/services/cep.service";
+import { Trash2 } from "lucide-react";
 import { useClient, useUpdateClient, useDeleteClient } from "@/services/clients.service";
-import { maskCEP, maskCNPJ, removeMask } from "@/utils/masks";
 import { TabBar } from "@/components/ui/TabBar";
-import { DynamicForm, type FormFieldConfig } from "@/components/ui/DynamicForm";
+import { DynamicForm } from "@/components/ui/DynamicForm";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { ActionButton } from "@/components/ui/ActionButton";
-import { ErrorMessage } from "@/components/ui/ErrorMessage";
+import { ErrorAlert } from "@/components/ui/ErrorAlert";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
+import { FormSection } from "@/components/ui/FormSection";
+import { useClientForm } from "@/hooks/useClientForm";
+import { useAuthRedirect } from "@/hooks/useAuthRedirect";
+import { useErrorHandler } from "@/hooks/useErrorHandler";
 import { updateClientSchema, type UpdateClientFormData } from "@/lib/client-schemas";
-import { clientFormFields } from "@/lib/form-fields";
 
 export const Route = createFileRoute("/_panel/clients/$clientId/")({
   component: ClientEditPage,
@@ -21,23 +20,16 @@ export const Route = createFileRoute("/_panel/clients/$clientId/")({
 function ClientEditPage() {
   const navigate = useNavigate();
   const { clientId } = Route.useParams();
-  const { user: currentUser, isAuthenticated } = useAuthStore();
-  const [cepValue, setCepValue] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
+  const { getFieldsWithHandlers, getDefaultValuesWithCep } = useClientForm();
+  const { errorMessage, handleError, clearError } = useErrorHandler();
   
   const clientQuery = useClient(clientId);
   const updateClientMutation = useUpdateClient();
   const deleteClientMutation = useDeleteClient();
-  const cepQuery = useCepQuery(cepValue, cepValue.length >= 8);
 
-  useEffect(() => {
-    if (!isAuthenticated || currentUser?.role !== "admin") {
-      navigate({ to: "/login" });
-      return;
-    }
-  }, [isAuthenticated, currentUser, navigate]);
+  useAuthRedirect({ requireRole: "admin" });
 
-  const defaultValues = clientQuery.data ? {
+  const baseValues = clientQuery.data ? {
     name: clientQuery.data.name || "",
     email: clientQuery.data.email || "",
     role: clientQuery.data.role || "user",
@@ -53,60 +45,18 @@ function ClientEditPage() {
     complement: clientQuery.data.complement || "",
     status: clientQuery.data.status || "Active",
     conectaPlus: clientQuery.data.conectaPlus ? "Yes" : "No",
-    ...(cepQuery.data && !cepQuery.isLoading ? {
-      street: cepQuery.data.street || clientQuery.data.street || "",
-      district: cepQuery.data.district || clientQuery.data.district || "",
-      city: cepQuery.data.city || clientQuery.data.city || "",
-      state: cepQuery.data.state || clientQuery.data.state || "",
-    } : {}),
   } : {};
+  
+  const defaultValues = getDefaultValuesWithCep(baseValues);
 
-  const handleCepChange = (value: string) => {
-    const maskedValue = maskCEP(value);
-    setCepValue(removeMask(maskedValue));
-    return maskedValue;
-  };
-
-  const handleCnpjChange = (value: string) => {
-    return maskCNPJ(value);
-  };
-
-  const getFieldWithCustomHandlers = (): FormFieldConfig[] => {
-    return clientFormFields.map((field) => {
-      if (field.name === "zipCode") {
-        return {
-          ...field,
-          loading: cepQuery.isLoading,
-          icon: cepQuery.data ? <Search className="h-4 w-4 text-green-500" /> : undefined,
-          onChange: handleCepChange,
-        };
-      }
-      if (field.name === "taxId") {
-        return {
-          ...field,
-          onChange: handleCnpjChange,
-        };
-      }
-      if (field.name === "password") {
-        return {
-          ...field,
-          label: "Nova senha (opcional)",
-          placeholder: "Deixe em branco para manter a atual",
-          required: false,
-        };
-      }
-      return field;
-    });
-  };
 
   const handleUpdateClient = async (data: UpdateClientFormData) => {
-    setErrorMessage("");
+    clearError();
     
     try {
-      const clientData = {
+      const updateData = {
         name: data.name,
         email: data.email,
-        ...(data.password && { password: data.password }),
         role: data.role,
         tradeName: data.tradeName || "",
         taxId: data.taxId || "",
@@ -121,33 +71,24 @@ function ClientEditPage() {
         status: data.status || "Active",
         conectaPlus: data.conectaPlus === "Yes",
       };
-      
-      await updateClientMutation.mutateAsync({ id: clientId, data: clientData });
+      await updateClientMutation.mutateAsync({ id: clientId, data: updateData });
       navigate({ to: "/clients" });
     } catch (error: any) {
-      if (
-        error.response?.data?.message === "Este email já está em uso" ||
-        error.response?.data?.message?.includes("email já está em uso")
-      ) {
-        setErrorMessage("Este email já está em uso");
-      } else {
-        setErrorMessage(
-          error.response?.data?.message || "Erro ao atualizar cliente. Tente novamente."
-        );
-      }
+      handleError(error, "Erro ao atualizar cliente. Tente novamente.");
     }
   };
 
   const handleDeleteClient = async () => {
-    if (window.confirm("Tem certeza que deseja excluir este cliente?")) {
-      try {
-        await deleteClientMutation.mutateAsync(clientId);
-        navigate({ to: "/clients" });
-      } catch (error: any) {
-        setErrorMessage(
-          error.response?.data?.message || "Erro ao excluir cliente. Tente novamente."
-        );
-      }
+    const clientName = clientQuery.data?.name || "este cliente";
+    if (!window.confirm(`Tem certeza que deseja excluir ${clientName}?`)) {
+      return;
+    }
+
+    try {
+      await deleteClientMutation.mutateAsync(clientId);
+      navigate({ to: "/clients" });
+    } catch (error: any) {
+      handleError(error, "Erro ao excluir cliente. Tente novamente.");
     }
   };
 
@@ -220,22 +161,19 @@ function ClientEditPage() {
         />
 
         {errorMessage && (
-          <div role="alert" aria-live="polite">
-            <ErrorMessage message={errorMessage} className="mb-6" />
-          </div>
+          <ErrorAlert message={errorMessage} className="mb-6" />
         )}
 
-        <section className="bg-white rounded-lg shadow p-6" aria-labelledby="client-form">
-          <h2 id="client-form" className="sr-only">Formulário de edição do cliente</h2>
+        <FormSection title="Formulário de edição do cliente">
           <DynamicForm
-            fields={getFieldWithCustomHandlers()}
+            fields={getFieldsWithHandlers()}
             schema={updateClientSchema}
             onSubmit={handleUpdateClient}
             defaultValues={defaultValues}
             submitLabel={updateClientMutation.isPending ? "Salvando..." : "Salvar Alterações"}
             isLoading={updateClientMutation.isPending}
           />
-        </section>
+        </FormSection>
       </main>
     </div>
   );
