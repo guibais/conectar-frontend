@@ -12,6 +12,7 @@ import {
   useDeleteClient,
 } from "@/services/clients.service";
 import { maskCEP, maskCNPJ, removeMask } from "@/utils/masks";
+import { TabBar } from "@/components/ui/TabBar";
 
 export const Route = createFileRoute("/_panel/clients/$clientId/")({
   component: ClientEditPage,
@@ -123,7 +124,6 @@ function ClientEditPage() {
 
       navigate({ to: "/clients" });
     } catch (error: any) {
-      console.error("Error updating client:", error);
       if (error.response?.data?.message) {
         setError("root", { message: error.response.data.message });
       } else {
@@ -141,7 +141,6 @@ function ClientEditPage() {
       await deleteClientMutation.mutateAsync(clientId);
       navigate({ to: "/clients" });
     } catch (error) {
-      console.error("Error deleting client:", error);
     }
   };
 
@@ -193,16 +192,18 @@ function ClientEditPage() {
   }
 
   return (
-    <div className="p-8">
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-2xl font-semibold text-gray-900 mb-1">
-            Editar Cliente
-          </h1>
-          <p className="text-sm text-gray-500">
-            Gerencie informações do cliente
-          </p>
-        </div>
+    <div>
+      <TabBar activeTab="dados-basicos" />
+      <div className="p-8">
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-2xl font-semibold text-gray-900 mb-1">
+              Editar Cliente
+            </h1>
+            <p className="text-sm text-gray-500">
+              Gerencie informações do cliente
+            </p>
+          </div>
         <div className="flex items-center gap-3">
           <button
             onClick={() => navigate({ to: "/clients" })}
@@ -497,6 +498,7 @@ function ClientEditPage() {
             </div>
           </form>
         </div>
+      </div>
       </div>
     </div>
   );

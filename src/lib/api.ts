@@ -14,7 +14,7 @@ const getTokenFromStorage = () => {
       return parsed.state?.token;
     }
   } catch (error) {
-    console.error('Error getting token from storage:', error);
+    // Token retrieval failed
   }
   return null;
 };

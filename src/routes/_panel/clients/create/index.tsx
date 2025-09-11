@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { useCepQuery } from "@/services/cep.service";
 import { useCreateClient } from "@/services/clients.service";
 import { maskCEP, maskCNPJ, removeMask } from "@/utils/masks";
+import { TabBar } from "@/components/ui/TabBar";
 
 export const Route = createFileRoute("/_panel/clients/create/")({
   component: CreateClientPage,
@@ -110,7 +111,6 @@ function CreateClientPage() {
       if (error.response?.data?.message === "Email already exists") {
         setError("email", { message: "Este email já está em uso" });
       } else {
-        console.error("Error creating client:", error);
         setError("root", {
           message: "Erro ao criar cliente. Tente novamente.",
         });
@@ -119,14 +119,16 @@ function CreateClientPage() {
   };
 
   return (
-    <div className="px-6 py-8">
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Novo Cliente
-          </h1>
-          <p className="text-gray-600">Adicione um novo cliente ao sistema</p>
-        </div>
+    <div>
+      <TabBar activeTab="dados-basicos" />
+      <div className="px-6 py-8">
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              Novo Cliente
+            </h1>
+            <p className="text-gray-600">Adicione um novo cliente ao sistema</p>
+          </div>
         <button
           onClick={() => navigate({ to: "/clients" })}
           className="px-6 py-3 text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors font-medium cursor-pointer"
@@ -386,6 +388,7 @@ function CreateClientPage() {
           </button>
         </div>
       </form>
+      </div>
     </div>
   );
 }

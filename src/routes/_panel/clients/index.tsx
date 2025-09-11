@@ -24,6 +24,7 @@ import {
   ConectaPlusBadge,
 } from "../../../components/ui/StatusBadge";
 import { FilterCard } from "../../../components/ui/FilterCard";
+import { TabBar } from "../../../components/ui/TabBar";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 
 const clientsSearchSchema = z.object({
@@ -159,7 +160,6 @@ function ClientsPage() {
       if (error.response?.data?.message === "Email already exists") {
         setError("email", { message: "Este email já está em uso" });
       } else {
-        console.error("Error creating client:", error);
       }
     }
   };
@@ -170,7 +170,6 @@ function ClientsPage() {
     try {
       await deleteClientMutation.mutateAsync(clientId);
     } catch (error) {
-      console.error("Error deleting client:", error);
     }
   };
 
@@ -183,20 +182,22 @@ function ClientsPage() {
   }
 
   return (
-    <div className="px-6 py-8">
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Clientes</h1>
-          <p className="text-gray-600">Gerencie seus clientes e informações</p>
+    <div>
+      <TabBar activeTab="dados-basicos" />
+      <div className="px-6 py-8">
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Clientes</h1>
+            <p className="text-gray-600">Gerencie seus clientes e informações</p>
+          </div>
+          <button
+            onClick={() => navigate({ to: "/clients/create" })}
+            className="flex items-center gap-2 px-6 py-3 bg-conectar-primary text-white rounded-lg hover:bg-conectar-600 transition-colors font-medium cursor-pointer"
+          >
+            <Plus className="h-5 w-5" />
+            Adicionar Cliente
+          </button>
         </div>
-        <button
-          onClick={() => navigate({ to: "/clients/create" })}
-          className="flex items-center gap-2 px-6 py-3 bg-conectar-primary text-white rounded-lg hover:bg-conectar-600 transition-colors font-medium cursor-pointer"
-        >
-          <Plus className="h-5 w-5" />
-          Adicionar Cliente
-        </button>
-      </div>
 
       <FilterCard
         title="Filtros"
@@ -232,19 +233,18 @@ function ClientsPage() {
           });
         }}
       >
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Buscar por nome
             </label>
             <input
               type="text"
-              placeholder="Digite o nome"
+              placeholder=""
               value={tempFilters.name || ""}
               onChange={(e) =>
                 setTempFilters({ ...tempFilters, name: e.target.value })
               }
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-conectar-primary transition-colors"
             />
           </div>
 
@@ -254,12 +254,12 @@ function ClientsPage() {
             </label>
             <input
               type="text"
-              placeholder="Digite o CNPJ"
+              placeholder=""
               value={tempFilters.taxId || ""}
               onChange={(e) =>
                 setTempFilters({ ...tempFilters, taxId: e.target.value })
               }
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-conectar-primary transition-colors"
             />
           </div>
 
@@ -275,7 +275,7 @@ function ClientsPage() {
                   status: e.target.value as any,
                 })
               }
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white cursor-pointer"
+              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-conectar-primary transition-colors bg-white cursor-pointer"
             >
               <option value="">Selecione</option>
               <option value="Active">Ativo</option>
@@ -295,14 +295,13 @@ function ClientsPage() {
                   conectaPlus: e.target.value as "Yes" | "No" | "",
                 })
               }
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white cursor-pointer"
+              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-conectar-primary transition-colors bg-white cursor-pointer"
             >
               <option value="">Selecione</option>
               <option value="Yes">Sim</option>
               <option value="No">Não</option>
             </select>
           </div>
-        </div>
       </FilterCard>
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-100">
@@ -685,6 +684,7 @@ function ClientsPage() {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }

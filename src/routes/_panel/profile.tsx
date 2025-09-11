@@ -53,7 +53,6 @@ function ProfilePage() {
 
       alert("Perfil atualizado com sucesso!");
     } catch (error: any) {
-      console.error("Error updating profile:", error);
       setError("root", { message: "Erro ao atualizar perfil" });
     }
   };

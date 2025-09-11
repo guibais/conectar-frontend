@@ -18,47 +18,50 @@ export function Layout({ children }: LayoutProps) {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-conectar-primary text-white">
-        <div className="max-w-full px-6">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-8">
-              <Link to="/clients" className="text-xl font-bold">
+      <header className="bg-[#00B894] text-white">
+        <div className="max-w-full">
+          <div className="flex items-center h-16">
+            <div className="flex items-center">
+              <Link
+                to="/clients"
+                className="px-6 py-4 text-xl font-bold bg-[#00A085] h-16 flex items-center cursor-pointer"
+              >
                 Conéctar
               </Link>
 
               {user?.role === "admin" && (
-                <nav className="flex space-x-1">
+                <nav className="flex h-16 mb-1">
                   <Link
                     to="/clients"
-                    className="flex items-center space-x-2 px-3 py-2 text-sm font-medium hover:bg-white/10 transition-colors"
-                    activeProps={{ className: "bg-white/10" }}
+                    className="px-6 py-4 text-base font-medium bg-[#00B894] hover:bg-[#00A085] transition-colors h-16 flex items-center cursor-pointer border-b-2 border-transparent"
+                    activeProps={{ className: "bg-[#00A085] border-b-white" }}
                   >
-                    <span>Clientes</span>
+                    Clientes
                   </Link>
                   <Link
                     to="/notifications"
-                    className="flex items-center space-x-2 px-3 py-2 text-sm font-medium hover:bg-white/10 transition-colors"
-                    activeProps={{ className: "bg-white/10" }}
+                    className="px-6 py-4 text-base font-medium bg-[#00B894] hover:bg-[#00A085] transition-colors h-16 flex items-center cursor-pointer border-b-2 border-transparent"
+                    activeProps={{ className: "bg-[#00A085] border-b-white" }}
                   >
-                    <span>Notificações</span>
+                    Notificações
                   </Link>
                 </nav>
               )}
             </div>
 
-            <div className="flex items-center space-x-3">
-              <button className="p-2 hover:bg-white/10 rounded-full transition-colors">
+            <div className="flex items-center ml-auto mr-6 space-x-3">
+              <button className="p-2 hover:bg-white/10 rounded-full transition-colors cursor-pointer">
                 <HelpCircle size={20} />
               </button>
               <Link
                 to="/notifications"
-                className="p-2 hover:bg-white/10 rounded-full transition-colors"
+                className="p-2 hover:bg-white/10 rounded-full transition-colors cursor-pointer"
               >
                 <Bell size={20} />
               </Link>
               <button
                 onClick={handleLogout}
-                className="p-2 hover:bg-white/10 rounded-full transition-colors"
+                className="p-2 hover:bg-white/10 rounded-full transition-colors cursor-pointer"
               >
                 <LogOut size={20} />
               </button>
