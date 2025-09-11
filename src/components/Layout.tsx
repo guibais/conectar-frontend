@@ -21,9 +21,9 @@ export function Layout({ children }: LayoutProps) {
             <div className="flex items-center">
               <Link
                 to={user?.role === "admin" ? "/clients" : "/profile"}
-                className="px-6 py-4 text-xl font-bold bg-[#00A085] h-16 flex items-center cursor-pointer"
+                className="px-6 py-4  h-16 flex items-center cursor-pointer"
               >
-                Conéctar
+                <img src="/logo-white.png" alt="Conéctar" className="h-8" />
               </Link>
 
               {user?.role === "admin" && (
@@ -71,15 +71,15 @@ export function Layout({ children }: LayoutProps) {
         <div className="flex items-center justify-center h-16">
           <Link
             to={user?.role === "admin" ? "/clients" : "/profile"}
-            className="text-xl font-bold cursor-pointer"
+            className="cursor-pointer"
           >
-            Conéctar
+            <img src="/logo-white.png" alt="Conéctar" className="h-8" />
           </Link>
         </div>
       </header>
 
       <main className="pb-20 md:pb-0">{children}</main>
-      
+
       {/* Mobile Bottom Navigation */}
       <MobileBottomNav />
     </div>
