@@ -205,10 +205,10 @@ function ClientsPage() {
       <main className="px-6 py-8" role="main">
         <header className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">{t("clients.title")}</h1>
-            <p className="text-gray-600">
-              {t("clients.subtitle")}
-            </p>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              {t("clients.title")}
+            </h1>
+            <p className="text-gray-600">{t("clients.subtitle")}</p>
           </div>
           <button
             onClick={() => navigate({ to: "/clients/create" })}
@@ -226,96 +226,110 @@ function ClientsPage() {
           onClear={handleClearFilters}
           onApply={handleApplyFilters}
         >
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div>
-              <label htmlFor="filter-name" className="block text-sm font-medium text-gray-700 mb-1">
-                {t("clients.fields.name")}
-              </label>
-              <input
-                id="filter-name"
-                type="text"
-                value={tempFilters.name || ""}
-                onChange={(e) =>
-                  setTempFilters({ ...tempFilters, name: e.target.value })
-                }
-                className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-transparent"
-                placeholder={t("filters.searchName")}
-                aria-describedby="filter-name-help"
-              />
-              <span id="filter-name-help" className="sr-only">{t("filters.searchNameHelp")}</span>
-            </div>
+          <div>
+            <label
+              htmlFor="filter-name"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              {t("clients.fields.name")}
+            </label>
+            <input
+              id="filter-name"
+              type="text"
+              value={tempFilters.name || ""}
+              onChange={(e) =>
+                setTempFilters({ ...tempFilters, name: e.target.value })
+              }
+              className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-transparent"
+              placeholder={t("filters.searchName")}
+              aria-describedby="filter-name-help"
+            />
+            <span id="filter-name-help" className="sr-only">
+              {t("filters.searchNameHelp")}
+            </span>
+          </div>
 
-            <div>
-              <label htmlFor="filter-cnpj" className="block text-sm font-medium text-gray-700 mb-1">
-                {t("clients.fields.taxId")}
-              </label>
-              <input
-                id="filter-cnpj"
-                type="text"
-                value={tempFilters.taxId || ""}
-                onChange={(e) =>
-                  setTempFilters({ ...tempFilters, taxId: e.target.value })
-                }
-                className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-transparent"
-                placeholder={t("filters.searchTaxId")}
-                aria-describedby="filter-cnpj-help"
-              />
-              <span id="filter-cnpj-help" className="sr-only">{t("filters.searchTaxIdHelp")}</span>
-            </div>
+          <div>
+            <label
+              htmlFor="filter-cnpj"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              {t("clients.fields.taxId")}
+            </label>
+            <input
+              id="filter-cnpj"
+              type="text"
+              value={tempFilters.taxId || ""}
+              onChange={(e) =>
+                setTempFilters({ ...tempFilters, taxId: e.target.value })
+              }
+              className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-transparent"
+              placeholder={t("filters.searchTaxId")}
+              aria-describedby="filter-cnpj-help"
+            />
+            <span id="filter-cnpj-help" className="sr-only">
+              {t("filters.searchTaxIdHelp")}
+            </span>
+          </div>
 
-            <div>
-              <label htmlFor="filter-status" className="block text-sm font-medium text-gray-700 mb-1">
-                {t("clients.fields.status")}
-              </label>
-              <select
-                id="filter-status"
-                value={tempFilters.status || ""}
-                onChange={(e) =>
-                  setTempFilters({
-                    ...tempFilters,
-                    status: e.target.value as "Active" | "Inactive" | undefined,
-                  })
-                }
-                className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-transparent"
-                aria-describedby="filter-status-help"
-              >
-                {filterOptions.status.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-              <span id="filter-status-help" className="sr-only">{t("filters.selectStatusHelp")}</span>
-            </div>
+          <div>
+            <label
+              htmlFor="filter-status"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              {t("clients.fields.status")}
+            </label>
+            <select
+              id="filter-status"
+              value={tempFilters.status || ""}
+              onChange={(e) =>
+                setTempFilters({
+                  ...tempFilters,
+                  status: e.target.value as "Active" | "Inactive" | undefined,
+                })
+              }
+              className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-transparent"
+              aria-describedby="filter-status-help"
+            >
+              {filterOptions.status.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            <span id="filter-status-help" className="sr-only">
+              {t("filters.selectStatusHelp")}
+            </span>
+          </div>
 
-            <div>
-              <label htmlFor="filter-conecta-plus" className="block text-sm font-medium text-gray-700 mb-1">
-                {t("clients.fields.conectaPlus")}
-              </label>
-              <select
-                id="filter-conecta-plus"
-                value={tempFilters.conectaPlus || ""}
-                onChange={(e) =>
-                  setTempFilters({
-                    ...tempFilters,
-                    conectaPlus: e.target.value as
-                      | "Yes"
-                      | "No"
-                      | ""
-                      | undefined,
-                  })
-                }
-                className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-transparent"
-                aria-describedby="filter-conecta-plus-help"
-              >
-                {filterOptions.conectaPlus.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-              <span id="filter-conecta-plus-help" className="sr-only">{t("filters.selectConectaPlusHelp")}</span>
-            </div>
+          <div>
+            <label
+              htmlFor="filter-conecta-plus"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              {t("clients.fields.conectaPlus")}
+            </label>
+            <select
+              id="filter-conecta-plus"
+              value={tempFilters.conectaPlus || ""}
+              onChange={(e) =>
+                setTempFilters({
+                  ...tempFilters,
+                  conectaPlus: e.target.value as "Yes" | "No" | "" | undefined,
+                })
+              }
+              className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-transparent"
+              aria-describedby="filter-conecta-plus-help"
+            >
+              {filterOptions.conectaPlus.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            <span id="filter-conecta-plus-help" className="sr-only">
+              {t("filters.selectConectaPlusHelp")}
+            </span>
           </div>
         </FilterCard>
 
@@ -334,7 +348,11 @@ function ClientsPage() {
               })
             }
             actions={(client: any) => (
-              <div className="flex items-center gap-2" role="group" aria-label={`Ações para ${client.name}`}>
+              <div
+                className="flex items-center gap-2"
+                role="group"
+                aria-label={`Ações para ${client.name}`}
+              >
                 <button
                   onClick={() => navigate({ to: `/clients/${client.id}` })}
                   className="p-1 text-gray-400 hover:text-conectar-primary transition-colors focus:outline-none focus:ring-2 focus:ring-conectar-primary focus:ring-offset-2 rounded"
@@ -346,7 +364,9 @@ function ClientsPage() {
                   <button
                     onClick={() => handleDeleteClient(client.id)}
                     className="p-1 text-gray-400 hover:text-red-600 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 rounded"
-                    aria-label={t("clients.deleteClient", { name: client.name })}
+                    aria-label={t("clients.deleteClient", {
+                      name: client.name,
+                    })}
                   >
                     <Trash2 className="h-4 w-4" aria-hidden="true" />
                   </button>
