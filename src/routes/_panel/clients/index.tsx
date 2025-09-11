@@ -25,6 +25,7 @@ import {
 } from "../../../components/ui/StatusBadge";
 import { FilterCard } from "../../../components/ui/FilterCard";
 import { TabBar } from "../../../components/ui/TabBar";
+import { maskCNPJ } from "../../../utils/masks";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 
 const clientsSearchSchema = z.object({
@@ -256,9 +257,10 @@ function ClientsPage() {
               type="text"
               placeholder=""
               value={tempFilters.taxId || ""}
-              onChange={(e) =>
-                setTempFilters({ ...tempFilters, taxId: e.target.value })
-              }
+              onChange={(e) => {
+                const maskedValue = maskCNPJ(e.target.value);
+                setTempFilters({ ...tempFilters, taxId: maskedValue });
+              }}
               className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-conectar-primary transition-colors"
             />
           </div>
