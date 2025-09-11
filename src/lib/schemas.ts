@@ -6,17 +6,17 @@ export const loginSchema = z.object({
 });
 
 export const clientSchema = z.object({
-  nomeFachada: z.string().min(1, 'Nome na fachada é obrigatório'),
-  cnpj: z.string().regex(/^[0-9]{14}$/, 'CNPJ deve conter 14 dígitos'),
-  razaoSocial: z.string().min(1, 'Razão social é obrigatória'),
-  status: z.enum(['Ativo', 'Inativo'], { required_error: 'Status é obrigatório' }),
-  cep: z.string().regex(/^[0-9]{8}$|^[0-9]{5}-[0-9]{3}$/, 'CEP deve conter 8 dígitos'),
-  rua: z.string().min(1, 'Rua é obrigatória'),
-  numero: z.string().min(1, 'Número é obrigatório'),
-  bairro: z.string().min(1, 'Bairro é obrigatório'),
-  cidade: z.string().min(1, 'Cidade é obrigatória'),
-  estado: z.string().min(2, 'Estado é obrigatório'),
-  complemento: z.string().optional(),
+  tradeName: z.string().min(1, 'Trade name é obrigatório'),
+  taxId: z.string().regex(/^[0-9]{14}$/, 'Tax ID deve conter 14 dígitos'),
+  companyName: z.string().min(1, 'Company name é obrigatória'),
+  status: z.enum(['Active', 'Inactive'], { required_error: 'Status é obrigatório' }),
+  zipCode: z.string().regex(/^[0-9]{8}$|^[0-9]{5}-[0-9]{3}$/, 'Zip code deve conter 8 dígitos'),
+  street: z.string().min(1, 'Street é obrigatória'),
+  number: z.string().min(1, 'Number é obrigatório'),
+  district: z.string().min(1, 'District é obrigatório'),
+  city: z.string().min(1, 'City é obrigatória'),
+  state: z.string().min(2, 'State é obrigatório'),
+  complement: z.string().optional(),
   latitude: z.string().optional(),
   longitude: z.string().optional(),
 });
@@ -29,8 +29,8 @@ export const userProfileSchema = z.object({
 
 export const filterSchema = z.object({
   name: z.string().optional(),
-  cnpj: z.string().optional(),
-  status: z.enum(['Ativo', 'Inativo', '']).optional(),
+  taxId: z.string().optional(),
+  status: z.enum(['Active', 'Inactive', '']).optional(),
   conectaPlus: z.enum(['Sim', 'Não', '']).optional(),
 });
 

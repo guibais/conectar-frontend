@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -21,14 +21,25 @@ import {
   useDeleteClient,
 } from "../../services/clients.service";
 
+const clientsSearchSchema = z.object({
+  name: z.string().optional(),
+  email: z.string().optional(),
+  taxId: z.string().optional(),
+  status: z.enum(["Active", "Inactive"]).optional(),
+  sortBy: z.enum(["name", "createdAt"]).optional().default("createdAt"),
+  order: z.enum(["asc", "desc"]).optional().default("desc"),
+  page: z.number().optional().default(1),
+  limit: z.number().optional().default(10),
+});
+
 export const Route = createFileRoute("/clients/")({
   component: ClientsPage,
+  validateSearch: clientsSearchSchema,
 });
 
 type ClientFilterQuery = {
   name?: string;
   email?: string;
-  role?: "admin" | "user";
   taxId?: string;
   status?: "Active" | "Inactive";
   sortBy?: "name" | "createdAt";
@@ -59,21 +70,26 @@ type CreateClientFormData = z.infer<typeof createClientSchema>;
 
 function ClientsPage() {
   const navigate = useNavigate();
+  const search = useSearch({ from: "/clients/" }) as z.infer<typeof clientsSearchSchema>;
   const { user: currentUser, isAuthenticated } = useAuthStore();
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [tempFilters, setTempFilters] = useState<ClientFilterQuery>({
-    name: "",
-    taxId: "",
-    status: undefined,
-    role: undefined,
+    name: search.name || "",
+    taxId: search.taxId || "",
+    status: search.status,
   });
-  const [filters, setFilters] = useState<ClientFilterQuery>({
-    sortBy: "createdAt",
-    order: "desc",
-    page: 1,
-    limit: 10,
-  });
+  
+  const filters: ClientFilterQuery = {
+    name: search.name,
+    email: search.email,
+    taxId: search.taxId,
+    status: search.status,
+    sortBy: search.sortBy || "createdAt",
+    order: search.order || "desc",
+    page: search.page || 1,
+    limit: search.limit || 10,
+  };
 
   const clientsQuery = useClients(filters);
   const createClientMutation = useCreateClient();
@@ -99,11 +115,14 @@ function ClientsPage() {
   const handleSort = (column: "name" | "createdAt") => {
     const newOrder =
       filters.sortBy === column && filters.order === "asc" ? "desc" : "asc";
-    setFilters({
-      ...filters,
-      sortBy: column,
-      order: newOrder,
-      page: 1,
+    navigate({
+      to: "/clients",
+      search: {
+        ...search,
+        sortBy: column,
+        order: newOrder,
+        page: 1,
+      },
     });
   };
 
@@ -259,30 +278,11 @@ function ClientsPage() {
                     className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white"
                   >
                     <option value="">Selecione</option>
-                    <option value="Ativo">Ativo</option>
-                    <option value="Inativo">Inativo</option>
+                    <option value="Active">Ativo</option>
+                    <option value="Inactive">Inativo</option>
                   </select>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Buscar por conector+
-                  </label>
-                  <select
-                    value={tempFilters.role || ""}
-                    onChange={(e) =>
-                      setTempFilters({
-                        ...tempFilters,
-                        role: e.target.value as any,
-                      })
-                    }
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white"
-                  >
-                    <option value="">Selecione</option>
-                    <option value="admin">Administrador</option>
-                    <option value="user">Cliente</option>
-                  </select>
-                </div>
               </div>
 
               <div className="flex items-center gap-3">
@@ -292,7 +292,15 @@ function ClientsPage() {
                       name: "",
                       taxId: "",
                       status: undefined,
-                      role: undefined,
+                    });
+                    navigate({
+                      to: "/clients",
+                      search: {
+                        sortBy: search.sortBy,
+                        order: search.order,
+                        page: 1,
+                        limit: search.limit,
+                      },
                     });
                   }}
                   className="px-4 py-2 text-sm font-medium text-gray-600 border border-gray-300 rounded-lg hover:bg-white transition-colors"
@@ -301,13 +309,15 @@ function ClientsPage() {
                 </button>
                 <button
                   onClick={() => {
-                    setFilters({
-                      ...filters,
-                      name: tempFilters.name,
-                      taxId: tempFilters.taxId,
-                      status: tempFilters.status,
-                      role: tempFilters.role,
-                      page: 1,
+                    navigate({
+                      to: "/clients",
+                      search: {
+                        ...search,
+                        name: tempFilters.name || undefined,
+                        taxId: tempFilters.taxId || undefined,
+                        status: tempFilters.status,
+                        page: 1,
+                      },
                     });
                   }}
                   className="px-4 py-2 text-sm font-medium bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
@@ -381,7 +391,7 @@ function ClientsPage() {
                           : "bg-red-50 text-red-700"
                       }`}
                     >
-                      {client.status}
+                      {client.status === "Active" ? "Ativo" : "Inativo"}
                     </span>
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-500">
@@ -419,44 +429,50 @@ function ClientsPage() {
           <div className="px-6 py-4 border-t border-gray-100 bg-gray-50 flex items-center justify-between">
             <div className="text-sm text-gray-600">
               Mostrando{" "}
-              {(clientsQuery.data.pagination.page - 1) *
-                clientsQuery.data.pagination.limit +
+              {(Number(clientsQuery.data.pagination.page) - 1) *
+                Number(clientsQuery.data.pagination.limit) +
                 1}{" "}
               a{" "}
               {Math.min(
-                clientsQuery.data.pagination.page *
-                  clientsQuery.data.pagination.limit,
-                clientsQuery.data.pagination.total
+                Number(clientsQuery.data.pagination.page) *
+                  Number(clientsQuery.data.pagination.limit),
+                Number(clientsQuery.data.pagination.total)
               )}{" "}
               de {clientsQuery.data.pagination.total} clientes
             </div>
             <div className="flex items-center gap-2">
               <button
                 onClick={() =>
-                  setFilters({
-                    ...filters,
-                    page: clientsQuery.data.pagination.page - 1,
+                  navigate({
+                    to: "/clients",
+                    search: {
+                      ...search,
+                      page: Number(clientsQuery.data.pagination.page) - 1,
+                    },
                   })
                 }
-                disabled={clientsQuery.data.pagination.page === 1}
+                disabled={Number(clientsQuery.data.pagination.page) <= 1}
                 className="px-3 py-2 text-sm border border-gray-200 rounded-lg hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 Anterior
               </button>
               <span className="px-3 py-2 text-sm text-gray-600">
-                {clientsQuery.data.pagination.page} de{" "}
-                {clientsQuery.data.pagination.totalPages}
+                {Number(clientsQuery.data.pagination.page)} de{" "}
+                {Number(clientsQuery.data.pagination.totalPages)}
               </span>
               <button
                 onClick={() =>
-                  setFilters({
-                    ...filters,
-                    page: clientsQuery.data.pagination.page + 1,
+                  navigate({
+                    to: "/clients",
+                    search: {
+                      ...search,
+                      page: Number(clientsQuery.data.pagination.page) + 1,
+                    },
                   })
                 }
                 disabled={
-                  clientsQuery.data.pagination.page ===
-                  clientsQuery.data.pagination.totalPages
+                  Number(clientsQuery.data.pagination.page) >=
+                  Number(clientsQuery.data.pagination.totalPages)
                 }
                 className="px-3 py-2 text-sm border border-gray-200 rounded-lg hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >

@@ -18,17 +18,17 @@ const updateClientSchema = z.object({
   email: z.string().email('Email inválido'),
   password: z.string().optional(),
   role: z.enum(['admin', 'user']),
-  nomeFachada: z.string().optional(),
-  cnpj: z.string().optional(),
-  razaoSocial: z.string().optional(),
-  cep: z.string().optional(),
-  rua: z.string().optional(),
-  numero: z.string().optional(),
-  bairro: z.string().optional(),
-  cidade: z.string().optional(),
-  estado: z.string().optional(),
-  complemento: z.string().optional(),
-  status: z.enum(['Ativo', 'Inativo']).default('Ativo'),
+  tradeName: z.string().optional(),
+  taxId: z.string().optional(),
+  companyName: z.string().optional(),
+  zipCode: z.string().optional(),
+  street: z.string().optional(),
+  number: z.string().optional(),
+  district: z.string().optional(),
+  city: z.string().optional(),
+  state: z.string().optional(),
+  complement: z.string().optional(),
+  status: z.enum(['Active', 'Inactive']).default('Active'),
 });
 
 type UpdateClientFormData = z.infer<typeof updateClientSchema>;
@@ -67,41 +67,44 @@ function ClientEditPage() {
   useEffect(() => {
     if (clientQuery.data) {
       reset({
-        nomeFachada: clientQuery.data.nomeFachada || '',
-        cnpj: clientQuery.data.cnpj || '',
-        razaoSocial: clientQuery.data.razaoSocial || '',
-        cep: clientQuery.data.cep || '',
-        rua: clientQuery.data.rua || '',
-        numero: clientQuery.data.numero || '',
-        bairro: clientQuery.data.bairro || '',
-        cidade: clientQuery.data.cidade || '',
-        estado: clientQuery.data.estado || '',
-        complemento: clientQuery.data.complemento || '',
-        status: clientQuery.data.status || 'Ativo',
+        name: clientQuery.data.name || '',
+        email: clientQuery.data.email || '',
+        role: clientQuery.data.role || 'user',
+        tradeName: clientQuery.data.tradeName || '',
+        taxId: clientQuery.data.taxId || '',
+        companyName: clientQuery.data.companyName || '',
+        zipCode: clientQuery.data.zipCode || '',
+        street: clientQuery.data.street || '',
+        number: clientQuery.data.number || '',
+        district: clientQuery.data.district || '',
+        city: clientQuery.data.city || '',
+        state: clientQuery.data.state || '',
+        complement: clientQuery.data.complement || '',
+        status: clientQuery.data.status || 'Active',
       });
       
-      setCepValue(removeMask(clientQuery.data.cep || ''));
+      setCepValue(removeMask(clientQuery.data.zipCode || ''));
     }
   }, [clientQuery.data, reset]);
 
   useEffect(() => {
     if (cepQuery.data && cepQuery.data.cep) {
-      setValue('rua', cepQuery.data.street || '');
-      setValue('bairro', cepQuery.data.district || '');
-      setValue('cidade', cepQuery.data.city || '');
-      setValue('estado', cepQuery.data.state || '');
+      setValue('street', cepQuery.data.street || '');
+      setValue('district', cepQuery.data.district || '');
+      setValue('city', cepQuery.data.city || '');
+      setValue('state', cepQuery.data.state || '');
     }
   }, [cepQuery.data, setValue]);
 
   const handleCepChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const maskedValue = maskCEP(e.target.value);
     setCepValue(removeMask(maskedValue));
-    setValue('cep', maskedValue);
+    setValue('zipCode', maskedValue);
   };
 
   const handleCnpjChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const maskedValue = maskCNPJ(e.target.value);
-    setValue('cnpj', maskedValue);
+    setValue('taxId', maskedValue);
   };
 
   const handleUpdateClient = async (data: UpdateClientFormData) => {
@@ -278,11 +281,11 @@ function ClientEditPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-900 mb-2">
-                  Nome Fachada
+                  Nome Fantasia
                 </label>
                 <input
                   type="text"
-                  {...register('nomeFachada')}
+                  {...register('tradeName')}
                   className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                 />
               </div>
@@ -293,7 +296,7 @@ function ClientEditPage() {
                 </label>
                 <input
                   type="text"
-                  {...register('cnpj')}
+                  {...register('taxId')}
                   onChange={handleCnpjChange}
                   className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                   placeholder="00.000.000/0000-00"
@@ -307,7 +310,7 @@ function ClientEditPage() {
               </label>
               <input
                 type="text"
-                {...register('razaoSocial')}
+                {...register('companyName')}
                 className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
               />
             </div>
@@ -320,7 +323,7 @@ function ClientEditPage() {
                 <div className="relative">
                   <input
                     type="text"
-                    {...register('cep')}
+                    {...register('zipCode')}
                     onChange={handleCepChange}
                     className="w-full px-3 py-2.5 pr-10 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                     placeholder="00000-000"
@@ -345,7 +348,7 @@ function ClientEditPage() {
                 </label>
                 <input
                   type="text"
-                  {...register('rua')}
+                  {...register('street')}
                   className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                 />
               </div>
@@ -358,7 +361,7 @@ function ClientEditPage() {
                 </label>
                 <input
                   type="text"
-                  {...register('numero')}
+                  {...register('number')}
                   className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                 />
               </div>
@@ -369,7 +372,7 @@ function ClientEditPage() {
                 </label>
                 <input
                   type="text"
-                  {...register('bairro')}
+                  {...register('district')}
                   className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                 />
               </div>
@@ -380,7 +383,7 @@ function ClientEditPage() {
                 </label>
                 <input
                   type="text"
-                  {...register('cidade')}
+                  {...register('city')}
                   className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                 />
               </div>
@@ -393,7 +396,7 @@ function ClientEditPage() {
                 </label>
                 <input
                   type="text"
-                  {...register('estado')}
+                  {...register('state')}
                   className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                 />
               </div>
@@ -404,7 +407,7 @@ function ClientEditPage() {
                 </label>
                 <input
                   type="text"
-                  {...register('complemento')}
+                  {...register('complement')}
                   className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                 />
               </div>
@@ -418,8 +421,8 @@ function ClientEditPage() {
                 {...register('status')}
                 className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white"
               >
-                <option value="Ativo">Ativo</option>
-                <option value="Inativo">Inativo</option>
+                <option value="Active">Ativo</option>
+                <option value="Inactive">Inativo</option>
               </select>
             </div>
 

@@ -33,10 +33,10 @@ export const CepInput = ({ value, onChange, setValue, error, className = '' }: C
 
   useEffect(() => {
     if (cepData && isSuccess) {
-      setValue('rua', cepData.street || '');
-      setValue('bairro', cepData.district || '');
-      setValue('cidade', cepData.city || '');
-      setValue('estado', cepData.state || '');
+      setValue('street', cepData.street || '');
+      setValue('district', cepData.district || '');
+      setValue('city', cepData.city || '');
+      setValue('state', cepData.state || '');
       
       if (cepData.location?.coordinates) {
         setValue('latitude', cepData.location.coordinates.latitude || '');

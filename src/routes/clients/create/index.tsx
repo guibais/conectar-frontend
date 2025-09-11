@@ -85,6 +85,10 @@ function CreateClientPage() {
   const handleCreateClient = async (data: CreateClientFormData) => {
     try {
       const clientData = {
+        name: data.name,
+        email: data.email,
+        password: data.password,
+        role: data.role,
         tradeName: data.tradeName || '',
         taxId: data.taxId || '',
         companyName: data.companyName || '',
@@ -190,7 +194,7 @@ function CreateClientPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Trade Name
+                Nome Fantasia
               </label>
               <input
                 type="text"
@@ -201,7 +205,7 @@ function CreateClientPage() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Tax ID
+                CNPJ
               </label>
               <input
                 type="text"
@@ -214,7 +218,7 @@ function CreateClientPage() {
 
             <div className="md:col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Company Name
+                Razão Social
               </label>
               <input
                 type="text"
@@ -225,7 +229,7 @@ function CreateClientPage() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Zip Code
+                CEP
               </label>
               <div className="relative">
                 <input
@@ -251,7 +255,7 @@ function CreateClientPage() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                City
+                Cidade
               </label>
               <input
                 type="text"
@@ -262,7 +266,7 @@ function CreateClientPage() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Street
+                Rua
               </label>
               <input
                 type="text"
@@ -273,7 +277,7 @@ function CreateClientPage() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Number
+                Número
               </label>
               <input
                 type="text"
@@ -284,7 +288,7 @@ function CreateClientPage() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                District
+                Bairro
               </label>
               <input
                 type="text"
@@ -295,7 +299,7 @@ function CreateClientPage() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                State
+                Estado
               </label>
               <input
                 type="text"
@@ -308,7 +312,7 @@ function CreateClientPage() {
 
             <div className="md:col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Complement
+                Complemento
               </label>
               <input
                 type="text"
@@ -325,8 +329,8 @@ function CreateClientPage() {
                 {...register('status')}
                 className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-conectar-primary text-sm"
               >
-                <option value="Active">Active</option>
-                <option value="Inactive">Inactive</option>
+                <option value="Active">Ativo</option>
+                <option value="Inactive">Inativo</option>
               </select>
             </div>
           </div>
