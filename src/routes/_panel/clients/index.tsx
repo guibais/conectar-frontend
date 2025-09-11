@@ -7,10 +7,7 @@ import { useState, useEffect } from "react";
 import { z } from "zod";
 import { Plus, Edit, Trash2 } from "lucide-react";
 import { useAuthStore } from "@/stores/auth-store";
-import {
-  useClients,
-  useDeleteClient,
-} from "@/services/clients.service";
+import { useClients, useDeleteClient } from "@/services/clients.service";
 import { DataTable } from "@/components/ui/DataTable";
 import { StatusBadge, ConectaPlusBadge } from "@/components/ui/StatusBadge";
 import { FilterCard } from "@/components/ui/FilterCard";
@@ -18,6 +15,7 @@ import { TabBar } from "@/components/ui/TabBar";
 import { maskCNPJ } from "@/utils/masks";
 import { TableSkeleton } from "@/components/ui/SkeletonLoader";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { filterOptions } from "@/lib/filter-options";
 
 const clientsSearchSchema = z.object({
   name: z.string().optional(),
@@ -83,14 +81,14 @@ function ClientsPage() {
     }
   }, [isAuthenticated, currentUser, navigate]);
 
-  const handleSort = (column: "name" | "createdAt") => {
+  const handleSort = (column: string) => {
     const newOrder =
       filters.sortBy === column && filters.order === "asc" ? "desc" : "asc";
     navigate({
       to: "/clients",
       search: {
         ...search,
-        sortBy: column,
+        sortBy: column as "name" | "createdAt",
         order: newOrder,
         page: 1,
       },
@@ -156,8 +154,8 @@ function ClientsPage() {
 
   const columns = [
     {
-      key: "name" as const,
-      label: "Nome",
+      key: "name",
+      header: "Nome",
       sortable: true,
       render: (client: any) => (
         <div>
@@ -167,8 +165,8 @@ function ClientsPage() {
       ),
     },
     {
-      key: "taxId" as const,
-      label: "CNPJ",
+      key: "taxId",
+      header: "CNPJ",
       render: (client: any) => (
         <span className="text-sm text-gray-600">
           {client.taxId ? maskCNPJ(client.taxId) : "-"}
@@ -176,20 +174,20 @@ function ClientsPage() {
       ),
     },
     {
-      key: "status" as const,
-      label: "Status",
+      key: "status",
+      header: "Status",
       render: (client: any) => <StatusBadge status={client.status} />,
     },
     {
-      key: "conectaPlus" as const,
-      label: "Conecta+",
+      key: "conectaPlus",
+      header: "Conecta+",
       render: (client: any) => (
         <ConectaPlusBadge conectaPlus={client.conectaPlus} />
       ),
     },
     {
-      key: "createdAt" as const,
-      label: "Criado em",
+      key: "createdAt",
+      header: "Criado em",
       sortable: true,
       render: (client: any) => (
         <span className="text-sm text-gray-600">
@@ -197,37 +195,13 @@ function ClientsPage() {
         </span>
       ),
     },
-    {
-      key: "actions" as const,
-      label: "Ações",
-      render: (client: any) => (
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => navigate({ to: `/clients/${client.id}` })}
-            className="p-1 text-gray-400 hover:text-conectar-primary transition-colors"
-            title="Editar cliente"
-          >
-            <Edit className="h-4 w-4" />
-          </button>
-          {currentUser?.id !== client.id && (
-            <button
-              onClick={() => handleDeleteClient(client.id)}
-              className="p-1 text-gray-400 hover:text-red-600 transition-colors"
-              title="Excluir cliente"
-            >
-              <Trash2 className="h-4 w-4" />
-            </button>
-          )}
-        </div>
-      ),
-    },
   ];
 
   return (
     <div>
       <TabBar activeTab="dados-basicos" />
-      <div className="px-6 py-8">
-        <div className="flex items-center justify-between mb-8">
+      <main className="px-6 py-8" role="main">
+        <header className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 mb-2">Clientes</h1>
             <p className="text-gray-600">
@@ -236,12 +210,13 @@ function ClientsPage() {
           </div>
           <button
             onClick={() => navigate({ to: "/clients/create" })}
-            className="flex items-center gap-2 px-4 py-2 bg-conectar-primary text-white rounded-lg hover:bg-conectar-600 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-conectar-primary text-white rounded-lg hover:bg-conectar-600 transition-colors focus:outline-none focus:ring-2 focus:ring-conectar-primary focus:ring-offset-2"
+            aria-label="Criar novo cliente"
           >
-            <Plus className="h-4 w-4" />
+            <Plus className="h-4 w-4" aria-hidden="true" />
             Novo Cliente
           </button>
-        </div>
+        </header>
 
         <FilterCard
           title="Filtros"
@@ -251,10 +226,11 @@ function ClientsPage() {
         >
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="filter-name" className="block text-sm font-medium text-gray-700 mb-1">
                 Nome
               </label>
               <input
+                id="filter-name"
                 type="text"
                 value={tempFilters.name || ""}
                 onChange={(e) =>
@@ -262,14 +238,17 @@ function ClientsPage() {
                 }
                 className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-transparent"
                 placeholder="Buscar por nome..."
+                aria-describedby="filter-name-help"
               />
+              <span id="filter-name-help" className="sr-only">Digite o nome do cliente para filtrar a lista</span>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="filter-cnpj" className="block text-sm font-medium text-gray-700 mb-1">
                 CNPJ
               </label>
               <input
+                id="filter-cnpj"
                 type="text"
                 value={tempFilters.taxId || ""}
                 onChange={(e) =>
@@ -277,14 +256,17 @@ function ClientsPage() {
                 }
                 className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-transparent"
                 placeholder="Buscar por CNPJ..."
+                aria-describedby="filter-cnpj-help"
               />
+              <span id="filter-cnpj-help" className="sr-only">Digite o CNPJ do cliente para filtrar a lista</span>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="filter-status" className="block text-sm font-medium text-gray-700 mb-1">
                 Status
               </label>
               <select
+                id="filter-status"
                 value={tempFilters.status || ""}
                 onChange={(e) =>
                   setTempFilters({
@@ -293,31 +275,44 @@ function ClientsPage() {
                   })
                 }
                 className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-transparent"
+                aria-describedby="filter-status-help"
               >
-                <option value="">Todos os status</option>
-                <option value="Active">Ativo</option>
-                <option value="Inactive">Inativo</option>
+                {filterOptions.status.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
               </select>
+              <span id="filter-status-help" className="sr-only">Selecione o status do cliente para filtrar a lista</span>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="filter-conecta-plus" className="block text-sm font-medium text-gray-700 mb-1">
                 Conecta+
               </label>
               <select
+                id="filter-conecta-plus"
                 value={tempFilters.conectaPlus || ""}
                 onChange={(e) =>
                   setTempFilters({
                     ...tempFilters,
-                    conectaPlus: e.target.value as "Yes" | "No" | "" | undefined,
+                    conectaPlus: e.target.value as
+                      | "Yes"
+                      | "No"
+                      | ""
+                      | undefined,
                   })
                 }
                 className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-transparent"
+                aria-describedby="filter-conecta-plus-help"
               >
-                <option value="">Todos</option>
-                <option value="Yes">Sim</option>
-                <option value="No">Não</option>
+                {filterOptions.conectaPlus.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
               </select>
+              <span id="filter-conecta-plus-help" className="sr-only">Selecione se o cliente possui Conecta+ para filtrar a lista</span>
             </div>
           </div>
         </FilterCard>
@@ -329,56 +324,36 @@ function ClientsPage() {
             onSort={handleSort}
             sortBy={filters.sortBy}
             sortOrder={filters.order}
+            pagination={clientsQuery.data?.pagination}
+            onPageChange={(page) =>
+              navigate({
+                to: "/clients",
+                search: { ...search, page },
+              })
+            }
+            actions={(client: any) => (
+              <div className="flex items-center gap-2" role="group" aria-label={`Ações para ${client.name}`}>
+                <button
+                  onClick={() => navigate({ to: `/clients/${client.id}` })}
+                  className="p-1 text-gray-400 hover:text-conectar-primary transition-colors focus:outline-none focus:ring-2 focus:ring-conectar-primary focus:ring-offset-2 rounded"
+                  aria-label={`Editar cliente ${client.name}`}
+                >
+                  <Edit className="h-4 w-4" aria-hidden="true" />
+                </button>
+                {currentUser?.id !== client.id && (
+                  <button
+                    onClick={() => handleDeleteClient(client.id)}
+                    className="p-1 text-gray-400 hover:text-red-600 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 rounded"
+                    aria-label={`Excluir cliente ${client.name}`}
+                  >
+                    <Trash2 className="h-4 w-4" aria-hidden="true" />
+                  </button>
+                )}
+              </div>
+            )}
           />
-
-          {clientsQuery.data?.pagination && (
-            <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200">
-              <div className="text-sm text-gray-500">
-                Mostrando {clientsQuery.data.pagination.offset + 1} até{" "}
-                {Math.min(
-                  clientsQuery.data.pagination.offset +
-                    clientsQuery.data.pagination.limit,
-                  clientsQuery.data.pagination.total
-                )}{" "}
-                de {clientsQuery.data.pagination.total} resultados
-              </div>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() =>
-                    navigate({
-                      to: "/clients",
-                      search: { ...search, page: (filters.page || 1) - 1 },
-                    })
-                  }
-                  disabled={!clientsQuery.data.pagination.hasPrevious}
-                  className="px-3 py-2 text-sm border border-gray-200 rounded-lg hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
-                >
-                  Anterior
-                </button>
-                <span className="px-3 py-2 text-sm">
-                  Página {filters.page || 1} de{" "}
-                  {Math.ceil(
-                    clientsQuery.data.pagination.total /
-                      clientsQuery.data.pagination.limit
-                  )}
-                </span>
-                <button
-                  onClick={() =>
-                    navigate({
-                      to: "/clients",
-                      search: { ...search, page: (filters.page || 1) + 1 },
-                    })
-                  }
-                  disabled={!clientsQuery.data.pagination.hasNext}
-                  className="px-3 py-2 text-sm border border-gray-200 rounded-lg hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
-                >
-                  Próximo
-                </button>
-              </div>
-            </div>
-          )}
         </div>
-      </div>
+      </main>
     </div>
   );
 }

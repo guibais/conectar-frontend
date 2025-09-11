@@ -12,10 +12,10 @@ import { useAuthStore } from "@/stores/auth-store";
 import { authFormFields } from "@/lib/form-fields";
 
 const profileFields = [
-  authFormFields.profile.find(field => field.name === "name")!,
-  authFormFields.profile.find(field => field.name === "email")!,
+  authFormFields.profile.find((field) => field.name === "name")!,
+  authFormFields.profile.find((field) => field.name === "email")!,
   {
-    ...authFormFields.profile.find(field => field.name === "password")!,
+    ...authFormFields.profile.find((field) => field.name === "password")!,
     label: "Nova senha (opcional)",
     placeholder: "Digite uma nova senha",
     required: false,
@@ -35,16 +35,18 @@ function ProfilePage() {
   const profileQuery = useUserProfile();
   const updateProfileMutation = useUpdateUserProfile();
 
-  const defaultValues = profileQuery.data ? {
-    name: profileQuery.data.name || "",
-    email: profileQuery.data.email || "",
-    password: "",
-  } : {};
+  const defaultValues = profileQuery.data
+    ? {
+        name: profileQuery.data.name || "",
+        email: profileQuery.data.email || "",
+        password: "",
+      }
+    : {};
 
   const onSubmit = async (data: UserProfileFormData) => {
     setErrorMessage("");
     setSuccessMessage("");
-    
+
     try {
       const updateData = { ...data };
       if (!updateData.password) {
@@ -57,7 +59,8 @@ function ProfilePage() {
       setSuccessMessage("Perfil atualizado com sucesso!");
     } catch (error: any) {
       setErrorMessage(
-        error.response?.data?.message || "Erro ao atualizar perfil. Tente novamente."
+        error.response?.data?.message ||
+          "Erro ao atualizar perfil. Tente novamente."
       );
     }
   };
@@ -82,19 +85,15 @@ function ProfilePage() {
       description="Gerencie suas informações pessoais"
       isLoading={profileQuery.isLoading}
     >
-      <div className=" space-y-6 w-full">
-        <div className="bg-white rounded-lg shadow p-6 w-full">
-          <div className="mb-6">
-            <div className="flex items-center space-x-4 mb-4">
-              <div className="p-3 bg-conectar-primary rounded-full">
-                <User size={24} className="text-white" />
-              </div>
-              <div>
-                <h2 className="text-lg font-semibold text-gray-900">
-                  Informações da Conta
-                </h2>
-              </div>
-            </div>
+      <main className="space-y-6 w-full" role="main">
+        <section
+          className="bg-white rounded-lg shadow p-6 w-full"
+          aria-labelledby="profile-info"
+        >
+          <header className="mb-6">
+            <h2 id="profile-info" className="sr-only">
+              Informações do perfil
+            </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
               <div>
                 <span className="text-gray-500">Role:</span>
@@ -113,16 +112,24 @@ function ProfilePage() {
                 </span>
               </div>
             </div>
-          </div>
+          </header>
 
           {errorMessage && (
-            <div className="p-4 bg-red-50 border border-red-200 rounded-lg mb-6">
+            <div
+              className="p-4 bg-red-50 border border-red-200 rounded-lg mb-6"
+              role="alert"
+              aria-live="polite"
+            >
               <p className="text-sm text-red-600">{errorMessage}</p>
             </div>
           )}
 
           {successMessage && (
-            <div className="p-4 bg-green-50 border border-green-200 rounded-lg mb-6">
+            <div
+              className="p-4 bg-green-50 border border-green-200 rounded-lg mb-6"
+              role="alert"
+              aria-live="polite"
+            >
               <p className="text-sm text-green-600">{successMessage}</p>
             </div>
           )}
@@ -143,6 +150,8 @@ function ProfilePage() {
                     to: user?.role === "admin" ? "/clients" : "/profile",
                   })
                 }
+                className="focus:outline-none focus:ring-2 focus:ring-conectar-primary focus:ring-offset-2"
+                aria-label="Cancelar alterações no perfil"
               >
                 Cancelar
               </Button>
@@ -152,8 +161,8 @@ function ProfilePage() {
               Deixe a senha em branco para manter a atual
             </div>
           </DynamicForm>
-        </div>
-      </div>
+        </section>
+      </main>
     </PageTemplate>
   );
 }

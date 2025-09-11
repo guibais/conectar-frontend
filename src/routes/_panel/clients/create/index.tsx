@@ -116,37 +116,48 @@ function CreateClientPage() {
   return (
     <div>
       <TabBar activeTab="dados-basicos" />
-      <div className="px-6 py-8">
+      <main className="px-6 py-8" role="main">
         <PageHeader
           title="Novo Cliente"
           description="Adicione um novo cliente ao sistema"
           actions={
-            <ActionButton onClick={() => navigate({ to: "/clients" })}>
+            <ActionButton 
+              onClick={() => navigate({ to: "/clients" })}
+              className="focus:outline-none focus:ring-2 focus:ring-conectar-primary focus:ring-offset-2"
+            >
               Cancelar
             </ActionButton>
           }
         />
 
-        {errorMessage && <ErrorMessage message={errorMessage} />}
+        {errorMessage && (
+          <div role="alert" aria-live="polite">
+            <ErrorMessage message={errorMessage} />
+          </div>
+        )}
 
-        <DynamicForm
-          fields={getFieldWithCustomHandlers()}
-          schema={createClientSchema}
-          onSubmit={handleCreateClient}
-          defaultValues={defaultValues}
-          submitLabel="Criar Cliente"
-          isLoading={createClientMutation.isPending}
-          formActions={
-            <button
-              type="button"
-              onClick={() => navigate({ to: "/clients" })}
-              className="px-6 py-3 text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 hover:scale-105 transition-all duration-200 font-medium cursor-pointer transform active:scale-95"
-            >
-              Cancelar
-            </button>
-          }
-        />
-      </div>
+        <section className="bg-white rounded-lg shadow p-6" aria-labelledby="client-create-form">
+          <h2 id="client-create-form" className="sr-only">Formulário de criação de cliente</h2>
+          <DynamicForm
+            fields={getFieldWithCustomHandlers()}
+            schema={createClientSchema}
+            onSubmit={handleCreateClient}
+            defaultValues={defaultValues}
+            submitLabel="Criar Cliente"
+            isLoading={createClientMutation.isPending}
+            formActions={
+              <button
+                type="button"
+                onClick={() => navigate({ to: "/clients" })}
+                className="px-6 py-3 text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 hover:scale-105 transition-all duration-200 font-medium cursor-pointer transform active:scale-95 focus:outline-none focus:ring-2 focus:ring-conectar-primary focus:ring-offset-2"
+                aria-label="Cancelar criação do cliente"
+              >
+                Cancelar
+              </button>
+            }
+          />
+        </section>
+      </main>
     </div>
   );
 }

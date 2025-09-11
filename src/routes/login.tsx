@@ -82,7 +82,11 @@ function LoginPage() {
   return (
     <AuthTemplate subtitle="Faça login em sua conta">
       {errorMessage && (
-        <div className="p-4 bg-red-50 border border-red-200 rounded-lg mb-6">
+        <div 
+          className="p-4 bg-red-50 border border-red-200 rounded-lg mb-6"
+          role="alert"
+          aria-live="polite"
+        >
           <p className="text-sm text-red-600">{errorMessage}</p>
         </div>
       )}
@@ -94,43 +98,45 @@ function LoginPage() {
         submitLabel="Entrar"
         isLoading={isLoading}
         fullWidthSubmit={true}
+        formActions={
+          <div className="space-y-4">
+            <div className="relative" role="separator" aria-label="ou">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300" />
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-white text-gray-500">ou</span>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-center">
+              <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={handleGoogleError}
+                text="signin_with"
+                shape="rectangular"
+                theme="outline"
+                size="large"
+                logo_alignment="center"
+              />
+            </div>
+
+            <div className="text-center">
+              <p className="text-sm text-gray-600">
+                Não tem uma conta?{" "}
+                <button
+                  type="button"
+                  onClick={() => navigate({ to: "/register" })}
+                  className="text-conectar-primary hover:text-conectar-600 font-medium cursor-pointer focus:outline-none focus:ring-2 focus:ring-conectar-primary focus:ring-offset-2 rounded"
+                  aria-label="Ir para página de criação de conta"
+                >
+                  Criar conta
+                </button>
+              </p>
+            </div>
+          </div>
+        }
       />
-
-      <div className="mt-6">
-        <div className="relative">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-gray-300" />
-          </div>
-          <div className="relative flex justify-center text-sm">
-            <span className="px-2 bg-white text-gray-500">ou</span>
-          </div>
-        </div>
-
-        <div className="mt-6 flex items-center justify-center">
-          <GoogleLogin
-            onSuccess={handleGoogleSuccess}
-            onError={handleGoogleError}
-            text="signin_with"
-            shape="rectangular"
-            theme="outline"
-            size="large"
-            logo_alignment="center"
-          />
-        </div>
-      </div>
-
-      <div className="text-center mt-6">
-        <p className="text-sm text-gray-600">
-          Não tem uma conta?{" "}
-          <button
-            type="button"
-            onClick={() => navigate({ to: "/register" })}
-            className="text-conectar-primary hover:text-conectar-600 font-medium cursor-pointer"
-          >
-            Criar conta
-          </button>
-        </p>
-      </div>
     </AuthTemplate>
   );
 }

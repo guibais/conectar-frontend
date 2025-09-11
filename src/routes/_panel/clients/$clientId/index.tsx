@@ -201,53 +201,42 @@ function ClientEditPage() {
   return (
     <div>
       <TabBar activeTab="dados-basicos" />
-      <div className="p-8">
+      <main className="px-6 py-8" role="main">
         <PageHeader
           title="Editar Cliente"
-          description="Gerencie informações do cliente"
+          description="Atualize as informações do cliente"
           actions={
-            <>
-              <ActionButton onClick={() => navigate({ to: "/clients" })}>
-                Cancelar
-              </ActionButton>
-              {currentUser?.id !== clientQuery.data?.id && (
-                <ActionButton 
-                  variant="danger" 
-                  onClick={handleDeleteClient}
-                  className="flex items-center gap-2"
-                >
-                  <Trash2 className="h-4 w-4" />
-                  Excluir Cliente
-                </ActionButton>
-              )}
-            </>
+            <ActionButton
+              variant="danger"
+              onClick={handleDeleteClient}
+              disabled={deleteClientMutation.isPending}
+              className="focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 flex items-center gap-2"
+            >
+              <Trash2 className="h-4 w-4" aria-hidden="true" />
+              <span className="sr-only">Excluir cliente {clientQuery.data?.name || ''}</span>
+              {deleteClientMutation.isPending ? "Excluindo..." : "Excluir Cliente"}
+            </ActionButton>
           }
         />
 
-        {errorMessage && <ErrorMessage message={errorMessage} />}
+        {errorMessage && (
+          <div role="alert" aria-live="polite">
+            <ErrorMessage message={errorMessage} className="mb-6" />
+          </div>
+        )}
 
-      <div className="bg-white rounded-lg border border-gray-200">
-        <div className="p-6">
+        <section className="bg-white rounded-lg shadow p-6" aria-labelledby="client-form">
+          <h2 id="client-form" className="sr-only">Formulário de edição do cliente</h2>
           <DynamicForm
             fields={getFieldWithCustomHandlers()}
             schema={updateClientSchema}
             onSubmit={handleUpdateClient}
             defaultValues={defaultValues}
-            submitLabel="Salvar Alterações"
+            submitLabel={updateClientMutation.isPending ? "Salvando..." : "Salvar Alterações"}
             isLoading={updateClientMutation.isPending}
-            formActions={
-              <button
-                type="button"
-                onClick={() => navigate({ to: "/clients" })}
-                className="px-4 py-2 text-sm font-medium text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
-              >
-                Cancelar
-              </button>
-            }
           />
-        </div>
-      </div>
-      </div>
+        </section>
+      </main>
     </div>
   );
 }

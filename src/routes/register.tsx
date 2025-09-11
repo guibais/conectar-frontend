@@ -87,7 +87,7 @@ function RegisterPage() {
     <AuthTemplate 
       subtitle="Crie sua conta"
       success={successMessage ? {
-        icon: <UserPlus className="w-8 h-8 text-success" />,
+        icon: <UserPlus className="w-8 h-8 text-success" aria-hidden="true" />,
         title: "Conta criada!",
         message: successMessage
       } : undefined}
@@ -104,9 +104,10 @@ function RegisterPage() {
           <button
             type="button"
             onClick={() => navigate({ to: "/login" })}
-            className="inline-flex items-center gap-2 px-6 py-3 text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 hover:scale-105 transition-all duration-200 font-medium cursor-pointer transform active:scale-95"
+            className="inline-flex items-center gap-2 px-6 py-3 text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 hover:scale-105 transition-all duration-200 font-medium cursor-pointer transform active:scale-95 focus:outline-none focus:ring-2 focus:ring-conectar-primary focus:ring-offset-2"
+            aria-label="Voltar para página de login"
           >
-            <ArrowLeft className="h-4 w-4" />
+            <ArrowLeft className="h-4 w-4" aria-hidden="true" />
             Voltar para o login
           </button>
         }
