@@ -1,4 +1,4 @@
-import { type ReactNode, useState } from "react";
+import { type ReactNode, useState, useEffect } from "react";
 import { Search, ChevronDown } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -11,6 +11,7 @@ type FilterCardProps = {
   clearLabel?: string;
   applyLabel?: string;
   defaultExpanded?: boolean;
+  hasActiveFilters?: boolean;
 };
 
 export function FilterCard({
@@ -22,9 +23,16 @@ export function FilterCard({
   clearLabel,
   applyLabel,
   defaultExpanded = false,
+  hasActiveFilters = false,
 }: FilterCardProps) {
   const { t } = useTranslation();
-  const [isExpanded, setIsExpanded] = useState(defaultExpanded);
+  const [isExpanded, setIsExpanded] = useState(defaultExpanded || hasActiveFilters);
+  
+  useEffect(() => {
+    if (hasActiveFilters && !isExpanded) {
+      setIsExpanded(true);
+    }
+  }, [hasActiveFilters, isExpanded]);
   
   const defaultTitle = title || t('common.filters');
   const defaultClearLabel = clearLabel || t('common.clearFields');

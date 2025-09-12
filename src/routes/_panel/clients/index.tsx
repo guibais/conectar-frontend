@@ -257,6 +257,7 @@ function ClientsPage() {
           itemCount={clientsQuery.data?.clients?.length || 0}
           onClear={handleClearFilters}
           onApply={handleApplyFilters}
+          hasActiveFilters={!!(search.name || search.taxId || search.status || search.conectaPlus)}
         >
           <div>
             <label
