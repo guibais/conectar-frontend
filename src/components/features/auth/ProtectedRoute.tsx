@@ -1,6 +1,6 @@
 import { useEffect, type ReactNode } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { useAuthStore } from "../stores/auth-store";
+import { useAuthStore } from "../../../stores/auth-store";
 
 type ProtectedRouteProps = {
   children: ReactNode;

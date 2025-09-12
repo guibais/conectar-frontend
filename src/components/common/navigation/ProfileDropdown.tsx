@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { User, LogOut, ChevronDown } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { useAuthStore } from "../../stores/auth-store";
+import { useAuthStore } from "@/stores/auth-store";
 
 type ProfileDropdownProps = {
   isMobile?: boolean;
@@ -22,7 +22,10 @@ export function ProfileDropdown({ isMobile = false }: ProfileDropdownProps) {
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setIsOpen(false);
       }
     }
@@ -41,7 +44,9 @@ export function ProfileDropdown({ isMobile = false }: ProfileDropdownProps) {
           className="flex flex-col items-center text-gray-600 transition-colors cursor-pointer"
         >
           <User size={24} />
-          <span className="text-xs mt-1 font-medium">{t('navigation.profile')}</span>
+          <span className="text-xs mt-1 font-medium">
+            {t("navigation.profile")}
+          </span>
         </button>
 
         {isOpen && (
@@ -52,7 +57,7 @@ export function ProfileDropdown({ isMobile = false }: ProfileDropdownProps) {
               onClick={() => setIsOpen(false)}
             >
               <User size={16} />
-              {t('profile.myProfile')}
+              {t("profile.myProfile")}
             </Link>
             <hr className="my-2 border-gray-100" />
             <button
@@ -60,7 +65,7 @@ export function ProfileDropdown({ isMobile = false }: ProfileDropdownProps) {
               className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:scale-105 transition-all duration-150 cursor-pointer w-full text-left transform"
             >
               <LogOut size={16} />
-              {t('auth.logout')}
+              {t("auth.logout")}
             </button>
           </div>
         )}
@@ -78,7 +83,10 @@ export function ProfileDropdown({ isMobile = false }: ProfileDropdownProps) {
           <User size={16} />
         </div>
         <span className="text-sm font-medium">{user?.name}</span>
-        <ChevronDown size={16} className={`transition-transform ${isOpen ? "rotate-180" : ""}`} />
+        <ChevronDown
+          size={16}
+          className={`transition-transform ${isOpen ? "rotate-180" : ""}`}
+        />
       </button>
 
       {isOpen && (
@@ -89,7 +97,7 @@ export function ProfileDropdown({ isMobile = false }: ProfileDropdownProps) {
             onClick={() => setIsOpen(false)}
           >
             <User size={16} />
-            {t('profile.myProfile')}
+            {t("profile.myProfile")}
           </Link>
           <hr className="my-2 border-gray-100" />
           <button
@@ -97,7 +105,7 @@ export function ProfileDropdown({ isMobile = false }: ProfileDropdownProps) {
             className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:scale-105 transition-all duration-150 cursor-pointer w-full text-left transform"
           >
             <LogOut size={16} />
-            {t('auth.logout')}
+            {t("auth.logout")}
           </button>
         </div>
       )}

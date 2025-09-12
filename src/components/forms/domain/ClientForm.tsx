@@ -1,7 +1,7 @@
 import { type ReactNode } from 'react';
 import { type ZodSchema } from 'zod';
 import { useTranslation } from 'react-i18next';
-import { DynamicForm, type FormFieldConfig } from '../ui/DynamicForm';
+import { DynamicForm, type FormFieldConfig } from '../components/DynamicForm';
 
 export type ClientFormData = {
   name: string;

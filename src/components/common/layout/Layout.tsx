@@ -2,9 +2,9 @@ import { type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { Bell, HelpCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { useAuthStore } from "../stores/auth-store";
-import { ProfileDropdown } from "./ui/ProfileDropdown";
-import { MobileBottomNav } from "./ui/MobileBottomNav";
+import { useAuthStore } from "../../../stores/auth-store";
+import { ProfileDropdown } from "../navigation/ProfileDropdown";
+import { MobileBottomNav } from "./MobileBottomNav";
 
 type LayoutProps = {
   children: ReactNode;

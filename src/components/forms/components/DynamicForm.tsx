@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { type ZodSchema } from "zod";
 import { useTranslation } from "react-i18next";
 import { FormField } from "./FormField";
-import { DynamicInput, type InputType, type SelectOption } from "./DynamicInput";
+import { DynamicInput, type InputType, type SelectOption } from "../fields/DynamicInput";
 
 export type FormFieldConfig = {
   name: string;
@@ -71,7 +71,7 @@ export function DynamicForm<T extends FieldValues>({
     return (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
       const target = e.target as HTMLInputElement;
       const value = target.type === "checkbox" ? target.checked : target.value;
-      setValue(fieldName as any, value);
+      setValue(fieldName as any, value as any);
       onChange?.(value);
     };
   };
