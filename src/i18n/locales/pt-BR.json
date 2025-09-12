@@ -23,7 +23,34 @@
     "filters": "Filtros",
     "clearFields": "Limpar campos",
     "filterAndSearchItems": "Filtre e busque itens na página",
-    "and": "e"
+    "and": "e",
+    "errors": {
+      "generic": "Ocorreu um erro inesperado",
+      "internalServerError": "Erro interno do servidor",
+      "validationError": "Erro de validação",
+      "unauthorized": "Não autorizado",
+      "forbidden": "Acesso negado",
+      "notFound": "Não encontrado"
+    },
+    "status": "Status",
+    "active": "Ativo",
+    "inactive": "Inativo",
+    "open": "Abrir",
+    "view": "Visualizar",
+    "download": "Baixar",
+    "upload": "Enviar",
+    "refresh": "Atualizar",
+    "reset": "Redefinir",
+    "apply": "Aplicar",
+    "remove": "Remover",
+    "add": "Adicionar",
+    "update": "Atualizar",
+    "send": "Enviar",
+    "receive": "Receber",
+    "success": "Sucesso",
+    "error": "Erro",
+    "warning": "Aviso",
+    "info": "Informação"
   },
   "auth": {
     "login": {
@@ -64,6 +91,14 @@
       "maxLength": "Deve ter no máximo {{count}} caracteres",
       "passwordMinLength": "Senha deve ter pelo menos 6 caracteres",
       "nameMinLength": "Nome deve ter pelo menos 2 caracteres"
+    },
+    "errors": {
+      "emailAlreadyExists": "Este email já está em uso",
+      "invalidCredentials": "Credenciais inválidas",
+      "googleAuthFailed": "Falha na autenticação do Google",
+      "missingGoogleData": "Dados obrigatórios do Google não encontrados",
+      "invalidGoogleToken": "Token do Google inválido",
+      "userCreationFailed": "Erro ao criar usuário"
     }
   },
   "navigation": {
@@ -100,6 +135,16 @@
     "saveChanges": "Salvar Alterações",
     "notFoundMessage": "O cliente solicitado não foi encontrado.",
     "backToList": "Voltar para lista de clientes",
+    "errors": {
+      "clientNotFound": "Cliente não encontrado",
+      "emailAlreadyExists": "Este email já está em uso",
+      "cnpjAlreadyExists": "Este CNPJ já está em uso",
+      "invalidClientData": "Dados do cliente inválidos",
+      "clientCreationFailed": "Erro ao criar cliente",
+      "clientUpdateFailed": "Erro ao atualizar cliente",
+      "clientDeleteFailed": "Erro ao excluir cliente",
+      "unauthorizedAccess": "Acesso não autorizado"
+    },
     "tabs": {
       "basicData": "Dados Básicos"
     },

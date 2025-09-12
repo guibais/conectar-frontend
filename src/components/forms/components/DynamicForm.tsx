@@ -84,12 +84,6 @@ export function DynamicForm<T extends FieldValues>({
         </div>
       )}
 
-      {errorMessage && (
-        <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-sm text-red-600">{errorMessage}</p>
-        </div>
-      )}
-
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {fields.map((field) => {
           const fieldError = errors[field.name as keyof typeof errors];
@@ -132,6 +126,12 @@ export function DynamicForm<T extends FieldValues>({
       {errors.root && (
         <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
           <p className="text-sm text-red-600">{errors.root.message}</p>
+        </div>
+      )}
+
+      {errorMessage && (
+        <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+          <p className="text-sm text-red-600">{errorMessage}</p>
         </div>
       )}
 

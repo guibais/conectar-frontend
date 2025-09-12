@@ -8,6 +8,7 @@ import { userProfileSchema } from "@/lib/schemas";
 import { useUserProfile, useUpdateUserProfile } from "@/services/users.service";
 import { useAuthStore } from "@/stores/auth-store";
 import { authFormFields } from "@/lib/form-fields";
+import { formatDateLocalized } from "@/utils/date-helpers";
 import {
   Button,
   DynamicForm,
@@ -125,11 +126,7 @@ function ProfilePage() {
                   {t("profile.fields.memberSince")}:
                 </span>
                 <span className="ml-2 font-medium">
-                  {profileQuery.data?.createdAt
-                    ? new Date(profileQuery.data.createdAt).toLocaleDateString(
-                        i18n.language === "en" ? "en-US" : "pt-BR"
-                      )
-                    : "N/A"}
+                  {formatDateLocalized(profileQuery.data?.createdAt, i18n.language)}
                 </span>
               </div>
             </div>

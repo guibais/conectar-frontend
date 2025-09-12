@@ -9,6 +9,7 @@ import { useGoogleLogin as useGoogleLoginMutation } from "../services/google-aut
 import { useAuthStore } from "@/stores/auth-store";
 import { authFormFields } from "@/lib/form-fields";
 import { AuthTemplate, DynamicForm, GoogleLoginButton } from "@/components";
+import { handleStandardizedError } from "@/utils/error-handler";
 
 export const Route = createFileRoute("/register")({
   component: RegisterPage,
@@ -85,8 +86,8 @@ function RegisterPage() {
             navigate({ to: "/clients" });
           }
         },
-        onError: () => {
-          setErrorMessage(t("auth.login.loginError"));
+        onError: (error) => {
+          setErrorMessage(handleStandardizedError(error, t, "auth.login.loginError"));
         },
       });
     },
@@ -125,16 +126,7 @@ function RegisterPage() {
         navigate({ to: "/login" });
       }, 2000);
     } catch (error: any) {
-      if (
-        error.response?.data?.message === "Este email já está em uso" ||
-        error.response?.data?.message?.includes("email já está em uso")
-      ) {
-        setErrorMessage(t("auth.register.emailInUse"));
-      } else {
-        setErrorMessage(
-          error.response?.data?.message || t("auth.register.registerError")
-        );
-      }
+      setErrorMessage(handleStandardizedError(error, t, "auth.register.registerError"));
     }
   };
 

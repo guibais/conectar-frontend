@@ -7,20 +7,28 @@ import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
 import { Plus, Edit, Trash2 } from "lucide-react";
-import { useAuthStore } from "@/stores/auth-store";
 import { useClients, useDeleteClient } from "@/services/clients.service";
+import { useAuthStore } from "@/stores/auth-store";
+import { useErrorHandler } from "@/hooks/useErrorHandler";
+import { formatDateShort } from "@/utils/date-helpers";
 import { maskCNPJ } from "@/utils/masks";
-import { filterOptions } from "@/lib/filter-options";
-import { TableSkeleton } from "@/components/common/feedback/SkeletonLoader";
 import {
-  ConfirmModal,
+  PageTemplate,
   DataTable,
+  Button,
+  Input,
+  Select,
+  ConfirmModal,
+  ErrorAlert,
+  SuccessAlert,
   FilterCard,
   ProtectedRoute,
   StatusBadge,
   TabBar,
 } from "@/components";
+import { TableSkeleton } from "@/components/common/feedback/SkeletonLoader";
 import { ConectaPlusBadge } from "@/components/ui/data-display/StatusBadge";
+import { filterOptions } from "@/lib/filter-options";
 
 const clientsSearchSchema = z.object({
   name: z.string().optional(),
@@ -217,7 +225,7 @@ function ClientsPage() {
       sortable: true,
       render: (client: any) => (
         <span className="text-sm text-gray-600">
-          {new Date(client.createdAt).toLocaleDateString("pt-BR")}
+          {formatDateShort(client.createdAt)}
         </span>
       ),
     },

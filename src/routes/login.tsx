@@ -10,9 +10,9 @@ import { loginSchema, type LoginFormData } from "../lib/schemas";
 import {
   AuthTemplate,
   DynamicForm,
-  ErrorAlert,
   GoogleLoginButton,
 } from "@/components";
+import { handleStandardizedError } from "@/utils/error-handler";
 
 export const Route = createFileRoute("/login")({
   component: LoginPage,
@@ -39,8 +39,8 @@ function LoginPage() {
             navigate({ to: "/clients" });
           }
         },
-        onError: () => {
-          setErrorMessage(t("auth.login.loginError"));
+        onError: (error) => {
+          setErrorMessage(handleStandardizedError(error, t, "auth.login.loginError"));
         },
       });
     },
@@ -69,8 +69,8 @@ function LoginPage() {
           navigate({ to: "/clients" });
         }
       },
-      onError: () => {
-        setErrorMessage(t("auth.login.invalidCredentials"));
+      onError: (error) => {
+        setErrorMessage(handleStandardizedError(error, t, "auth.login.invalidCredentials"));
       },
     });
   };
@@ -103,8 +103,6 @@ function LoginPage() {
   return (
     <AuthTemplate subtitle={t("auth.login.subtitle")}>
       <div className="space-y-6">
-        {errorMessage && <ErrorAlert message={errorMessage} />}
-
         <DynamicForm
           fields={loginFields}
           schema={loginSchema}
@@ -112,6 +110,7 @@ function LoginPage() {
           submitLabel={t("auth.login.loginButton")}
           isLoading={loginMutation.isPending}
           fullWidthSubmit={true}
+          errorMessage={errorMessage}
         />
 
         <div className="relative">

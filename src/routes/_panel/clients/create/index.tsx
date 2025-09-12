@@ -4,6 +4,7 @@ import { useCreateClient } from "@/services/clients.service";
 import { useClientForm } from "@/hooks/useClientForm";
 import { useAuthRedirect } from "@/hooks/useAuthRedirect";
 import { useErrorHandler } from "@/hooks/useErrorHandler";
+import { handleStandardizedError } from "@/utils/error-handler";
 import {
   createClientSchema,
   type CreateClientFormData,
@@ -63,20 +64,8 @@ function CreateClientPage() {
       await createClientMutation.mutateAsync(clientData);
       navigate({ to: "/clients" });
     } catch (error: any) {
-      const emailInUseMessages = [
-        "Este email já está em uso",
-        "email já está em uso",
-      ];
-
-      const isEmailInUse = emailInUseMessages.some((msg) =>
-        error.response?.data?.message?.includes(msg)
-      );
-
-      if (isEmailInUse) {
-        handleError(error, t("auth.register.emailInUse"));
-      } else {
-        handleError(error, t("clients.createError"));
-      }
+      const errorMessage = handleStandardizedError(error, t);
+      handleError(error, errorMessage);
     }
   };
 

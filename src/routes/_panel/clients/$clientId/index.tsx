@@ -2,19 +2,29 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Trash2 } from "lucide-react";
-import { useClient, useUpdateClient, useDeleteClient } from "@/services/clients.service";
-import { TabBar } from "@/components/ui/TabBar";
-import { DynamicForm } from "@/components/ui/DynamicForm";
-import { PageHeader } from "@/components/ui/PageHeader";
-import { ActionButton } from "@/components/ui/ActionButton";
-import { ErrorAlert } from "@/components/ui/ErrorAlert";
-import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
-import { FormSection } from "@/components/ui/FormSection";
-import { ConfirmModal } from "@/components/ui/ConfirmModal";
+import {
+  useClient,
+  useUpdateClient,
+  useDeleteClient,
+} from "@/services/clients.service";
+
 import { useClientForm } from "@/hooks/useClientForm";
 import { useAuthRedirect } from "@/hooks/useAuthRedirect";
 import { useErrorHandler } from "@/hooks/useErrorHandler";
-import { updateClientSchema, type UpdateClientFormData } from "@/lib/client-schemas";
+import {
+  updateClientSchema,
+  type UpdateClientFormData,
+} from "@/lib/client-schemas";
+import {
+  ActionButton,
+  ConfirmModal,
+  DynamicForm,
+  ErrorAlert,
+  FormSection,
+  LoadingSpinner,
+  PageHeader,
+  TabBar,
+} from "@/components";
 
 export const Route = createFileRoute("/_panel/clients/$clientId/")({
   component: ClientEditPage,
@@ -26,7 +36,7 @@ function ClientEditPage() {
   const { clientId } = Route.useParams();
   const { getFieldsWithHandlers, getDefaultValuesWithCep } = useClientForm();
   const { errorMessage, handleError, clearError } = useErrorHandler();
-  
+
   const clientQuery = useClient(clientId);
   const updateClientMutation = useUpdateClient();
   const deleteClientMutation = useDeleteClient();
@@ -34,30 +44,31 @@ function ClientEditPage() {
 
   useAuthRedirect({ requireRole: "admin" });
 
-  const baseValues = clientQuery.data ? {
-    name: clientQuery.data.name || "",
-    email: clientQuery.data.email || "",
-    role: clientQuery.data.role || "user",
-    tradeName: clientQuery.data.tradeName || "",
-    taxId: clientQuery.data.taxId || "",
-    companyName: clientQuery.data.companyName || "",
-    zipCode: clientQuery.data.zipCode || "",
-    street: clientQuery.data.street || "",
-    number: clientQuery.data.number || "",
-    district: clientQuery.data.district || "",
-    city: clientQuery.data.city || "",
-    state: clientQuery.data.state || "",
-    complement: clientQuery.data.complement || "",
-    status: clientQuery.data.status || "Active",
-    conectaPlus: clientQuery.data.conectaPlus ? "Yes" : "No",
-  } : {};
-  
-  const defaultValues = getDefaultValuesWithCep(baseValues);
+  const baseValues = clientQuery.data
+    ? {
+        name: clientQuery.data.name || "",
+        email: clientQuery.data.email || "",
+        role: clientQuery.data.role || "user",
+        tradeName: clientQuery.data.tradeName || "",
+        taxId: clientQuery.data.taxId || "",
+        companyName: clientQuery.data.companyName || "",
+        zipCode: clientQuery.data.zipCode || "",
+        street: clientQuery.data.street || "",
+        number: clientQuery.data.number || "",
+        district: clientQuery.data.district || "",
+        city: clientQuery.data.city || "",
+        state: clientQuery.data.state || "",
+        complement: clientQuery.data.complement || "",
+        status: clientQuery.data.status || "Active",
+        conectaPlus: clientQuery.data.conectaPlus ? "Yes" : "No",
+      }
+    : {};
 
+  const defaultValues = getDefaultValuesWithCep(baseValues);
 
   const handleUpdateClient = async (data: UpdateClientFormData) => {
     clearError();
-    
+
     try {
       const updateData = {
         name: data.name,
@@ -76,7 +87,10 @@ function ClientEditPage() {
         status: data.status || "Active",
         conectaPlus: data.conectaPlus === "Yes",
       };
-      await updateClientMutation.mutateAsync({ id: clientId, data: updateData });
+      await updateClientMutation.mutateAsync({
+        id: clientId,
+        data: updateData,
+      });
       navigate({ to: "/clients" });
     } catch (error: any) {
       handleError(error, t("clients.updateError"));
@@ -115,9 +129,7 @@ function ClientEditPage() {
           <h2 className="text-lg font-semibold text-red-800 mb-2">
             {t("clients.notFound")}
           </h2>
-          <p className="text-red-600">
-            {t("clients.notFoundMessage")}
-          </p>
+          <p className="text-red-600">{t("clients.notFoundMessage")}</p>
           <button
             onClick={() => navigate({ to: "/clients" })}
             className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 cursor-pointer"
@@ -162,15 +174,19 @@ function ClientEditPage() {
               className="focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 flex items-center gap-2"
             >
               <Trash2 className="h-4 w-4" aria-hidden="true" />
-              <span className="sr-only">{t("clients.deleteClient", { name: clientQuery.data?.name || '' })}</span>
-              {deleteClientMutation.isPending ? t("clients.deleting") : t("clients.delete")}
+              <span className="sr-only">
+                {t("clients.deleteClient", {
+                  name: clientQuery.data?.name || "",
+                })}
+              </span>
+              {deleteClientMutation.isPending
+                ? t("clients.deleting")
+                : t("clients.delete")}
             </ActionButton>
           }
         />
 
-        {errorMessage && (
-          <ErrorAlert message={errorMessage} className="mb-6" />
-        )}
+        {errorMessage && <ErrorAlert message={errorMessage} className="mb-6" />}
 
         <FormSection title={t("clients.editForm")}>
           <DynamicForm
@@ -178,7 +194,11 @@ function ClientEditPage() {
             schema={updateClientSchema}
             onSubmit={handleUpdateClient}
             defaultValues={defaultValues}
-            submitLabel={updateClientMutation.isPending ? t("clients.saving") : t("clients.saveChanges")}
+            submitLabel={
+              updateClientMutation.isPending
+                ? t("clients.saving")
+                : t("clients.saveChanges")
+            }
             isLoading={updateClientMutation.isPending}
           />
         </FormSection>
@@ -189,7 +209,9 @@ function ClientEditPage() {
         onClose={closeDeleteModal}
         onConfirm={confirmDeleteClient}
         title={t("clients.delete")}
-        message={t("clients.deleteConfirmName", { name: clientQuery.data?.name || "este cliente" })}
+        message={t("clients.deleteConfirmName", {
+          name: clientQuery.data?.name || "este cliente",
+        })}
         confirmText={t("common.delete")}
         cancelText={t("common.cancel")}
         variant="danger"

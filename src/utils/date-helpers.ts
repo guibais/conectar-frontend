@@ -1,6 +1,36 @@
-export const formatDate = (dateString: string | null) => {
+export const formatDate = (
+  dateString: string | null,
+  locale: string = "pt-BR",
+  options?: Intl.DateTimeFormatOptions
+) => {
   if (!dateString) return "Nunca";
-  return new Date(dateString).toLocaleDateString("pt-BR", {
+  
+  const defaultOptions: Intl.DateTimeFormatOptions = {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  };
+  
+  return new Date(dateString).toLocaleDateString(locale, options || defaultOptions);
+};
+
+export const formatDateLocalized = (
+  dateString: string | Date | null | undefined,
+  language: string = "pt-BR"
+) => {
+  if (!dateString) return "N/A";
+  
+  const locale = language === "en" ? "en-US" : "pt-BR";
+  return new Date(dateString).toLocaleDateString(locale);
+};
+
+export const formatDateShort = (
+  dateString: string | Date | null,
+  locale: string = "pt-BR"
+) => {
+  if (!dateString) return "N/A";
+  
+  return new Date(dateString).toLocaleDateString(locale, {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
