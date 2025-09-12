@@ -29,27 +29,36 @@ export function Layout({ children }: LayoutProps) {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-[#00B894] text-white hidden md:block">
+      <header 
+        className="bg-[#00B894] text-white hidden md:block"
+        role="banner"
+      >
         <div className="max-w-full">
           <div className="flex items-center h-16">
             <div className="flex items-center">
               <Link
                 to={user?.role === "admin" ? "/clients" : "/profile"}
-                className="px-6 py-4  h-16 flex items-center cursor-pointer"
+                className="px-6 py-4  h-16 flex items-center cursor-pointer focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-[#00B894]"
+                aria-label={`Ir para ${user?.role === "admin" ? "clientes" : "perfil"}`}
               >
-                <img src="/logo-white.png" alt="Conéctar" className="h-8" />
+                <img src="/logo-white.png" alt="Logotipo Conéctar - Ir para página inicial" className="h-8" />
               </Link>
 
               {user?.role === "admin" && (
-                <nav className="flex h-16 mb-1">
+                <nav 
+                  className="flex h-16 mb-1"
+                  role="navigation"
+                  aria-label="Navegação principal"
+                >
                   {navigationItems
                     .filter(item => !item.adminOnly || user?.role === "admin")
                     .map((item) => (
                       <Link
                         key={item.to}
                         to={item.to}
-                        className="px-6 py-4 text-base font-medium bg-[#00B894] hover:bg-[#00A085] transition-colors h-16 flex items-center cursor-pointer border-b-2 border-transparent"
+                        className="px-6 py-4 text-base font-medium bg-[#00B894] hover:bg-[#00A085] transition-colors h-16 flex items-center cursor-pointer border-b-2 border-transparent focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-[#00B894]"
                         activeProps={{ className: "bg-[#00A085] border-b-white" }}
+                        aria-current="page"
                       >
                         {item.label}
                       </Link>
@@ -61,14 +70,19 @@ export function Layout({ children }: LayoutProps) {
             <div className="flex items-center ml-auto mr-6 space-x-3">
               {user?.role === "admin" && (
                 <>
-                  <button className="p-2 hover:bg-white/10 rounded-full transition-colors cursor-pointer">
-                    <HelpCircle size={20} />
+                  <button 
+                    className="p-2 hover:bg-white/10 rounded-full transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-[#00B894]"
+                    aria-label="Ajuda"
+                    type="button"
+                  >
+                    <HelpCircle size={20} aria-hidden="true" />
                   </button>
                   <Link
                     to="/notifications"
-                    className="p-2 hover:bg-white/10 rounded-full transition-colors cursor-pointer"
+                    className="p-2 hover:bg-white/10 rounded-full transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-[#00B894]"
+                    aria-label="Notificações"
                   >
-                    <Bell size={20} />
+                    <Bell size={20} aria-hidden="true" />
                   </Link>
                 </>
               )}
@@ -78,18 +92,29 @@ export function Layout({ children }: LayoutProps) {
         </div>
       </header>
 
-      <header className="bg-[#00B894] text-white md:hidden">
+      <header 
+        className="bg-[#00B894] text-white md:hidden"
+        role="banner"
+      >
         <div className="flex items-center justify-center h-16">
           <Link
             to={user?.role === "admin" ? "/clients" : "/profile"}
-            className="cursor-pointer"
+            className="cursor-pointer focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-[#00B894] rounded"
+            aria-label={`Ir para ${user?.role === "admin" ? "clientes" : "perfil"}`}
           >
-            <img src="/logo-white.png" alt="Conéctar" className="h-8" />
+            <img src="/logo-white.png" alt="Logotipo Conéctar - Ir para página inicial" className="h-8" />
           </Link>
         </div>
       </header>
 
-      <main className="pb-20 md:pb-0">{children}</main>
+      <main 
+        className="pb-20 md:pb-0"
+        role="main"
+        id="main-content"
+        tabIndex={-1}
+      >
+        {children}
+      </main>
 
       <MobileBottomNav />
     </div>

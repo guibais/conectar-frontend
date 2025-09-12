@@ -11,15 +11,37 @@ type FormFieldProps = {
 
 export const FormField = forwardRef<HTMLDivElement, FormFieldProps>(
   ({ label, error, required, children, className = '' }, ref) => {
+    const fieldId = `field-${Math.random().toString(36).substr(2, 9)}`;
+    const errorId = error ? `${fieldId}-error` : undefined;
+
     return (
       <div ref={ref} className={className}>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label 
+          htmlFor={fieldId}
+          className="block text-sm font-medium text-gray-700 mb-2"
+        >
           {label}
-          {required && <span className="text-red-500 ml-1">*</span>}
+          {required && (
+            <span 
+              className="text-red-500 ml-1"
+              aria-label="campo obrigatório"
+            >
+              *
+            </span>
+          )}
         </label>
-        {children}
+        <div id={fieldId}>
+          {children}
+        </div>
         {error && (
-          <p className="mt-1 text-sm text-red-600">{error.message}</p>
+          <p 
+            id={errorId}
+            className="mt-1 text-sm text-red-600"
+            role="alert"
+            aria-live="polite"
+          >
+            {error.message}
+          </p>
         )}
       </div>
     );

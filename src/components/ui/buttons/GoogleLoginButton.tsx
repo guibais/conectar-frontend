@@ -23,6 +23,8 @@ export function GoogleLoginButton({
         theme="outline"
         size={size}
         logo_alignment="center"
+        useOneTap={false}
+        auto_select={false}
       />
     </div>
   );

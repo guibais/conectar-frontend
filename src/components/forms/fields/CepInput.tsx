@@ -80,26 +80,38 @@ export const CepInput = ({
     return "";
   };
 
+  const inputId = `cep-input-${Math.random().toString(36).substr(2, 9)}`;
+  const errorId = error ? `${inputId}-error` : undefined;
+  const statusId = `${inputId}-status`;
+
   return (
     <div className="space-y-2">
       <div className="relative">
         <input
+          id={inputId}
           type="text"
           value={inputValue}
           onChange={handleInputChange}
           placeholder="00000-000"
           maxLength={9}
-          className={`w-full px-3 py-2 pr-10 border rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-transparent ${
+          className={`w-full px-3 py-2 pr-10 border rounded-lg focus:ring-2 focus:ring-conectar-primary focus:border-transparent focus:outline-none ${
             error ? "border-error" : "border-gray-200"
           } ${className}`}
+          aria-invalid={error ? "true" : "false"}
+          aria-describedby={`${errorId} ${statusId}`.trim()}
+          aria-label="CEP - Código de Endereçamento Postal"
         />
-        <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+        <div 
+          className="absolute inset-y-0 right-0 flex items-center pr-3"
+          aria-hidden="true"
+        >
           {getStatusIcon()}
         </div>
       </div>
 
       {(isLoading || cepError || (isSuccess && cepData)) && (
         <div
+          id={statusId}
           className={`text-sm flex items-center gap-1 ${
             cepError
               ? "text-error"
@@ -107,12 +119,23 @@ export const CepInput = ({
                 ? "text-success"
                 : "text-gray-500"
           }`}
+          aria-live="polite"
+          role="status"
         >
           {getStatusMessage()}
         </div>
       )}
 
-      {error && <p className="text-sm text-error">{error}</p>}
+      {error && (
+        <p 
+          id={errorId}
+          className="text-sm text-error"
+          role="alert"
+          aria-live="polite"
+        >
+          {error}
+        </p>
+      )}
 
       {isSuccess && cepData?.location?.coordinates && (
         <div className="text-xs text-gray-500 flex items-center gap-1">

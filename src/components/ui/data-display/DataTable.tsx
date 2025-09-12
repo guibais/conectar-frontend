@@ -67,18 +67,35 @@ export function DataTable<T extends Record<string, any>>({
   return (
     <div>
       <div className="overflow-x-auto">
-        <table className="w-full">
+        <table 
+          className="w-full"
+          role="table"
+          aria-label="Tabela de dados"
+        >
           <thead>
             <tr className="border-b border-gray-100">
               {columns.map((column) => (
-                <th key={column.key} className={`px-6 py-4 text-left ${column.className || ''}`}>
+                <th 
+                  key={column.key} 
+                  className={`px-6 py-4 text-left ${column.className || ''}`}
+                  scope="col"
+                >
                   {column.sortable && onSort ? (
                     <button
                       onClick={() => onSort(column.key)}
-                      className="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:scale-105 transition-all duration-150 cursor-pointer transform active:scale-95"
+                      className="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:scale-105 transition-all duration-150 cursor-pointer transform active:scale-95 focus:outline-none focus:ring-2 focus:ring-conectar-primary focus:ring-offset-2 rounded"
+                      aria-label={`Ordenar por ${column.header}`}
+                      aria-sort={
+                        sortBy === column.key 
+                          ? sortOrder === 'asc' ? 'ascending' : 'descending'
+                          : 'none'
+                      }
+                      type="button"
                     >
                       {column.header}
-                      {getSortIcon(column.key)}
+                      <span aria-hidden="true">
+                        {getSortIcon(column.key)}
+                      </span>
                     </button>
                   ) : (
                     <span className="text-sm font-medium text-gray-600">
@@ -88,7 +105,10 @@ export function DataTable<T extends Record<string, any>>({
                 </th>
               ))}
               {actions && (
-                <th className="px-6 py-4 text-right text-sm font-medium text-gray-600">
+                <th 
+                  className="px-6 py-4 text-right text-sm font-medium text-gray-600"
+                  scope="col"
+                >
                   {t('common.actions')}
                 </th>
               )}
@@ -108,12 +128,19 @@ export function DataTable<T extends Record<string, any>>({
               data.map((item, index) => (
                 <tr key={item.id || index} className="hover:bg-gray-25 transition-colors">
                   {columns.map((column) => (
-                    <td key={column.key} className="px-6 py-4">
+                    <td 
+                      key={column.key} 
+                      className="px-6 py-4"
+                      role="cell"
+                    >
                       {column.render ? column.render(item) : item[column.key]}
                     </td>
                   ))}
                   {actions && (
-                    <td className="px-6 py-4 text-right">
+                    <td 
+                      className="px-6 py-4 text-right"
+                      role="cell"
+                    >
                       <div className="flex items-center justify-end gap-1">
                         {actions(item)}
                       </div>

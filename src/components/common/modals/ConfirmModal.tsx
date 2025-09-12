@@ -1,4 +1,4 @@
-import { type ReactNode } from "react";
+import { type ReactNode, useEffect, useRef } from "react";
 import { X } from "lucide-react";
 import { Button } from "@/components";
 
@@ -27,10 +27,37 @@ export function ConfirmModal({
   isLoading = false,
   children,
 }: ConfirmModalProps) {
+  const modalRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleEscapeKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && !isLoading) {
+        onClose();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener("keydown", handleEscapeKey);
+      document.body.style.overflow = "hidden";
+      
+      // Focus trap
+      const focusableElements = modalRef.current?.querySelectorAll(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      );
+      const firstElement = focusableElements?.[0] as HTMLElement;
+      firstElement?.focus();
+    }
+
+    return () => {
+      document.removeEventListener("keydown", handleEscapeKey);
+      document.body.style.overflow = "unset";
+    };
+  }, [isOpen, isLoading, onClose]);
+
   if (!isOpen) return null;
 
   const handleBackdropClick = (e: React.MouseEvent) => {
-    if (e.target === e.currentTarget) {
+    if (e.target === e.currentTarget && !isLoading) {
       onClose();
     }
   };
@@ -61,26 +88,44 @@ export function ConfirmModal({
     <div
       className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
       onClick={handleBackdropClick}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-title"
+      aria-describedby="modal-description"
     >
-      <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 transform transition-all">
+      <div 
+        ref={modalRef}
+        className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 transform transition-all"
+        role="document"
+      >
         <div className="flex items-center justify-between p-6 border-b">
           <div className="flex items-center gap-3">
-            <span className="text-2xl">{styles.icon}</span>
-            <h3 className={`text-lg font-semibold ${styles.titleColor}`}>
+            <span className="text-2xl" aria-hidden="true">{styles.icon}</span>
+            <h3 
+              id="modal-title"
+              className={`text-lg font-semibold ${styles.titleColor}`}
+            >
               {title}
             </h3>
           </div>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            className="text-gray-400 hover:text-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-300 rounded"
             disabled={isLoading}
+            aria-label="Fechar modal"
+            type="button"
           >
-            <X size={20} />
+            <X size={20} aria-hidden="true" />
           </button>
         </div>
 
         <div className="p-6">
-          <p className="text-gray-600 mb-4">{message}</p>
+          <p 
+            id="modal-description"
+            className="text-gray-600 mb-4"
+          >
+            {message}
+          </p>
           {children}
         </div>
 
