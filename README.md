@@ -2,6 +2,20 @@
 
 A modern client management system built with React, TypeScript, and cutting-edge frontend technologies.
 
+## 🌐 Live URLs
+
+- **Frontend Application**: [https://conectar-test.pages.dev](https://conectar-test.pages.dev)
+- **Backend Repository**: [https://github.com/guibais/conectar-backend](https://github.com/guibais/conectar-backend)
+
+## 🔐 Admin Access
+
+For testing and demonstration purposes, use the following admin credentials:
+
+- **Email**: `admin@conectar.com`
+- **Password**: `123456`
+
+> ⚠️ **Note**: These are demo credentials for testing purposes only.
+
 ## 🚀 Quick Start
 
 ```bash
