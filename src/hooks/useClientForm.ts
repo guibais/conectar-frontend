@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useCepQuery } from "@/services/cep.service";
 import { maskCEP, maskCNPJ, removeMask } from "@/utils/masks";
-import type { FormFieldConfig } from "@/components/ui/DynamicForm";
+import type { FormFieldConfig } from "@/components/forms/components/DynamicForm";
 import { clientFormFields } from "@/lib/form-fields";
 
 export function useClientForm() {
