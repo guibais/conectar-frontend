@@ -9,18 +9,11 @@ import { z } from "zod";
 import { Plus, Edit, Trash2 } from "lucide-react";
 import { useClients, useDeleteClient } from "@/services/clients.service";
 import { useAuthStore } from "@/stores/auth-store";
-import { useErrorHandler } from "@/hooks/useErrorHandler";
 import { formatDateShort } from "@/utils/date-helpers";
 import { maskCNPJ } from "@/utils/masks";
 import {
-  PageTemplate,
   DataTable,
-  Button,
-  Input,
-  Select,
   ConfirmModal,
-  ErrorAlert,
-  SuccessAlert,
   FilterCard,
   ProtectedRoute,
   StatusBadge,
@@ -257,7 +250,14 @@ function ClientsPage() {
           itemCount={clientsQuery.data?.clients?.length || 0}
           onClear={handleClearFilters}
           onApply={handleApplyFilters}
-          hasActiveFilters={!!(search.name || search.taxId || search.status || search.conectaPlus)}
+          hasActiveFilters={
+            !!(
+              search.name ||
+              search.taxId ||
+              search.status ||
+              search.conectaPlus
+            )
+          }
         >
           <div>
             <label
