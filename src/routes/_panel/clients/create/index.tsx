@@ -1,16 +1,21 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { TabBar } from "@/components/ui/TabBar";
-import { DynamicForm } from "@/components/ui/DynamicForm";
-import { PageHeader } from "@/components/ui/PageHeader";
-import { ActionButton } from "@/components/ui/ActionButton";
-import { ErrorAlert } from "@/components/ui/ErrorAlert";
-import { FormSection } from "@/components/ui/FormSection";
 import { useCreateClient } from "@/services/clients.service";
 import { useClientForm } from "@/hooks/useClientForm";
 import { useAuthRedirect } from "@/hooks/useAuthRedirect";
 import { useErrorHandler } from "@/hooks/useErrorHandler";
-import { createClientSchema, type CreateClientFormData } from "@/lib/client-schemas";
+import {
+  createClientSchema,
+  type CreateClientFormData,
+} from "@/lib/client-schemas";
+import {
+  ActionButton,
+  DynamicForm,
+  ErrorAlert,
+  FormSection,
+  PageHeader,
+  TabBar,
+} from "@/components";
 
 export const Route = createFileRoute("/_panel/clients/create/")({
   component: CreateClientPage,
@@ -22,7 +27,7 @@ function CreateClientPage() {
   const createClientMutation = useCreateClient();
   const { getFieldsWithHandlers, getDefaultValuesWithCep } = useClientForm();
   const { errorMessage, handleError, clearError } = useErrorHandler();
-  
+
   useAuthRedirect({ requireRole: "admin" });
 
   const baseValues = {
@@ -30,13 +35,12 @@ function CreateClientPage() {
     status: "Active",
     conectaPlus: "false",
   };
-  
-  const defaultValues = getDefaultValuesWithCep(baseValues);
 
+  const defaultValues = getDefaultValuesWithCep(baseValues);
 
   const handleCreateClient = async (data: CreateClientFormData) => {
     clearError();
-    
+
     try {
       const clientData = {
         name: data.name,
@@ -61,13 +65,13 @@ function CreateClientPage() {
     } catch (error: any) {
       const emailInUseMessages = [
         "Este email já está em uso",
-        "email já está em uso"
+        "email já está em uso",
       ];
-      
-      const isEmailInUse = emailInUseMessages.some(msg => 
+
+      const isEmailInUse = emailInUseMessages.some((msg) =>
         error.response?.data?.message?.includes(msg)
       );
-      
+
       if (isEmailInUse) {
         handleError(error, t("auth.register.emailInUse"));
       } else {
@@ -84,7 +88,7 @@ function CreateClientPage() {
           title={t("clients.create")}
           description={t("clients.createDescription")}
           actions={
-            <ActionButton 
+            <ActionButton
               onClick={() => navigate({ to: "/clients" })}
               className="focus:outline-none focus:ring-2 focus:ring-conectar-primary focus:ring-offset-2"
             >
@@ -93,9 +97,7 @@ function CreateClientPage() {
           }
         />
 
-        {errorMessage && (
-          <ErrorAlert message={errorMessage} className="mb-6" />
-        )}
+        {errorMessage && <ErrorAlert message={errorMessage} className="mb-6" />}
 
         <FormSection title={t("clients.createForm")}>
           <DynamicForm

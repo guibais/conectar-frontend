@@ -1,4 +1,4 @@
-import { type FormFieldConfig } from "@/components/ui/DynamicForm";
+import { type FormFieldConfig } from "@/components";
 
 export const commonFields = {
   name: {

@@ -1,19 +1,22 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Button } from "@/components/ui/Button";
-import { PageTemplate } from "@/components/ui/PageTemplate";
-import { DynamicForm } from "@/components/ui/DynamicForm";
-import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
-import { ErrorAlert } from "@/components/ui/ErrorAlert";
-import { SuccessAlert } from "@/components/ui/SuccessAlert";
-import { LanguageSelector } from "@/components/ui/LanguageSelector";
+
 import { useErrorHandler } from "@/hooks/useErrorHandler";
 import type { UserProfileFormData } from "@/lib/schemas";
 import { userProfileSchema } from "@/lib/schemas";
 import { useUserProfile, useUpdateUserProfile } from "@/services/users.service";
 import { useAuthStore } from "@/stores/auth-store";
 import { authFormFields } from "@/lib/form-fields";
+import {
+  Button,
+  DynamicForm,
+  ErrorAlert,
+  LanguageSelector,
+  LoadingSpinner,
+  PageTemplate,
+  SuccessAlert,
+} from "@/components";
 
 const createProfileFields = (t: any) => [
   {

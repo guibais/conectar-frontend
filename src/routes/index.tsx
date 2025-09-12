@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { useAuthStore } from "../stores/auth-store";
-import { LoadingSpinner } from "../components/ui/LoadingSpinner";
+import { LoadingSpinner } from "@/components";
 
 export const Route = createFileRoute("/")({
   component: HomePage,

@@ -1,5 +1,4 @@
-import { Layout } from "@/components/Layout";
-import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { Layout, ProtectedRoute } from "@/components";
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_panel")({

@@ -5,11 +5,14 @@ import { useGoogleOneTapLogin } from "@react-oauth/google";
 import { useGoogleLogin as useGoogleLoginMutation } from "../services/google-auth.service";
 import { useLogin } from "../services/auth.service";
 import { useAuthStore } from "../stores/auth-store";
-import { AuthTemplate } from "../components/ui/AuthTemplate";
-import { GoogleLoginButton } from "../components/ui/GoogleLoginButton";
-import { DynamicForm } from "../components/ui/DynamicForm";
-import { ErrorAlert } from "../components/ui/ErrorAlert";
+
 import { loginSchema, type LoginFormData } from "../lib/schemas";
+import {
+  AuthTemplate,
+  DynamicForm,
+  ErrorAlert,
+  GoogleLoginButton,
+} from "@/components";
 
 export const Route = createFileRoute("/login")({
   component: LoginPage,
@@ -56,7 +59,7 @@ function LoginPage() {
 
   const handleLogin = async (data: LoginFormData) => {
     setErrorMessage("");
-    
+
     loginMutation.mutate(data, {
       onSuccess: (response) => {
         setUserAndToken(response.user, response.access_token);
@@ -100,9 +103,7 @@ function LoginPage() {
   return (
     <AuthTemplate subtitle={t("auth.login.subtitle")}>
       <div className="space-y-6">
-        {errorMessage && (
-          <ErrorAlert message={errorMessage} />
-        )}
+        {errorMessage && <ErrorAlert message={errorMessage} />}
 
         <DynamicForm
           fields={loginFields}

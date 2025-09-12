@@ -9,15 +9,18 @@ import { z } from "zod";
 import { Plus, Edit, Trash2 } from "lucide-react";
 import { useAuthStore } from "@/stores/auth-store";
 import { useClients, useDeleteClient } from "@/services/clients.service";
-import { DataTable } from "@/components/ui/DataTable";
-import { StatusBadge, ConectaPlusBadge } from "@/components/ui/StatusBadge";
-import { FilterCard } from "@/components/ui/FilterCard";
-import { TabBar } from "@/components/ui/TabBar";
-import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { maskCNPJ } from "@/utils/masks";
-import { TableSkeleton } from "@/components/ui/SkeletonLoader";
-import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { filterOptions } from "@/lib/filter-options";
+import { TableSkeleton } from "@/components/common/feedback/SkeletonLoader";
+import {
+  ConfirmModal,
+  DataTable,
+  FilterCard,
+  ProtectedRoute,
+  StatusBadge,
+  TabBar,
+} from "@/components";
+import { ConectaPlusBadge } from "@/components/ui/data-display/StatusBadge";
 
 const clientsSearchSchema = z.object({
   name: z.string().optional(),
@@ -403,7 +406,9 @@ function ClientsPage() {
         onClose={closeDeleteModal}
         onConfirm={confirmDeleteClient}
         title={t("clients.delete")}
-        message={t("clients.deleteConfirmName", { name: deleteModal.clientName })}
+        message={t("clients.deleteConfirmName", {
+          name: deleteModal.clientName,
+        })}
         confirmText={t("common.delete")}
         cancelText={t("common.cancel")}
         variant="danger"

@@ -1,11 +1,10 @@
-import { DataTable } from "@/components/ui/DataTable";
-import { RoleBadge } from "@/components/ui/StatusBadge";
-import { PageTemplate } from "@/components/ui/PageTemplate";
 import { useInactiveClients } from "@/services/notifications.service";
 import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { Clock, User, Mail, Calendar } from "lucide-react";
 import { formatDate, getDaysInactive } from "@/utils/date-helpers";
+import { DataTable, PageTemplate } from "@/components";
+import { RoleBadge } from "@/components/ui/data-display/StatusBadge";
 
 export const Route = createFileRoute("/_panel/notifications/")({
   component: NotificationsPage,
@@ -14,7 +13,6 @@ export const Route = createFileRoute("/_panel/notifications/")({
 function NotificationsPage() {
   const { t } = useTranslation();
   const inactiveClientsQuery = useInactiveClients();
-
 
   return (
     <PageTemplate
@@ -31,7 +29,10 @@ function NotificationsPage() {
             </h2>
             {inactiveClientsQuery.data && (
               <span className="ml-2 px-2 py-1 bg-orange-100 text-orange-800 text-sm font-medium rounded-full">
-                {inactiveClientsQuery.data.length} {t("notifications.users", { count: inactiveClientsQuery.data.length })}
+                {inactiveClientsQuery.data.length}{" "}
+                {t("notifications.users", {
+                  count: inactiveClientsQuery.data.length,
+                })}
               </span>
             )}
           </div>
