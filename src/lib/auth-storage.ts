@@ -1,36 +1,32 @@
-import Cookies from 'js-cookie';
+import secureLocalStorage from 'react-secure-storage';
 
 const TOKEN_KEY = 'conectar_token';
 const USER_KEY = 'conectar_user';
 
 export const authStorage = {
   setToken: (token: string) => {
-    Cookies.set(TOKEN_KEY, token, { 
-      expires: 1, 
-      secure: true, 
-      sameSite: 'strict' 
-    });
+    secureLocalStorage.setItem(TOKEN_KEY, token);
   },
 
   getToken: (): string | null => {
-    return Cookies.get(TOKEN_KEY) || null;
+    const token = secureLocalStorage.getItem(TOKEN_KEY);
+    return typeof token === 'string' ? token : null;
   },
 
   removeToken: () => {
-    Cookies.remove(TOKEN_KEY);
+    secureLocalStorage.removeItem(TOKEN_KEY);
   },
 
   setUser: (user: any) => {
-    localStorage.setItem(USER_KEY, JSON.stringify(user));
+    secureLocalStorage.setItem(USER_KEY, user);
   },
 
   getUser: () => {
-    const user = localStorage.getItem(USER_KEY);
-    return user ? JSON.parse(user) : null;
+    return secureLocalStorage.getItem(USER_KEY);
   },
 
   removeUser: () => {
-    localStorage.removeItem(USER_KEY);
+    secureLocalStorage.removeItem(USER_KEY);
   },
 
   clear: () => {

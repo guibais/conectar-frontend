@@ -1,18 +1,18 @@
 /// <reference types="vitest" />
-import { defineConfig } from "vite";
-import viteReact from "@vitejs/plugin-react";
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
 import tailwindcss from "@tailwindcss/vite";
-
 import tanstackRouter from "@tanstack/router-plugin/vite";
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  // @ts-ignore
   plugins: [
     tanstackRouter({
       target: "react",
       autoCodeSplitting: true,
     }),
-    viteReact(),
+    react(),
     tailwindcss(),
   ],
   server: {
@@ -20,12 +20,13 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      "@": "./src",
+      "@": new URL('./src', import.meta.url).pathname,
     },
   },
+  // @ts-ignore
   test: {
     globals: true,
-    environment: "jsdom",
-    setupFiles: ["./src/test/setup.ts"],
+    environment: 'jsdom',
+    setupFiles: ['./src/test/setup.ts'],
   },
 });
