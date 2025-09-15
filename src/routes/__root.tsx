@@ -23,7 +23,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
             name: "Tanstack Router",
             render: <TanStackRouterDevtoolsPanel />,
           },
-          TanStackQueryDevtools,
+          ...(import.meta.env.DEV ? [TanStackQueryDevtools] : []),
         ]}
       />
     </>
